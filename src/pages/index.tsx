@@ -1,9 +1,9 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
+import { useState } from "react";
 
 const Home: NextPage = () => {
-  const movie = {
+  const testmovie = {
     title: "Movie Title",
     categories: ["Action", "Drama"],
     cast: ["Actor1", "Actor2", "Actor3"],
@@ -18,7 +18,19 @@ const Home: NextPage = () => {
     showDates: [],
     showTimes: [],
   };
-  const movies = new Array(10).fill(movie);
+  const movies = new Array(10).fill(testmovie);
+  const categories = [
+    "Currently Showing",
+    "Coming Soon",
+    "Drama",
+    "Comedy",
+    "Action",
+    "Fantasy",
+    "Horror",
+    "Romance",
+    "Western",
+  ];
+
   return (
     <>
       <Head>
@@ -27,11 +39,28 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="bg-white">
+        <div className="mx-64 mt-8 grid grid-cols-12 gap-8 ">
+          <input
+            className="col-span-3 rounded border border-black"
+            placeholder="Search Movies"
+          />
+          {categories.map((category) => {
+            return (
+              <button
+                className={`rounded-full  bg-cyan-300 hover:bg-cyan-500`}
+                key={category}
+              >
+                {category}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="mx-64 mt-8 grid grid-cols-4 gap-8">
-          {movies.map(() => {
+          {movies.map((movie, index) => {
             return (
               <div
-                key={movie.title}
+                key={`${movie.title} card-${index}`}
                 className="rounded border border-black bg-zinc-200 shadow-xl hover:shadow-xl hover:shadow-blue-500/50"
               >
                 <div className="grid-rows-3">
@@ -45,6 +74,9 @@ const Home: NextPage = () => {
 
                   <div>{movie.title}</div>
                   <div>{movie.MPAAUSFilmRating}</div>
+                  <div>
+                    <button className="border border-black hover:bg-white bg-zinc-100">Book Movie</button>
+                  </div>
                 </div>
               </div>
             );

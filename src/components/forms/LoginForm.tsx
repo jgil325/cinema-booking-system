@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import * as z from "zod";
+import { z } from "zod";
 
 interface LoginFormProps {
   onSubmit: (username: string, password: string) => void;
@@ -18,7 +18,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
 
     const schema = z.object({
       username: z.string().required(),
-      password: z.string().required(),
+      password: z.string().min(8).required(),
     });
 
     const values = { username, password };

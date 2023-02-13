@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as z from "zod";
 
 interface LoginFormProps {
   onSubmit: (username: string, password: string) => void;
@@ -15,13 +16,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     setUsernameError("");
     setPasswordError("");
 
-    if (!username) {
-      setUsernameError("Username is required");
-      return;
-    }
+    const schema = z.object({
+      username: z.string().required(),
+      password: z.string().required(),
+    });
 
-    if (!password) {
-      setPasswordError("Password is required");
+    const values = { username, password };
+    const validated = schema.validate(values);
+
+    if (validated.error) {
+      validated.error.details.forEach((error) => {
+        if (error.path[0] === "username") {
+          setUsernameError(error.message);
+        } else if (error.path[0] === "password") {
+          setPasswordError(error.message);
+        }
+      });
       return;
     }
 

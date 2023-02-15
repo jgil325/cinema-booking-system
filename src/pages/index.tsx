@@ -1,7 +1,9 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
+
 import MovieCard from "../components/MovieCard";
+
 
 const Home: NextPage = () => {
   const testmovie = {
@@ -60,6 +62,7 @@ const Home: NextPage = () => {
         <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
           {movies.map((movie, index) => {
             return (
+
               <MovieCard
                 movie={movie}
                 key={`MovieCard-${index}-${movie.title}`}

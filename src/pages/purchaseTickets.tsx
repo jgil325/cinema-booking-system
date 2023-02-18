@@ -25,7 +25,7 @@ const purchaseTickets = () => {
     showTime: "18:00",
     seatsRemaining: Math.floor(Math.random() * 10),
   });
-  
+
   return (
     <>
       <Head>
@@ -108,7 +108,7 @@ const purchaseTickets = () => {
               </>
             }
             hiddenContent={
-              <div className="relative overflow-x-auto">
+              <div className="relative flex justify-center overflow-x-auto">
                 <table className="text-md text-left text-gray-500">
                   <thead className="text-md uppercase text-gray-900">
                     <tr>
@@ -172,23 +172,109 @@ const purchaseTickets = () => {
               </>
             }
             hiddenContent={
-              <div className="overflow-y-scroll">
-                <div className="mx-64 mt-8 grid grid-cols-12 gap-8 ">
-                  <input
-                    className="col-span-3 rounded border border-black"
-                    placeholder="Search Movies"
-                  />
-                </div>
-                <div className="mx-64 mt-8 grid grid-cols-3 gap-8 ">
-                  {movies.map((movie, index) => {
-                    return (
-                      <MovieCard
-                        movie={movie}
-                        key={`MovieCard-${index}-${movie.title}`}
-                      />
-                    );
-                  })}
-                </div>
+              <div className="relative flex justify-center overflow-x-auto">
+                <table className="text-md text-left text-gray-500">
+                  <tbody className="text-md uppercase text-gray-900">
+                    {Array.from(Array(10).keys()).map((row) => {
+                      return (
+                        <div
+                          key={JSON.stringify(row)}
+                          className="flex grid grid-cols-10"
+                        >
+                          {Array.from(Array(10).keys()).map((col) => {
+                            return (
+                              <div
+                                key={col}
+                                className="border border-white hover:bg-white"
+                              >
+                                <div className="relative">
+                                  <h3 className="x-5 absolute top-8 right-6 mx-3 inline-block text-2xl font-semibold tracking-tight text-black">
+                                    {row}
+                                    {col}
+                                  </h3>
+                                </div>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="100"
+                                  height="100"
+                                  viewBox="0 0 208 315"
+                                  fill="none"
+                                >
+                                  <g filter="url(#filter0_d_1_10)">
+                                    <g clip-path="url(#clip0_1_10)">
+                                      <path
+                                        d="M204 0L179 190.5H29L4 0H204Z"
+                                        fill="#D9D9D9"
+                                      />
+                                      <rect
+                                        x="29"
+                                        y="190"
+                                        width="150"
+                                        height="117"
+                                        fill="#D9D9D9"
+                                      />
+                                    </g>
+                                  </g>
+                                  <defs>
+                                    <filter
+                                      id="filter0_d_1_10"
+                                      x="0"
+                                      y="0"
+                                      width="208"
+                                      height="315"
+                                      filterUnits="userSpaceOnUse"
+                                      color-interpolation-filters="sRGB"
+                                    >
+                                      <feFlood
+                                        flood-opacity="0"
+                                        result="BackgroundImageFix"
+                                      />
+                                      <feColorMatrix
+                                        in="SourceAlpha"
+                                        type="matrix"
+                                        values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                                        result="hardAlpha"
+                                      />
+                                      <feOffset dy="4" />
+                                      <feGaussianBlur stdDeviation="2" />
+                                      <feComposite
+                                        in2="hardAlpha"
+                                        operator="out"
+                                      />
+                                      <feColorMatrix
+                                        type="matrix"
+                                        values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+                                      />
+                                      <feBlend
+                                        mode="normal"
+                                        in2="BackgroundImageFix"
+                                        result="effect1_dropShadow_1_10"
+                                      />
+                                      <feBlend
+                                        mode="normal"
+                                        in="SourceGraphic"
+                                        in2="effect1_dropShadow_1_10"
+                                        result="shape"
+                                      />
+                                    </filter>
+                                    <clipPath id="clip0_1_10">
+                                      <rect
+                                        x="4"
+                                        width="200"
+                                        height="307"
+                                        fill="white"
+                                      />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             }
           />
@@ -218,23 +304,42 @@ const purchaseTickets = () => {
               </>
             }
             hiddenContent={
-              <div className="overflow-y-scroll">
-                <div className="mx-64 mt-8 grid grid-cols-12 gap-8 ">
-                  <input
-                    className="col-span-3 rounded border border-black"
-                    placeholder="Search Movies"
-                  />
-                </div>
-                <div className="mx-64 mt-8 grid grid-cols-3 gap-8 ">
-                  {movies.map((movie, index) => {
-                    return (
-                      <MovieCard
-                        movie={movie}
-                        key={`MovieCard-${index}-${movie.title}`}
-                      />
-                    );
-                  })}
-                </div>
+              <div className="relative flex justify-center overflow-x-auto">
+                <table className="text-md text-left text-gray-500">
+                  <thead className="text-md uppercase text-gray-900">
+                    <tr>
+                      <th scope="col" className="px-6 py-3">
+                        Seat Number
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        Ticket Type
+                      </th>
+                      <th scope="col" className="px-6 py-3"></th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {Array.from(Array(4).keys()).map((val, index) => {
+                      return (
+                        <tr key={index} className="bg-white">
+                          <th
+                            scope="row"
+                            className="px-6 py-4 font-medium text-gray-900"
+                          >
+                            {index}
+                          </th>
+                          <td className="px-6 py-4 font-medium  text-gray-900">
+                            <select>
+                              <option value="child">Child</option>
+                              <option value="adult">Adult</option>
+                              <option value="senior">Senior</option>
+                            </select>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             }
           />

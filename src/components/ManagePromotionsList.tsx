@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import PromoCard from "./PromoCard";
+import { faTrashCan as Trash } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface ManagePromotionsList {
     onSubmit: (movieName: string) => void;
@@ -13,12 +15,21 @@ const ManagePromotionsList: React.FC<ManagePromotionsList> = ({ onSubmit }) => {
                 MANAGE PROMOTIONS
             </label>
             <div className="my-8">
+                <button disabled={true}>
+                    <FontAwesomeIcon icon={Trash} size="2xl" className=''></FontAwesomeIcon>
+                </button>
                 <PromoCard/>
             </div>
             <div className="my-8">
+                <button disabled={true}>
+                    <FontAwesomeIcon icon={Trash} size="2xl" className=''></FontAwesomeIcon>
+                </button>
                 <PromoCard/>
             </div>
             <div className="my-8">
+                <button disabled={true}>
+                    <FontAwesomeIcon icon={Trash} size="2xl" className=''></FontAwesomeIcon>
+                </button>
                 <PromoCard/>
             </div>
         </form>

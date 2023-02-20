@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ManageMoviesForm from "../components/forms/ManageMoviesForm";
 import ManageMoviesList from "../components/ManageMoviesList";
 import ManagePromotionsForm from "../components/forms/ManagePromotionsForm";
@@ -36,6 +36,7 @@ const Admin = () => {
     // Perform actual login logic here
   };
 
+  useEffect(() => setIsViewMovies(true), [])
   return (
     <div>
       <div className='flex flex-col items-center mt-6 gap-5'>

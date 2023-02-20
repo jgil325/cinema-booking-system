@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import MovieCard from "./MovieCard";
+import { faTrashCan as Trash } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const testmovie = {
     title: "Shrek",
@@ -22,30 +24,39 @@ interface ManageMoviesList {
 }
 
 const ManageMoviesList: React.FC<ManageMoviesList> = ({ onSubmit }) => {
-    const [movieName, setMovieName] = useState('');
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
     
         // NEEDS LOTS OF PROPER ERROR HANDLING AND ONLY PATCH CHANGED FIELDS
-    
+        var movieName = 'Shrek';
         onSubmit(movieName);
     };
 
+    // Later map these movies to a list, but this works for now.
     return (
         <form className="rounded-lg bg-white p-20 shadow-md" onSubmit={handleSubmit}>
             <label className="block text-center text-xl font-medium text-gray-700">
                 MANAGE MOVIES
             </label>
             <div className="my-8">
+                <button disabled={true}>
+                    <FontAwesomeIcon icon={Trash} size="2xl" className=''></FontAwesomeIcon>
+                </button>
                 <MovieCard
                 movie={testmovie}/>
             </div>
             <div className="my-8">
+                <button disabled={true}>
+                    <FontAwesomeIcon icon={Trash} size="2xl" className=''></FontAwesomeIcon>
+                </button>
                 <MovieCard
                 movie={testmovie}/>
             </div>
             <div className="my-8">
+                <button disabled={true}>
+                    <FontAwesomeIcon icon={Trash} size="2xl" className=''></FontAwesomeIcon>
+                </button>
                 <MovieCard
                 movie={testmovie}/>
             </div>

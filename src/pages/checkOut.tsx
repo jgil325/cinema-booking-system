@@ -8,8 +8,11 @@ const checkOut = () => {
         CheckOut
       </h1>
       <CheckOutForm />
-      <div className="mt-5 flex justify-end">
-        <button className="w-full rounded-lg bg-indigo-500 py-2 px-4 font-medium text-white hover:bg-indigo-700">
+      <div className="mt-5 flex flex-row justify-end">
+        <button className="mx-2 w-full rounded-lg bg-red-500 px-4 font-medium text-white hover:bg-red-700">
+          Cancel
+        </button>
+        <button className="mx-2 w-full rounded-lg bg-indigo-500  px-4 font-medium text-white hover:bg-indigo-700">
           Check Out
         </button>
       </div>

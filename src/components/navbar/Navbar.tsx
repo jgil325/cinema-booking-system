@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 // import { faFilm } from "@fortawesome/free-solid-svg-icons";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-let temporaryLoginStatus = true; // later with global log in context
+let temporaryLoginStatus = false; // later with global log in context
 
 const NavLink = (props: any) => {
   return (
@@ -27,7 +27,7 @@ const Navbar = () => {
           size="3x"
           className="ml-6 mt-3 text-white"
         ></FontAwesomeIcon> */}
-        <div className="gap-30 flex flex-row space-x-6">
+        <div className="gap-30 align-end flex flex-row space-x-6">
           <NavLink switchRoute={() => router.push("/")} linkName="Home" />
           <NavLink linkName="Browse Movies" />
           {temporaryLoginStatus ? (

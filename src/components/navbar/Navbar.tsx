@@ -20,7 +20,7 @@ const Navbar = () => {
   const router = useRouter();
 
   return (
-    <div className="sticky top-0 z-50 bg-cyan-800 shadow-2xl">
+    <div className="sticky top-0 z-50 bg-blue-500 shadow-2xl">
       <div className="align-end mr-6 flex flex-row justify-between space-x-6">
         {/* <FontAwesomeIcon
           icon={faFilm}

@@ -21,13 +21,13 @@ const Navbar = () => {
 
   return (
     <div className="sticky top-0 z-50 bg-cyan-800 shadow-2xl">
-      <div className="mr-6 flex flex-row justify-between space-x-6">
+      <div className="align-end mr-6 flex flex-row justify-between space-x-6">
         {/* <FontAwesomeIcon
           icon={faFilm}
           size="3x"
           className="ml-6 mt-3 text-white"
         ></FontAwesomeIcon> */}
-        <div className="gap-30 align-end flex flex-row space-x-6">
+        <div className="gap-30 flex flex-row space-x-6">
           <NavLink switchRoute={() => router.push("/")} linkName="Home" />
           <NavLink linkName="Browse Movies" />
           {temporaryLoginStatus ? (

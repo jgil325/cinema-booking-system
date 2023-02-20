@@ -41,6 +41,20 @@ const RegisterForm = () => {
           data-[state=active]:focus:shadow-black"
           value="tab2"
         >
+          Payment Info
+        </Tabs.Trigger>
+        <Tabs.Trigger
+          className="hover:text-violet11 data-[state=active]:text-violet11
+         flex h-[45px] flex-1 
+         cursor-default select-none items-center justify-center 
+         bg-white px-5 text-[15px] leading-none text-gray-700 
+         outline-none first:rounded-tl-md last:rounded-tr-md 
+         data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0]
+          data-[state=active]:shadow-current data-[state=active]:focus:relative 
+          data-[state=active]:focus:shadow-[0_0_0_2px] 
+          data-[state=active]:focus:shadow-black"
+          value="tab3"
+        >
           Password
         </Tabs.Trigger>
       </Tabs.List>
@@ -67,14 +81,27 @@ const RegisterForm = () => {
         <fieldset className="mb-[15px] flex w-full flex-col justify-start">
           <label
             className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="username"
+            htmlFor="name"
           >
-            Username
+            Name
           </label>
           <input
             className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="username"
-            defaultValue="@example"
+            id="name"
+            defaultValue="example"
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="phone"
+          >
+            Phone Number
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="phone"
+            defaultValue="XXX-XXX-XXXX"
           />
         </fieldset>
         <div className="mt-5 flex justify-end">
@@ -86,6 +113,115 @@ const RegisterForm = () => {
       <Tabs.Content
         className="grow rounded-b-md bg-white p-5 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"
         value="tab2"
+      >
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="card-type"
+          >
+            Card Type
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="card-type"
+            defaultValue="Visa"
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="card-number"
+          >
+            Card Number
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="card-number"
+            defaultValue=""
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="card-exp"
+          >
+            Expiration Date
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="card-exp"
+            defaultValue="X/XX"
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="card-billing"
+          >
+            Billing Address
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="card-billing"
+            defaultValue="123 example st"
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="home-address"
+          >
+            Home Street
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="home-address"
+            defaultValue="123 example st"
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="home-address"
+          >
+            Home City
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="home-address"
+            defaultValue="Athens"
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="home-address"
+          >
+            Home State
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="home-address"
+            defaultValue="GA"
+          />
+        </fieldset>
+        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+          <label
+            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            htmlFor="home-address"
+          >
+            Home Zip Code
+          </label>
+          <input
+            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+            id="home-address"
+            defaultValue="30601"
+          />
+        </fieldset>
+      </Tabs.Content>
+      <Tabs.Content
+        className="grow rounded-b-md bg-white p-5 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"
+        value="tab3"
       >
         <p className="text-mauve11 mb-5 text-[15px] leading-normal">
           Set your password here.

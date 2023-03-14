@@ -6,18 +6,23 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider     = "mysql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model User {
+    id        String    @id @default(cuid())
+    password  String
+    firstName String
+    lastName  String
+    email     String
+    Account   Account[]
+    Session   Session[]
 }
 
 // Necessary for Next auth
@@ -47,20 +52,130 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-}
-
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Movie {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title     String
+    category  String // if we want this to be a String[] we need to change our database type
+    cast      String
+    director  String
+    producer  String
+    synopsis  String
+    Review    Review[]
+}
+
+model Review {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    rating    Int
+    title     String
+    content   String
+    author    String // this is the userID of creator of this
+    movieId   String
+    Movie     Movie    @relation(fields: [movieId], references: [id])
+}
+
+model Show {
+    id                  String       @id @default(cuid())
+    createdAt           DateTime     @default(now())
+    updatedAt           DateTime     @updatedAt
+    showDate            DateTime
+    showTime            DateTime
+    showDurationMinutes Int
+    showRoom            ShowRoom     @relation(fields: [showRoomId], references: [id])
+    showRoomId          String
+    SeatInShow          SeatInShow[]
+}
+
+model ShowRoom {
+    id             String   @id @default(cuid())
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    numberOfSeats  Int
+    name           String
+    currentShowing Show[]
+    seats          Seat[]
+}
+
+model Seat {
+    seatNumber  Int
+    isOccupied  Boolean
+    doesRecline Boolean      @default(false)
+    showRoomId  String
+    ShowRoom    ShowRoom     @relation(fields: [showRoomId], references: [id])
+    SeatInShow  SeatInShow[]
+
+    @@id(fields: [showRoomId, seatNumber])
+}
+
+model SeatInShow {
+    show Show @relation(fields: [showId], references: [id])
+    seat Seat @relation(fields: [seatShowRoomId, seatNumber], references: [showRoomId, seatNumber])
+
+    isOccupied     Boolean
+    showId         String
+    seatShowRoomId String
+    seatNumber     Int
+    Ticket         Ticket[]
+
+    @@id(fields: [showId, seatNumber])
+}
+
+enum TicketType {
+    ADULT
+    SENIOR
+    CHILD
+}
+
+model Ticket {
+    id    String     @id @default(cuid())
+    price Float
+    type  TicketType
+
+    seatInShow SeatInShow @relation(fields: [showId, seatNumber], references: [showId, seatNumber])
+    showId     String
+    seatNumber Int
+    Booking    Booking?   @relation(fields: [bookingId], references: [id])
+    bookingId  String?
+}
+
+model Booking {
+    id                String   @id @default(cuid())
+    tickets           Ticket[]
+    bookingFee        Float
+    tax               Float
+    totalPrice        Float
+    promoDiscount     Float
+    isPaymentComplete Boolean
+}
+
+model PaymentCard {
+    id String @id @default(cuid())
+
+    cardNumber      BigInt
+    cardType        String
+    billingAddress  String
+    expirationMonth Int
+    expirationYear  Int
+}
+
+model Promotion {
+    id String @id @default(cuid())
+
+    title       String
+    description String
+    discount    Float
+    code        String
+    startDate   DateTime
+    endDate     DateTime
 }

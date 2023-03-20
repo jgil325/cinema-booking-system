@@ -44,7 +44,7 @@ export const userRouter = createTRPCRouter({
         }
 
         try { // dont know how to catch zod inputs
-
+            
         } catch (error) {
 
         }

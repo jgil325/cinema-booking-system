@@ -14,18 +14,27 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum StatusType {
+    ACTIVE
+    INACTIVE
+    SUSPENDED
+}
 model User {
     id        String    @id @default(cuid())
     password  String
     firstName String
     lastName  String
     email     String
+    phoneNumber String // ADD
+    statusType StatusType 
+    isSignedUpPromos Boolean 
     Account   Account[]
     Session   Session[]
+    paymentCards PaymentCard[] // ADD
 }
 
 // Necessary for Next auth
-model Account {
+model Account { // TODO: DELETE WHEN USE DELETES
     id                String  @id @default(cuid())
     userId            String
     type              String
@@ -40,10 +49,10 @@ model Account {
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+    @@unique([provider, providerAccountId]) // I think this needs to be changed
 }
 
-model Session {
+model Session { // TODO: DELETE WHEN USER DELETES
     id           String   @id @default(cuid())
     sessionToken String   @unique
     userId       String
@@ -158,14 +167,26 @@ model Booking {
     isPaymentComplete Boolean
 }
 
-model PaymentCard {
-    id String @id @default(cuid())
-
-    cardNumber      BigInt
-    cardType        String
+enum CardType {
+  VISA
+  MASTERCARD
+  AMEX
+  DISCOVER
+}
+model PaymentCard { // I think payment card deletes from database when user is deleted. But it throws errors when you click on it, but the error says null.
+    id String @id @default(cuid()) // autoincrement?
+    cardNumber      String // changed from BigInt to String
+    cardType        CardType
     billingAddress  String
-    expirationMonth Int
+    expirationMonth Int // combine for expiration date?
     expirationYear  Int
+    homeAddress     String // ADD
+    //homeStreet String // ADD
+    homeCity        String // ADD
+    homeState       String // ADD
+    homeZipCode     String // ADD
+    userId          String // Dont know if this is right // ADD
+    User            User @relation(fields: [userId], references: [id], onDelete: Cascade) // ADD
 }
 
 model Promotion {

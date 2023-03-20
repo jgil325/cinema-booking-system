@@ -13,10 +13,9 @@ export const activateRouter = createTRPCRouter({
       const { userID } = input;
 
       try {
-        // Update user status to ACTIVE
         const updatedUser = await ctx.prisma.user.update({
           where: { id: userID },
-          data: { statusType: StatusType.ACTIVE },
+          data: { statusType: StatusType.ACTIVE }, // Update user status to ACTIVE
         });
 
         console.log(`User ${updatedUser.id} activated successfully.`);

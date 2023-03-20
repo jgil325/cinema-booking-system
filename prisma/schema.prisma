@@ -24,7 +24,7 @@ model User {
     password  String
     firstName String
     lastName  String
-    email     String
+    email     String    @unique
     phoneNumber String // ADD
     statusType StatusType 
     isSignedUpPromos Boolean 

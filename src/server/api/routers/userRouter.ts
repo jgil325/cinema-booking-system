@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { StatusType } from '@prisma/client';
 import validator from 'validator';
 
-
 export const userRouter = createTRPCRouter({
 
     all: publicProcedure.query(({ ctx }) => {
@@ -43,15 +42,9 @@ export const userRouter = createTRPCRouter({
           throw new Error('A user with this email already exists!'); // TODO: I dont want this to go to the next page, rn it goes to the confirmation page.
         }
 
-        try { // dont know how to catch zod inputs
-            
-        } catch (error) {
+        const bcrypt = require('bcrypt');
+        const encodedPassword = await bcrypt.hash(password, 10);
 
-        }
-
-        const encodedPassword = Buffer.from(password).toString('base64'); // is this chill?
-
-        // can call payment router here If i wanted to
 
         const fullUserDetails = { 
             id: uuidv4(), // unique

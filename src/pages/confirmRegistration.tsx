@@ -48,7 +48,8 @@ const ConfirmRegistration = () => {
             {/* {isError && <p>Error: Unable to load email</p>} */}
             {/* {email && ( */}
               <p className="mb-4">
-                Please validate your email by clicking the button below. Ignore this message if you recieved the email by mistake.
+                Please validate your email by clicking the button below.
+                Ignore this message if you recieved the email by mistake.
               </p>
              {/* )}  */}
           </>

@@ -51,7 +51,8 @@ export const paymentRouter = createTRPCRouter({
           throw new Error('Zip code must be a 5-digit number');
         }
 
-        const encodedCard = Buffer.from(cardNumber).toString('base64');
+        const bcrypt = require('bcrypt');
+        const encodedCard = await bcrypt.hash(cardNumber, 10);
 
         const newCard = await ctx.prisma.paymentCard.create({ 
           data: {

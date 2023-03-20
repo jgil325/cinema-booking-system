@@ -31,18 +31,8 @@ const RegisterForm = () => {
   const [homeState, setHomeState] = useState("");
   const [homeZipCode, setHomeZip] = useState("");
 
-  // Render Page Comp
-  const [finishedReg, setFinishedReg] = useState(true);
-
   // Hooks
-  const createAccount = api.user.createAccount.useMutation({
-    // onSuccess(data) { // DONT FULLY UNDERSTAND THE USE OF THIS
-    //   console.log("Test: Account Creation was successful")
-    // },
-    // onError(error) {
-    //   alert("Testing:" + error.message);
-    // }
-  });
+  const createAccount = api.user.createAccount.useMutation();
   const createPaymentInfo = api.paymentCard.createPaymentInfo.useMutation();
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -53,7 +43,7 @@ const RegisterForm = () => {
       return;
     }
 
-    try { // Must have these handled here too or is gives a popup error
+    try { // I think this should be done soon
       const createAccountResult = await createAccount.mutateAsync({
         email,
         firstName,
@@ -63,7 +53,7 @@ const RegisterForm = () => {
         phoneNumber,
       });
 
-      try {
+      try { // if create account succeeds and payment card fails then it struggles to add payment card. Need to separate these tasks.
         await createPaymentInfo.mutateAsync({
           cardNumber,
           cardType: cardType,
@@ -75,41 +65,73 @@ const RegisterForm = () => {
           homeState,
           homeZipCode,
           userId: createAccountResult.id,
-          // TODO: CHECK Home Address, City, State, Zip Code
         });
-        // Navigate to success page or show success message
-        // setFinishedReg(false);
+        // TODO: Navigate to success page or show success message
       } catch (error) {
           let errorMessage;
-        if (error instanceof TRPCClientError) {
+        if (error instanceof TRPCClientError) { // only catching trpc errors
           const errorResult = error.message;
           errorMessage = "Please correct you payment information regarding: \n" + errorResult;
+          toast.error(errorMessage);
+          const popup = document.createElement('div');
+          popup.innerText = errorMessage;
+          popup.style.position = 'fixed';
+          popup.style.top = '50%';
+          popup.style.left = '50%';
+          popup.style.transform = 'translate(-50%, -50%)';
+          popup.style.backgroundColor = '#fff';
+          popup.style.color = '#000';
+          popup.style.padding = '20px';
+          popup.style.borderRadius = '5px';
+          popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.5)';
+          popup.style.maxWidth = '80%';
+          popup.style.maxHeight = '80%';
+          popup.style.overflow = 'auto';
+          popup.style.zIndex = '9999';
+          document.body.appendChild(popup);
+          const hidePopup = () => {
+            popup.remove();
+          };
+          setTimeout(hidePopup, 20000);
+          popup.addEventListener('click', hidePopup);
         } else {
-          errorMessage = "Server Error: Please try creating your account again."
+          alert(error); // should be coming from backend
         }
-        alert(errorMessage);
       }
     } catch (error) {
       let errorMessage;
-      if (error instanceof TRPCClientError) {
+      if (error instanceof TRPCClientError) { // only catching trpc errors
         const errorResult = error.message;
         errorMessage = "Please correct you account information regarding: \n" + errorResult;
+        toast.error(errorMessage);
+        const popup = document.createElement('div');
+        popup.innerText = errorMessage;
+        popup.style.position = 'fixed';
+        popup.style.top = '50%';
+        popup.style.left = '50%';
+        popup.style.transform = 'translate(-50%, -50%)';
+        popup.style.backgroundColor = '#fff';
+        popup.style.color = '#000';
+        popup.style.padding = '20px';
+        popup.style.borderRadius = '5px';
+        popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.5)';
+        popup.style.maxWidth = '80%';
+        popup.style.maxHeight = '80%';
+        popup.style.overflow = 'auto';
+        popup.style.zIndex = '9999';
+        document.body.appendChild(popup);
+        const hidePopup = () => {
+          popup.remove();
+        };
+        setTimeout(hidePopup, 20000);
+        popup.addEventListener('click', hidePopup);
       } else {
-        errorMessage = "Server Error: Please try creating your account again."
+        alert(error); // should be coming from backend
       }
-      alert(errorMessage);
     }
   };
 
   return ( 
-    // <div /* Dont know how to feel about this conditional thing*/> 
-    //   {!finishedReg ? (
-    //     <>
-    //       <p className="text-mauve11 mb-5 text-[15px] leading-normal">
-    //         Confirmation Email sent. Please confirm email to login.
-    //       </p>
-    //     </>
-    //   ) : (
       <Tabs.Root
         className="flex w-[300px] flex-col rounded-lg bg-white shadow-md"
         defaultValue="tab1"
@@ -428,7 +450,6 @@ const RegisterForm = () => {
           </fieldset>
           <form onSubmit={handleFormSubmit}> 
             <button // ADDED this form
-            // onClick={() => router.push("/confirmRegistration")} // TOOK THIS OUT
               className="w-full rounded-lg bg-indigo-500 py-2 px-4 font-medium text-white hover:bg-indigo-700"
               type="submit"
             >
@@ -437,8 +458,6 @@ const RegisterForm = () => {
           </form>
         </Tabs.Content>
       </Tabs.Root>
-      // )}
-      // </div> 
     );
 };
 

@@ -3,6 +3,7 @@ import {z} from 'zod'
 import { v4 as uuidv4 } from 'uuid';
 import { StatusType } from '@prisma/client';
 import validator from 'validator';
+import { TRPCError } from '@trpc/server';
 
 export const userRouter = createTRPCRouter({
 
@@ -120,4 +121,41 @@ export const userRouter = createTRPCRouter({
     delete: publicProcedure.input(z.string()).mutation(({ ctx, input }) => {
       return ctx.prisma.user.delete({ where: { id: input } });
     }),
+    validateLogin: publicProcedure
+        .input(z.object({ 
+            email: z.string(),
+            password: z.string()
+        }))
+        .mutation(async ({ input, ctx }) => {
+            try {
+              const userFound = await ctx.prisma.user.findFirst({
+                where: {
+                    email: input.email
+                },
+            });
+            if (userFound) {
+                const bcrypt = require('bcrypt');
+                const dbUserPass = userFound.password;
+                const compare = await bcrypt.compare(input.password, dbUserPass);
+                if (!compare) {
+                    throw new TRPCError({
+                        code: 'CONFLICT',
+                        message: 'non matching passwords'
+                    })
+                }
+                return {
+                    status: 'success',
+                    data: {
+                        userFound
+                    }
+                };
+            }
+           } 
+           catch {
+            throw new TRPCError({
+                code: 'NOT_FOUND',
+                message: 'user not found or other err'
+            })
+           }
+        })
   });

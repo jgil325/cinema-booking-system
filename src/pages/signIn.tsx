@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import LoginForm from "../components/forms/LoginForm";
 
@@ -26,9 +27,12 @@ const login = () => {
             id="password"
             placeholder="Password"
           />
-          <span className="font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
-            Forgot Password?
-          </span>
+          <Link href="/forgotPassword">
+            <span className="font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
+              Forgot Password?
+            </span>
+          </Link>
+
           <button
             className="w-full rounded-lg bg-indigo-500 py-2 px-4 font-medium text-white hover:bg-indigo-700"
             type="submit"
@@ -37,14 +41,23 @@ const login = () => {
           </button>
           <div className="flex justify-between">
             <div className="select-none">
-              <input type="checkbox" id="rememberMe" className="h-4 w-4 hover:cursor-pointer" />
-              <label htmlFor="rememberMe" className="pl-1.5 align-top font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                className="h-4 w-4 hover:cursor-pointer"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="font-sm pl-1.5 align-top text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500"
+              >
                 Remember Me
               </label>
             </div>
-            <span className="font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
-              Create Account
-            </span>
+            <Link href="/register">
+              <span className="font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
+                Create Account
+              </span>
+            </Link>
           </div>
         </div>
       </div>

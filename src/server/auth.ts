@@ -3,6 +3,7 @@ import {
   getServerSession,
   type NextAuthOptions,
   type DefaultSession,
+  Session,
 } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "../env.mjs";
@@ -19,15 +20,20 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
+      email: string;
+      firstName: string;
+      lastName: string;
       // role: UserRole;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    // role: UserRole;
+  }
 }
 
 /**
@@ -42,9 +48,9 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  // pages: {
-  //   signIn: "/signIn",
-  // },
+  pages: {
+    signIn: "/signIn",
+  },
   providers: [
     CredentialsProvider({
       id: "login",
@@ -62,6 +68,7 @@ export const authOptions: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
+        // TODO find correct user and decrypt password and stuff
         const user = await prisma.user.findFirst({});
         if (!user) {
           throw new Error("Invalid Credentials");
@@ -77,11 +84,32 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       return url.startsWith(baseUrl) ? url : baseUrl;
     },
-    session({ session, user }) {
-      console.log("user", user);
-      console.log("session", session);
+    async session({ session, token, user }) {
+      console.log(token);
+      if (token && token.email) {
+        const userInfo = await prisma.user.findFirst({
+          where: { email: token.email },
+        });
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            ...userInfo,
+            id: token.id as string,
+            // role: token.role as string,
+          },
+        };
+      }
+      const sess: Session = {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+          // role: token.role as string,
+        },
+      };
 
-      return session;
+      return sess;
     },
   },
 };

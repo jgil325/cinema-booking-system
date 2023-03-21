@@ -1,23 +1,11 @@
 import React from "react";
-import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
-
-let temporaryLoginStatus = false; // later with global log in context
-
-const NavLink = (props: any) => {
-  return (
-    <button className="m-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
-      {props.linkName}
-    </button>
-  );
-};
+import { signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
-  const router = useRouter();
-
+  const { data: session } = useSession();
   return (
     <div className="shadow-b sticky top-0 z-50 border-b border-gray-400 bg-blue-700 shadow-xl">
       <div className="align-end mr-6 flex flex-row justify-between space-x-6">
@@ -39,24 +27,29 @@ const Navbar = () => {
               Browse Movies
             </button>
           </Link>
+        </div>
+        {session ? (
+          <div className="gap-30 flex flex-row space-x-8">
+            <button
+              className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200"
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
+              onClick={() => signOut()}
+            >
+              Sign Out
+            </button>
+            <Link href={"/yourProfile"}>
+              <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
+                Your Profile
+              </button>
+            </Link>
+          </div>
+        ) : (
           <Link href={"/signIn"}>
             <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
               Sign In
             </button>
           </Link>
-
-          {/* {temporaryLoginStatus ? (
-            <NavLink
-              switchRoute={() => router.push("/profile")}
-              linkName="Profile"
-            />
-          ) : (
-            <NavLink
-              switchRoute={() => router.push("/signIn")}
-              linkName="Sign In"
-            />
-          )} */}
-        </div>
+        )}
       </div>
     </div>
   );

@@ -1,12 +1,16 @@
 import Link from "next/link";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   async function doSignIn() {
-    const res = signIn("login", { email, password });
+    await signIn("login", { email, password, redirect: false });
+    await router.push("/");
   }
   return (
     <div className="absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 transform">
@@ -48,7 +52,7 @@ const SignIn = () => {
               <input
                 type="checkbox"
                 id="rememberMe"
-                className="h-4 w-4 bg-gray-50 hover:cursor-pointer"
+                className="h-4 w-4 border-gray-900 bg-gray-50 hover:cursor-pointer hover:border-gray-500"
               />
               <label
                 htmlFor="rememberMe"

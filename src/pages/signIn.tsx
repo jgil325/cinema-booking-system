@@ -1,15 +1,13 @@
 import Link from "next/link";
-import React from "react";
-import LoginForm from "../components/forms/LoginForm";
+import React, { useState } from "react";
+import { signIn } from "next-auth/react";
+const SignIn = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-const login = () => {
-  const handleSubmit = (username: string, password: string) => {
-    console.log(`Submitting login credentials:`);
-    console.log(`Username: ${username}`);
-    console.log(`Password: ${password}`);
-    // Perform actual login logic here
-  };
-
+  async function doSignIn() {
+    const res = signIn("login", { email, password });
+  }
   return (
     <div className="absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 transform">
       <div className="flex justify-center">
@@ -20,12 +18,16 @@ const login = () => {
             type="text"
             id="email"
             placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             className="rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             type="password"
             id="password"
             placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <Link href="/forgotPassword">
             <span className="font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
@@ -36,6 +38,8 @@ const login = () => {
           <button
             className="w-full rounded-lg bg-indigo-500 py-2 px-4 font-medium text-white hover:bg-indigo-700"
             type="submit"
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick={doSignIn}
           >
             Login
           </button>
@@ -65,4 +69,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default SignIn;

@@ -16,7 +16,7 @@ const cardTypes = ["Select Card","Mastercard","Visa","Amex"];
 function StatesDropdownForm() {
   const [selected, setSelected] = useState(states[0]);
   return (
-    <form>
+    <div>
         <label
           className="mb-2 block font-medium text-gray-700"
           htmlFor="username"
@@ -33,7 +33,7 @@ function StatesDropdownForm() {
           </option>
          ))}
       </select>
-    </form>
+    </div>
   );
 }
 

@@ -44,7 +44,7 @@ const login = () => {
               <input
                 type="checkbox"
                 id="rememberMe"
-                className="h-4 w-4 hover:cursor-pointer"
+                className="h-4 w-4 bg-gray-50 hover:cursor-pointer"
               />
               <label
                 htmlFor="rememberMe"

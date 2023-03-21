@@ -37,9 +37,9 @@ const Navbar = () => {
             >
               Sign Out
             </button>
-            <Link href={"/myProfile"}>
+            <Link href={"/yourProfile"}>
               <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
-                My Account
+                Your Profile
               </button>
             </Link>
           </div>

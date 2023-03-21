@@ -66,9 +66,27 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         // TODO find correct user and decrypt password and stuff
-        const user = await prisma.user.findFirst({});
+        const { email, password} = credentials || {};
+
+        if (!email || !password) {
+          console.log("Email and password are required")
+          throw new Error("Email and password are required");
+        }
+
+        // Find the user by email
+        const user = await prisma.user.findFirst({ // findUnique: might need to change schema @@unique([email, password])
+          where: { email } 
+        });
         if (!user) {
-          throw new Error("Invalid Credentials");
+          console.log("Invalid email or password.")
+          throw new Error("Invalid email or password")
+        }
+
+        const bcrypt = require('bcrypt');
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+          console.log("Invalid password.")
+          throw new Error("Invalid password");
         }
         return user;
       },
@@ -76,6 +94,9 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
+      if (!user) {
+        throw new Error("Invalid email or password.");
+      }
       return true;
     },
     async redirect({ url, baseUrl }) {

@@ -9,8 +9,16 @@ const SignIn = () => {
   const router = useRouter();
 
   async function doSignIn() {
-    await signIn("login", { email, password, redirect: false });
-    await router.push("/");
+    try {
+      const signInResult = await signIn("login", { email, password, redirect: false }); 
+      if (signInResult?.error) {
+        throw new Error(signInResult.error);
+      }
+      await router.push("/");
+    } catch (error) {
+      console.log(error);
+      alert(error);
+    }
   }
   return (
     <div className="absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 transform">

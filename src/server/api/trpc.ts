@@ -20,6 +20,7 @@ import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "../auth";
 import { prisma } from "../db";
+import { ZodError } from "zod";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -67,13 +68,22 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import { Content } from "@radix-ui/react-tabs";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
-  errorFormatter({ shape }) {
-    return shape;
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+          error.cause instanceof ZodError ? error.cause.flatten() : null,
+      },
+    };
   },
 });
+
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
@@ -88,6 +98,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  * @see https://trpc.io/docs/router
  */
 export const createTRPCRouter = t.router;
+
 
 /**
  * Public (unauthenticated) procedure

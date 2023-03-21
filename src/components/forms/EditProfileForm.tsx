@@ -40,7 +40,7 @@ function StatesDropdownForm() {
 function CardTypeDropdownForm() {
     const [selected, setSelected] = useState(cardTypes[0]);
     return (
-      <form>
+      <div>
           <label
             className="mb-2 block font-medium text-gray-700"
             htmlFor="username"
@@ -57,7 +57,7 @@ function CardTypeDropdownForm() {
             </option>
            ))}
         </select>
-      </form>
+      </div>
     );
   }
 

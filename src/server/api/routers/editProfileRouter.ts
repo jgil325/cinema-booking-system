@@ -1,10 +1,78 @@
 import { createTRPCRouter, publicProcedure } from '../trpc'
 import {z} from 'zod'
 import { v4 as uuidv4 } from 'uuid';
-import { StatusType } from '@prisma/client';
+import { CardType, StatusType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 export const editProfileRouter = createTRPCRouter({
+    getUserInfo: publicProcedure
+        .query(async ({ ctx }) => {
+            const userID = ctx.session?.user.id;
+            try {
+                const userInfo = await ctx.prisma.user.findUnique({
+                    where: {
+                        id: userID
+                    },
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        paymentCards: {
+                            where: {
+                                userId: userID
+                            },
+                            select: {
+                                homeAddress: true,
+                                homeCity: true,
+                                homeState: true,
+                                homeZipCode: true,
+                                billingAddress: true,
+                                cardNumber: true,
+                                // more fields need to be added
+                            }
+                        }
+                    }
+                })
+                return ({
+                    status: 'successful fetch',
+                    payload: userInfo
+                });
+            } catch {
+                throw new TRPCError({
+                    code: 'BAD_REQUEST',
+                    message: 'Error fetching user data',
+                });
+            } 
+        }),
+    changePromoStatus: publicProcedure
+        .input(
+            z.object({
+                newPromoStatus: z.boolean() // TRUE indicates they want promos, FALSE indicates they do not want promos
+            }))
+        .mutation(async ({ ctx, input }) => {
+            try {
+                const userID = ctx.session?.user.id;
+                const updateUser = await ctx.prisma.user.update({
+                    where: {
+                        id: userID,
+                    },
+                    data: {
+                        isSignedUpPromos: input.newPromoStatus
+                    }
+                })
+                return(
+                    {
+                        status: 'success',
+                        operation: 'changed promotion status',
+                        newUser: updateUser
+                    }
+                );
+            } catch {
+                throw new TRPCError({
+                    code: 'BAD_REQUEST',
+                    message: 'Error changing promotion status!',
+                });
+            }
+        }),
     changeName: publicProcedure
         .input(
             z.object({
@@ -432,7 +500,7 @@ export const editProfileRouter = createTRPCRouter({
     changeCardType: publicProcedure
         .input(
             z.object({
-                newCardType: z.enum(["Mastercard", "Visa", "Amex", "Discover"]) // is this a correct enum?
+                newCardType: z.nativeEnum(CardType)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -448,7 +516,7 @@ export const editProfileRouter = createTRPCRouter({
                                     userId: userID // does this reference the right user??
                                 },
                                 data: {
-                                    cardNumber: input.newCardType // needs to be CardType
+                                    cardType: input.newCardType
                                 }
                             }
                         }

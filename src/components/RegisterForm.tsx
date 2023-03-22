@@ -1,7 +1,7 @@
 // import React from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { TRPCClientError } from "@trpc/client";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 
 const RegisterForm = () => {
   const router = useRouter();
-
   // User Account information
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -24,7 +23,7 @@ const RegisterForm = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [cardType, setCardType] = useState<
     "VISA" | "MASTERCARD" | "DISCOVER" | "AMEX"
-  >("VISA");
+    >("VISA");
   const [billingAddress, setBillingAddress] = useState("");
   const [billingCity, setBillingCity] = useState("");
   const [billingState, setBillingState] = useState("");
@@ -37,68 +36,72 @@ const RegisterForm = () => {
   const [homeZipCode, setHomeZip] = useState("");
 
   // Hooks
-  // const createAccount = api.user.createAccount.useMutation();
-  const handleFormSubmit = console.log("placeholder");
-  //   if (password !== confirmPassword) {
-  //     alert("Password and confirm password must match. Please try again.");
-  //     return;
-  //   }
+  const createAccount = api.user.createAccount.useMutation();
+  // const handleFormSubmit = console.log("placeholder");
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Password and confirm password must match. Please try again.");
+      return;
+    }
+    let createAccountResult;
+    try {
+      createAccountResult = await createAccount.mutateAsync({
+        email,
+        firstName,
+        lastName,
+        password,
+        isSignedUpPromos,
+        phoneNumber,
+        homeAddress,
+        homeCity,
+        homeState,
+        homeZipCode,
+        cardNumber,
+        cardType: cardType,
+        billingAddress,
+        expirationMonth: Number(expirationMonth),
+        expirationYear: Number(expirationYear),
+        billingCity,
+        billingState,
+        billingZipCode,
+      });
 
-  //   try {
-  //     const createAccountResult = await createAccount.mutateAsync({
-  //       email,
-  //       firstName,
-  //       lastName,
-  //       password,
-  //       isSignedUpPromos,
-  //       phoneNumber,
-  //       homeAddress,
-  //       homeCity,
-  //       homeState,
-  //       homeZipCode,
-  //       cardNumber,
-  //       cardType: cardType,
-  //       billingAddress,
-  //       expirationMonth: Number(expirationMonth),
-  //       expirationYear: Number(expirationYear),
-  //       billingCity,
-  //       billingState,
-  //       billingZipCode,
-  //     });
-
-  //     // TODO: Navigate to success page or show success message
-  //   } catch (error) {
-  //     let errorMessage;
-  //     if (error instanceof TRPCClientError) {
-  //       const errorResult = error.message;
-  //       errorMessage = "Please correct your information regarding: \n" + errorResult;
-  //       toast.error(errorMessage);
-  //       const popup = document.createElement('div');
-  //       popup.innerText = errorMessage;
-  //       popup.style.position = 'fixed';
-  //       popup.style.top = '50%';
-  //       popup.style.left = '50%';
-  //       popup.style.transform = 'translate(-50%, -50%)';
-  //       popup.style.backgroundColor = '#fff';
-  //       popup.style.color = '#000';
-  //       popup.style.padding = '20px';
-  //       popup.style.borderRadius = '5px';
-  //       popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.5)';
-  //       popup.style.maxWidth = '80%';
-  //       popup.style.maxHeight = '80%';
-  //       popup.style.overflow = 'auto';
-  //       popup.style.zIndex = '9999';
-  //       document.body.appendChild(popup);
-  //       const hidePopup = () => {
-  //         popup.remove();
-  //       };
-  //       setTimeout(hidePopup, 20000);
-  //       popup.addEventListener('click', hidePopup);
-  //     } else {
-  //       alert(error); // should be coming from backend
-  //     }
-  //   }
-  // }
+      // TODO: Navigate to success page or show success message
+    } catch (error) {
+      let errorMessage;
+      if (error instanceof TRPCClientError) {
+        const errorResult = error.message;
+        errorMessage = "Please correct your information regarding: \n" + errorResult;
+        toast.error(errorMessage);
+        const popup = document.createElement('div');
+        popup.innerText = errorMessage;
+        popup.style.position = 'fixed';
+        popup.style.top = '50%';
+        popup.style.left = '50%';
+        popup.style.transform = 'translate(-50%, -50%)';
+        popup.style.backgroundColor = '#fff';
+        popup.style.color = '#000';
+        popup.style.padding = '20px';
+        popup.style.borderRadius = '5px';
+        popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.5)';
+        popup.style.maxWidth = '80%';
+        popup.style.maxHeight = '80%';
+        popup.style.overflow = 'auto';
+        popup.style.zIndex = '9999';
+        document.body.appendChild(popup);
+        const hidePopup = () => {
+          popup.remove();
+        };
+        setTimeout(hidePopup, 20000);
+        popup.addEventListener('click', hidePopup);
+      } else {
+        alert(error); // should be coming from backend
+      }
+    }
+    router.push("/checkEmail");
+    return createAccountResult;
+  }
 
   return (
     <Tabs.Root

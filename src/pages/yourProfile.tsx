@@ -2,7 +2,7 @@ import React, { type InputHTMLAttributes, useState } from "react";
 import { stateList } from "../data/states";
 import { api } from "../utils/api";
 import { debounce } from "../utils/debounce";
-import { PaymentCard, User } from "@prisma/client";
+import { type PaymentCard, type User } from "@prisma/client";
 import EditPaymentCard from "../components/forms/EditPaymentCard";
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
@@ -22,7 +22,7 @@ const InputField = ({ title, ...props }: InputFieldProps) => {
 };
 
 const Page = () => {
-  const [editPaymentCard, setEditPaymentCard] = useState(1);
+  const [editPaymentCard, setEditPaymentCard] = useState(-1);
 
   const { data: user, isLoading, error } = api.user.byId.useQuery();
   if (isLoading) return null;

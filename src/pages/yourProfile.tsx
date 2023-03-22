@@ -43,6 +43,20 @@ const Page = () => {
       </div>
     );
 
+  const tempCard: PaymentCard = {
+    id: "1234",
+    cardNumber: "123432432432412",
+    cardType: "VISA",
+    expirationMonth: 5,
+    expirationYear: 23,
+    billingAddress: "1234 road road rd.",
+    billingCity: "Atlanta",
+    billingState: "GA",
+    billingZipCode: "30323",
+    userId: "532432fda",
+  };
+  //const cards: Array<PaymentCard> = [tempCard, tempCard, tempCard];
+
   return (
     <div className="border-grey mt-4 grid items-center justify-center">
       <div className="grid min-w-[50vw] space-y-0 rounded-xl border px-8 py-8 text-center">

@@ -3,6 +3,7 @@ import { stateList } from "../data/states";
 import { api } from "../utils/api";
 import { debounce } from "../utils/debounce";
 import EditPaymentCard from "../components/forms/EditPaymentCard";
+import { PaymentCard } from "@prisma/client";
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
 }
@@ -21,7 +22,7 @@ const InputField = ({ title, ...props }: InputFieldProps) => {
 };
 
 const Page = () => {
-  const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedCard, setSelectedCard] = useState<PaymentCard | null>(null);
   const [showCards, setShowCards] = useState(false);
 
   const { mutate: createNewCard } =
@@ -122,7 +123,7 @@ const Page = () => {
                   <button
                     className={className}
                     key={card.id}
-                    onClick={() => setSelectedCard(cards[index])}
+                    onClick={() => setSelectedCard(card)}
                   >
                     Card {index}
                   </button>

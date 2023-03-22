@@ -1,11 +1,14 @@
 import Link from "next/link";
 import React, { useState } from "react";
+import { api } from "../utils/api";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
-  async function handleChangePassClick() {
-    // mutate send email
+  const { mutate } = api.user.sendPasswordResetLink.useMutation();
+
+  function handleChangePassClick() {
+    mutate({ email });
     setEmailSent(true);
   }
 

@@ -30,7 +30,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
   const [state, setState] = useState(card.billingState);
   const [city, setCity] = useState(card.billingCity);
   const [zipcode, setZipcode] = useState(card.billingZipCode);
-  const [cardNumber, setCardNumber] = useState(card.cardNumber);
+  const [cardNumber, setCardNumber] = useState("");
   const [cardType, setCardType] = useState(card.cardType);
   const [expirationMonth, setExpirationMonth] = useState(card.expirationMonth);
   const [expirationYear, setExpirationYear] = useState(card.expirationYear);
@@ -184,7 +184,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
       <div className="flex space-x-6 pt-3  ">
         <div className="grow">
           <InputField
-            title={"Card Number"}
+            title={"Card Number (Hidden)"}
             type="number"
             value={cardNumber}
             onChange={handleChangeCardNumber}

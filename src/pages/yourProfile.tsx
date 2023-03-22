@@ -1,8 +1,7 @@
-import React, { type InputHTMLAttributes, useState } from "react";
+import React, { type InputHTMLAttributes, useState, useEffect } from "react";
 import { stateList } from "../data/states";
 import { api } from "../utils/api";
 import { debounce } from "../utils/debounce";
-import { type PaymentCard, type User } from "@prisma/client";
 import EditPaymentCard from "../components/forms/EditPaymentCard";
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
@@ -22,10 +21,44 @@ const InputField = ({ title, ...props }: InputFieldProps) => {
 };
 
 const Page = () => {
-  const [editPaymentCard, setEditPaymentCard] = useState(-1);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [showCards, setShowCards] = useState(false);
+
+  const { mutate: createNewCard } =
+    api.paymentCard.createPaymentInfo.useMutation({
+      onSuccess: async () => {
+        await refetchCards();
+      },
+    });
+
+  const { data: cards, refetch: refetchCards } =
+    api.paymentCard.byId.useQuery();
+
+  useEffect(() => {
+    async function doFetch() {
+      await refetchCards();
+    }
+    if (!showCards) setSelectedCard(null);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    doFetch();
+  }, [refetchCards, showCards, selectedCard]);
+
+  async function doCreateCard() {
+    createNewCard({
+      cardNumber: "4274904744200811",
+      cardType: "VISA",
+      billingAddress: "1234 Street",
+      expirationMonth: 1,
+      expirationYear: 2025,
+      billingCity: "City",
+      billingState: "State",
+      billingZipCode: "00000",
+      userId: user?.id || "",
+    });
+    await refetchCards();
+  }
 
   const { data: user, isLoading, error } = api.user.byId.useQuery();
-  const { data: cards } = api.paymentCard.byId.useQuery();
 
   if (isLoading) return null;
   if (error)
@@ -60,7 +93,7 @@ const Page = () => {
   return (
     <div className="border-grey mt-4 grid items-center justify-center">
       <div className="grid min-w-[50vw] space-y-0 rounded-xl border px-8 py-8 text-center">
-        {editPaymentCard === -1 ? (
+        {!showCards ? (
           <>
             <MyProfile user={user} />
             <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium"></span>
@@ -68,7 +101,7 @@ const Page = () => {
               <button
                 className="h-fit w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-1.5 font-medium text-black hover:bg-gray-200"
                 type="submit"
-                onClick={() => setEditPaymentCard(0)}
+                onClick={() => setShowCards(true)}
               >
                 Edit Payment Cards
               </button>
@@ -81,7 +114,7 @@ const Page = () => {
             </span>
             <div className="flex justify-center">
               {cards.map((card, index) => {
-                const selected = editPaymentCard === index;
+                const selected = selectedCard === card;
                 let className =
                   "my-3 mx-3 grow rounded border bg-gray-50 px-4 py-1.5 hover:bg-gray-200";
                 if (selected) className += "border-black border-2";
@@ -89,20 +122,29 @@ const Page = () => {
                   <button
                     className={className}
                     key={card.id}
-                    onClick={() => setEditPaymentCard(index)}
+                    onClick={() => setSelectedCard(cards[index])}
                   >
                     Card {index}
                   </button>
                 );
               })}
+              {cards.length < 3 ? (
+                <button
+                  onClick={doCreateCard}
+                  className="my-3 mx-3 grow rounded border bg-gray-50 px-4 py-1.5 hover:bg-gray-200"
+                >
+                  Add A New Card
+                </button>
+              ) : null}
             </div>
-            <EditPaymentCard card={cards[editPaymentCard]} />
+            {selectedCard ? <EditPaymentCard card={selectedCard} /> : null}
+
             <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium"></span>
             <div className="grid grid-cols-1 items-baseline space-x-6 pt-3">
               <button
                 className="h-fit w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-1.5 font-medium text-black hover:bg-gray-200"
                 type="submit"
-                onClick={() => setEditPaymentCard(-1)}
+                onClick={() => setShowCards(false)}
               >
                 Edit Profile
               </button>

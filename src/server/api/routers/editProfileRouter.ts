@@ -109,7 +109,7 @@ export const editProfileRouter = createTRPCRouter({
                         isSignedUpPromos: input.newPromoStatus
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -124,29 +124,58 @@ export const editProfileRouter = createTRPCRouter({
                 });
             }
         }),
-    changeName: publicProcedure
+    changeFirstName: publicProcedure
         .input(
             z.object({
-                newName: z.string()
+                newFirstName: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
-                const [ newFirstName, newLastName ] = input.newName.split(" ", 2);
                 const userID = ctx.session?.user.id;
                 const updateUser = await ctx.prisma.user.update({
                     where: {
                         id: userID,
                     },
                     data: {
-                        firstName: newFirstName,
-                        lastName: newLastName 
+                        firstName: input.newFirstName
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
-                        operation: 'change first and last name',
+                        operation: 'change first name',
+                        newUser: updateUser
+                    }
+                );
+            } catch {
+                throw new TRPCError({
+                    code: 'BAD_REQUEST',
+                    message: 'Error updating users new name!',
+                });
+            }
+        }),
+    changeLastName: publicProcedure
+        .input(
+            z.object({
+                newLastName: z.string()
+            }))
+        .mutation(async ({ ctx, input }) => {
+            try {
+                const userID = ctx.session?.user.id;
+                const updateUser = await ctx.prisma.user.update({
+                    where: {
+                        id: userID,
+                    },
+                    data: {
+                        firstName: input.newLastName
+                    }
+                })
+                sendUpdateEmail(ctx.session?.user.email || '');
+                return(
+                    {
+                        status: 'success',
+                        operation: 'change last name',
                         newUser: updateUser
                     }
                 );
@@ -173,7 +202,7 @@ export const editProfileRouter = createTRPCRouter({
                         phoneNumber: input.newPhoneNumber
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -222,7 +251,7 @@ export const editProfileRouter = createTRPCRouter({
                         password: encodedPassword
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -253,7 +282,7 @@ export const editProfileRouter = createTRPCRouter({
                         homeAddress: input.newStreetName
                     }
                 });
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -284,7 +313,7 @@ export const editProfileRouter = createTRPCRouter({
                         homeCity: input.newCityName
                     }
                 });
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -315,7 +344,7 @@ export const editProfileRouter = createTRPCRouter({
                         homeState: input.newStateName
                     }
                 });
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -346,7 +375,7 @@ export const editProfileRouter = createTRPCRouter({
                         homeZipCode: input.newZipName
                     }
                 });
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -387,7 +416,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -428,7 +457,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -469,7 +498,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -510,7 +539,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -551,7 +580,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -610,7 +639,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',
@@ -653,7 +682,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
-                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
+                sendUpdateEmail(ctx.session?.user.email || '');
                 return(
                     {
                         status: 'success',

@@ -5,6 +5,7 @@ import { TRPCClientError } from "@trpc/client";
 import { useState } from "react";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 // NEEDS: Need a page that says basically thank you for signing
 
@@ -466,6 +467,7 @@ const RegisterForm = () => {
             value={password}
             defaultValue=""
             onChange={(event) => setPassword(event.target.value)}
+            type="password"
           />
         </fieldset>
         <fieldset className="mb-[15px] flex w-full flex-col justify-start">
@@ -481,6 +483,8 @@ const RegisterForm = () => {
             value={confirmPassword}
             defaultValue=""
             onChange={(event) => setConfirmPassword(event.target.value)}
+            type="password"
+
           />
         </fieldset>
         <form onSubmit={handleFormSubmit}>

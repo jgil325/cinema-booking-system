@@ -5,6 +5,7 @@ import { useState } from "react";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { z } from "zod";
 
 // NEEDS: Need a page that says basically thank you for signing
 
@@ -34,6 +35,22 @@ const RegisterForm = () => {
   const [homeCity, setHomeCity] = useState("");
   const [homeState, setHomeState] = useState("");
   const [homeZipCode, setHomeZip] = useState("");
+
+  const validationSchema = z.object({
+    email: z.string().email().min(5),
+    firstName: z.string(),
+    lastName: z.string(),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
+    isSignedUpPromos: z.boolean(),
+    phoneNumber: z.string(),
+    cardNumber: z.string(),
+    cardType: z.string(),
+    address: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zipCode: z.number(),
+  });
 
   // Hooks
   const createAccount = api.user.createAccount.useMutation();

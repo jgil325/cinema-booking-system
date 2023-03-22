@@ -1,4 +1,4 @@
-import React, { type InputHTMLAttributes, useState, useEffect } from "react";
+import React, { type InputHTMLAttributes, useState } from "react";
 import { useSession } from "next-auth/react";
 import { stateList } from "../data/states";
 import { cardTypes } from "../data/cardTypes";
@@ -23,12 +23,10 @@ const InputField = ({ title, ...props }: InputFieldProps) => {
 
 const MyProfile = () => {
   const { data: session } = useSession();
-  console.log(session?.user)
+
   const { data: user, isLoading } = api.user.byId.useQuery({
-    email: session?.user.email || "",
+    id: session?.user.id || "",
   });
-  console.log(user)
-  //api.editProfile.sendConfirmEmail.useQuery();
 
   const [firstName, setFirstName] = useState(user?.firstName);
   const [lastName, setLastName] = useState(user?.firstName);
@@ -37,7 +35,7 @@ const MyProfile = () => {
   const [newPassConfirm, setNewPassConfirm] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
   const [state, setState] = useState("");
-  const [city, setCity] = useState(user?.homeCity);
+  const [city, setCity] = useState("");
   const [zipcode, setZipcode] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [cardType, setCardType] = useState("");

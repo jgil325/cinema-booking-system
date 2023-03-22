@@ -2,17 +2,20 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
+import { api } from "../utils/api";
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
-  const { code } = router.query;
+  const { uid } = router.query;
 
-  async function handleChangePass() {
+  const { mutate } = api.editProfile.resetPassword.useMutation();
+  console.log(uid)
+  function handleChangePass() {
     if (password.localeCompare(confirmPassword) !== 0)
       return window.alert("Passwords must match");
-    // await mutation(password, code)
+    mutate({ newPassword: password, uid });
     setShowSuccess(true);
   }
 

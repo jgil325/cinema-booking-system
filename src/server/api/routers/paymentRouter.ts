@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from '../trpc'
 import {z} from 'zod'
 import validator from 'validator';
 import bcrypt from 'bcrypt';
+import { TRPCError } from '@trpc/server';
 
 export const paymentRouter = createTRPCRouter({
   createPaymentInfo: publicProcedure
@@ -69,14 +70,22 @@ export const paymentRouter = createTRPCRouter({
     }
   }),
 
-  byId: publicProcedure // NOT TESTED OR USED // NO error checking
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const card = await ctx.prisma.paymentCard.findUnique({
-        where: { id: input.id },
-      });
-
-      return card;
+  byId: publicProcedure
+    .query(async ({ ctx }) => {
+      try {
+        const userID = ctx.session?.user.id;
+        const cards = await ctx.prisma.paymentCard.findMany({
+          where: { 
+            userId: userID 
+          },
+        });
+        return cards;
+      } catch {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'unable to fetch cards'
+        })
+      }
     }),
 
   all: publicProcedure.query(async ({ ctx }) => { // NOT TESTED OR USED // no error checking

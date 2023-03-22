@@ -1,11 +1,55 @@
 import { createTRPCRouter, publicProcedure } from '../trpc'
 import {z} from 'zod'
-import { v4 as uuidv4 } from 'uuid';
-import { CardType, StatusType } from '@prisma/client';
+import { CardType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
+
+const sendUpdateEmail = (email: string) => {
+    try {
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({  
+            service: 'Gmail',
+            auth: {
+            user: process.env.MAIL_USER,
+            pass: process.env.MAIL_PASS,
+            }
+        });
+        
+        const mailOptions = {
+            from: process.env.MAIL_USER,
+            to: email,
+            subject: 'Account Information Update',
+            html: 'Successfully updated profile information!'
+        };
+        
+        transporter.sendMail(mailOptions, function(error: any, info: { response: any; }) {
+            if (error) {
+            console.log(error);
+            } else {
+            console.log(`Profile Update Confirmation Email sent to ${email}.`);
+            }
+        });
+        return {
+            message: 'successfully sent email!',
+            email: email
+        }
+    } catch {
+        return new TRPCError({
+            code: 'CONFLICT',
+            message: 'failed sending email'
+        })
+    }
+}
+
 export const editProfileRouter = createTRPCRouter({
-    getUserInfo: publicProcedure
+    sendConfirmEmail: publicProcedure
+    // written as a query so an email isnt sent for each individual field updated
+        .query(async ({ ctx }) => {
+            const sendEmail = ctx.session?.user.email;
+            console.log(sendEmail);
+            return sendUpdateEmail(sendEmail || 'collinsr2k@gmail.com');
+        }),
+    /*getUserInfo: publicProcedure
         .query(async ({ ctx }) => {
             const userID = ctx.session?.user.id;
             try {
@@ -16,18 +60,24 @@ export const editProfileRouter = createTRPCRouter({
                     select: {
                         firstName: true,
                         lastName: true,
+                        homeAddress: true,
+                        homeCity: true,
+                        homeState: true,
+                        homeZipCode: true,
                         paymentCards: {
                             where: {
                                 userId: userID
                             },
                             select: {
-                                homeAddress: true,
-                                homeCity: true,
-                                homeState: true,
-                                homeZipCode: true,
+                                id: true,
+                                cardNumber: true, // for now just the encrypted number is fine
+                                cardType: true,
+                                expirationMonth: true,
+                                expirationYear: true,
                                 billingAddress: true,
-                                cardNumber: true,
-                                // more fields need to be added
+                                billingCity: true,
+                                billingState: true,
+                                billingZipCode: true,
                             }
                         }
                     }
@@ -42,7 +92,7 @@ export const editProfileRouter = createTRPCRouter({
                     message: 'Error fetching user data',
                 });
             } 
-        }),
+        }),*/
     changePromoStatus: publicProcedure
         .input(
             z.object({
@@ -59,6 +109,7 @@ export const editProfileRouter = createTRPCRouter({
                         isSignedUpPromos: input.newPromoStatus
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -91,6 +142,7 @@ export const editProfileRouter = createTRPCRouter({
                         lastName: newLastName 
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -121,6 +173,7 @@ export const editProfileRouter = createTRPCRouter({
                         phoneNumber: input.newPhoneNumber
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -169,6 +222,7 @@ export const editProfileRouter = createTRPCRouter({
                         password: encodedPassword
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -196,18 +250,10 @@ export const editProfileRouter = createTRPCRouter({
                         id: userID
                     },
                     data: {
-                        paymentCards: {
-                            updateMany: {
-                                where: {
-                                    userId: userID // does this reference the right user??
-                                },
-                                data: {
-                                    homeAddress: input.newStreetName
-                                }
-                            }
-                        }
+                        homeAddress: input.newStreetName
                     }
-                })
+                });
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -235,18 +281,10 @@ export const editProfileRouter = createTRPCRouter({
                         id: userID
                     },
                     data: {
-                        paymentCards: {
-                            updateMany: {
-                                where: {
-                                    userId: userID // does this reference the right user??
-                                },
-                                data: {
-                                    homeCity: input.newCityName
-                                }
-                            }
-                        }
+                        homeCity: input.newCityName
                     }
-                })
+                });
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -274,18 +312,10 @@ export const editProfileRouter = createTRPCRouter({
                         id: userID
                     },
                     data: {
-                        paymentCards: {
-                            updateMany: {
-                                where: {
-                                    userId: userID // does this reference the right user??
-                                },
-                                data: {
-                                    homeState: input.newStateName
-                                }
-                            }
-                        }
+                        homeState: input.newStateName
                     }
-                })
+                });
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -313,18 +343,10 @@ export const editProfileRouter = createTRPCRouter({
                         id: userID
                     },
                     data: {
-                        paymentCards: {
-                            updateMany: {
-                                where: {
-                                    userId: userID // does this reference the right user??
-                                },
-                                data: {
-                                    homeZipCode: input.newZipName
-                                }
-                            }
-                        }
+                        homeZipCode: input.newZipName
                     }
-                })
+                });
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -342,7 +364,8 @@ export const editProfileRouter = createTRPCRouter({
     changeBillingAddress: publicProcedure
         .input(
             z.object({
-                newStreetName: z.string()
+                newStreetName: z.string(),
+                cardId: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -353,9 +376,9 @@ export const editProfileRouter = createTRPCRouter({
                     },
                     data: {
                         paymentCards: {
-                            updateMany: {
+                            update: {
                                 where: {
-                                    userId: userID // does this reference the right user??
+                                    id: input.cardId
                                 },
                                 data: {
                                     billingAddress: input.newStreetName
@@ -364,6 +387,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -378,11 +402,11 @@ export const editProfileRouter = createTRPCRouter({
                 });
             }
         }),
-    // Is there a different billing city, state, zip?
     changeBillingCity: publicProcedure
         .input(
             z.object({
-                newCityName: z.string()
+                newCityName: z.string(),
+                cardId: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -393,17 +417,18 @@ export const editProfileRouter = createTRPCRouter({
                     },
                     data: {
                         paymentCards: {
-                            updateMany: {
+                            update: {
                                 where: {
-                                    userId: userID // does this reference the right user??
+                                    id: input.cardId
                                 },
                                 data: {
-                                    homeCity: input.newCityName
+                                    billingCity: input.newCityName
                                 }
                             }
                         }
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -421,7 +446,8 @@ export const editProfileRouter = createTRPCRouter({
     changeBillingState: publicProcedure
         .input(
             z.object({
-                newStateName: z.string()
+                newStateName: z.string(),
+                cardId: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -432,17 +458,18 @@ export const editProfileRouter = createTRPCRouter({
                     },
                     data: {
                         paymentCards: {
-                            updateMany: {
+                            update: {
                                 where: {
-                                    userId: userID // does this reference the right user??
+                                    id: input.cardId
                                 },
                                 data: {
-                                    homeState: input.newStateName
+                                    billingState: input.newStateName
                                 }
                             }
                         }
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -460,7 +487,8 @@ export const editProfileRouter = createTRPCRouter({
     changeBillingZipCode: publicProcedure
         .input(
             z.object({
-                newZipCode: z.string()
+                newZipCode: z.string(),
+                cardId: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -471,17 +499,18 @@ export const editProfileRouter = createTRPCRouter({
                     },
                     data: {
                         paymentCards: {
-                            updateMany: {
+                            update: {
                                 where: {
-                                    userId: userID // does this reference the right user??
+                                    id: input.cardId
                                 },
                                 data: {
-                                    homeZipCode: input.newZipCode
+                                    billingZipCode: input.newZipCode
                                 }
                             }
                         }
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -496,11 +525,11 @@ export const editProfileRouter = createTRPCRouter({
                 });
             }
         }),
-    // ^^^^^^ //
     changeCardType: publicProcedure
         .input(
             z.object({
-                newCardType: z.nativeEnum(CardType)
+                newCardType: z.nativeEnum(CardType),
+                cardId: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -511,9 +540,9 @@ export const editProfileRouter = createTRPCRouter({
                     },
                     data: {
                         paymentCards: {
-                            updateMany: {
+                            update: {
                                 where: {
-                                    userId: userID // does this reference the right user??
+                                    id: input.cardId
                                 },
                                 data: {
                                     cardType: input.newCardType
@@ -522,6 +551,7 @@ export const editProfileRouter = createTRPCRouter({
                         }
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
@@ -539,7 +569,9 @@ export const editProfileRouter = createTRPCRouter({
     changeCardExpiration: publicProcedure
         .input(
             z.object({
-                newCardExpirationDate: z.string() // needs to be Date type
+                newCardExpirationMonth: z.number(),
+                newCardExpirationYear: z.number(),
+                cardId: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -550,22 +582,40 @@ export const editProfileRouter = createTRPCRouter({
                     },
                     data: {
                         paymentCards: {
-                            updateMany: {
+                            update: {
                                 where: {
-                                    userId: userID // does this reference the right user??
+                                    id: input.cardId
                                 },
                                 data: {
-                                    cardNumber: input.newCardExpirationDate // needs to be Expiration DateType
+                                    expirationMonth: input.newCardExpirationMonth
                                 }
                             }
                         }
                     }
                 })
+                const updateUser1 = await ctx.prisma.user.update({
+                    where: {
+                        id: userID
+                    },
+                    data: {
+                        paymentCards: {
+                            update: {
+                                where: {
+                                    id: input.cardId
+                                },
+                                data: {
+                                    expirationYear: input.newCardExpirationYear
+                                }
+                            }
+                        }
+                    }
+                })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',
                         operation: 'change billing card expiration date',
-                        newUser: updateUser
+                        newUser: updateUser1
                     }
                 );
             } catch {
@@ -578,28 +628,32 @@ export const editProfileRouter = createTRPCRouter({
     changeCardNumber: publicProcedure
         .input(
             z.object({
-                newCardNumber: z.string().length(16)
+                newCardNumber: z.string().length(16),
+                cardId: z.string()
             }))
         .mutation(async ({ ctx, input }) => {
             try {
                 const userID = ctx.session?.user.id;
+                const bcrypt = require('bcrypt');
+                const encryptedCardNumber = await bcrypt.hash(input.newCardNumber, 10);
                 const updateUser = await ctx.prisma.user.update({
                     where: {
                         id: userID
                     },
                     data: {
                         paymentCards: {
-                            updateMany: {
+                            update: {
                                 where: {
-                                    userId: userID // does this reference the right user??
+                                    id: input.cardId
                                 },
                                 data: {
-                                    cardNumber: input.newCardNumber
+                                    cardNumber: encryptedCardNumber
                                 }
                             }
                         }
                     }
                 })
+                //sendUpdateEmail(ctx.session?.user.email || 'collinsr2k@gmail.com');
                 return(
                     {
                         status: 'success',

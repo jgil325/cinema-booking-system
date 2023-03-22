@@ -11,9 +11,10 @@ export const userRouter = createTRPCRouter({
       return ctx.prisma.user.findMany({ orderBy: { id: "desc" } });
     }),
     byId: publicProcedure
-      .input(z.object({ id: z.string() }))
-      .query(({ ctx, input }) => {
-        return ctx.prisma.user.findFirst({ where: { id: input.id } });
+      .input(z.object({ email: z.string() }))
+      .query(async ({ ctx, input }) => {
+        
+        return await ctx.prisma.user.findUnique({ where: { email: input.email } });
       }),
     createAccount: publicProcedure
       .input(

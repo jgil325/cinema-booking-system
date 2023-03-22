@@ -218,5 +218,48 @@ export const userRouter = createTRPCRouter({
                 message: 'user not found or other err'
             })
            }
-        })
+        }),
+    sendPasswordResetLink: publicProcedure
+      .input(z.object({
+        email: z.string()
+      }))
+      .mutation(async({ctx, input}) => {
+        try {
+          const userID = ctx.prisma.user.findUnique({
+            where: {
+              email: input.email
+            },
+            select: {
+              id: true
+            }
+          })
+          const activationLink = `http://localhost:3000/changePassword?uid=${userID}`;
+
+          const transporter = nodemailer.createTransport({  
+            service: 'Gmail',
+            auth: {
+              user: process.env.MAIL_USER,
+              pass: process.env.MAIL_PASS,
+            }
+          });
+          
+          const mailOptions = {
+            from: process.env.MAIL_USER,
+            to: input.email,
+            subject: 'Reset Password Request',
+            html: `You have requested to reset your email. Follow provided link: <a href="${activationLink}">${activationLink}</a>`
+          };
+          
+          transporter.sendMail(mailOptions, function(error, info: { response: any }) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log(`Reset Password Email sent to ${input.email}.`, info.response);
+            }
+          });
+        } catch {
+          return 'error';
+        }
+      })
+
   });

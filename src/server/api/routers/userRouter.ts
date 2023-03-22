@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { StatusType } from '@prisma/client';
 import validator from 'validator';
 import { TRPCError } from '@trpc/server';
+import nodemailer from 'nodemailer';
+import bcrypt from 'bcrypt';
 
 export const userRouter = createTRPCRouter({
 
@@ -86,9 +88,7 @@ export const userRouter = createTRPCRouter({
         }
 
 
-        const bcrypt = require('bcrypt');
         const encodedPassword = await bcrypt.hash(password, 10);
-
 
         const fullUserDetails = { 
             id: uuidv4(), // unique
@@ -156,7 +156,6 @@ export const userRouter = createTRPCRouter({
 
         const userID = createdUser.id;
         const activationLink = `http://localhost:3000/confirmRegistration?userID=${userID}`;
-        const nodemailer = require('nodemailer');
 
         const transporter = nodemailer.createTransport({  
           service: 'Gmail',
@@ -173,11 +172,11 @@ export const userRouter = createTRPCRouter({
           html: `Congrats! You have signed up for an cinema ebooking system account. Promotions coming soon! Please click on the link to activate you account: <a href="${activationLink}">${activationLink}</a>`
         };
         
-        transporter.sendMail(mailOptions, function(error: any, info: { response: any; }) {
+        transporter.sendMail(mailOptions, function(error, info: { response: any }) {
           if (error) {
             console.log(error);
           } else {
-            console.log(`Confirmation Email sent to ${email}.` + info.response);
+            console.log(`Confirmation Email sent to ${email}.`, info.response);
           }
         });
         return [createdUser, createdCard];
@@ -198,7 +197,6 @@ export const userRouter = createTRPCRouter({
                 },
             });
             if (userFound) {
-                const bcrypt = require('bcrypt');
                 const dbUserPass = userFound.password;
                 const compare = await bcrypt.compare(input.password, dbUserPass);
                 if (!compare) {

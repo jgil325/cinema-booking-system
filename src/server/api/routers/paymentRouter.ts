@@ -1,6 +1,7 @@
 import { createTRPCRouter, publicProcedure } from '../trpc'
 import {z} from 'zod'
 import validator from 'validator';
+import bcrypt from 'bcrypt';
 
 export const paymentRouter = createTRPCRouter({
   createPaymentInfo: publicProcedure
@@ -32,7 +33,6 @@ export const paymentRouter = createTRPCRouter({
           throw new Error('Card has already expired');
         }
 
-        const bcrypt = require('bcrypt');
         const encodedCard = await bcrypt.hash(cardNumber, 10);
 
         const newCard = await ctx.prisma.paymentCard.create({ 

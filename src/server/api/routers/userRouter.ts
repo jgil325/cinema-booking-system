@@ -87,7 +87,6 @@ export const userRouter = createTRPCRouter({
           throw new Error('A user with this email already exists!'); // TODO: I dont want this to go to the next page, rn it goes to the confirmation page.
         }
 
-
         const encodedPassword = await bcrypt.hash(password, 10);
 
         const fullUserDetails = { 

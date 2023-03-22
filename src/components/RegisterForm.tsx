@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 // NEEDS: Need a page that says basically thank you for signing
 
 const RegisterForm = () => {
-
+  const router = useRouter();
   // User Account information
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -99,6 +99,7 @@ const RegisterForm = () => {
         alert(error); // should be coming from backend
       }
     }
+    router.push("/checkEmail");
     return createAccountResult;
   }
 

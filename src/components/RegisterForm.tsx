@@ -1,7 +1,7 @@
 // import React from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { TRPCClientError } from "@trpc/client";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
@@ -44,9 +44,9 @@ const RegisterForm = () => {
       alert("Password and confirm password must match. Please try again.");
       return;
     }
-
+    let createAccountResult;
     try {
-      const createAccountResult = await createAccount.mutateAsync({
+      createAccountResult = await createAccount.mutateAsync({
         email,
         firstName,
         lastName,
@@ -99,6 +99,7 @@ const RegisterForm = () => {
         alert(error); // should be coming from backend
       }
     }
+    return createAccountResult;
   }
 
   return (

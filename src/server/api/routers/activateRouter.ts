@@ -1,15 +1,15 @@
-import { createTRPCRouter, publicProcedure } from '../trpc';
-import { z } from 'zod';
-import { StatusType } from '@prisma/client';
+import { createTRPCRouter, publicProcedure } from "../trpc";
+import { z } from "zod";
+import { StatusType } from "@prisma/client";
 
 export const activateRouter = createTRPCRouter({
   activate: publicProcedure
     .input(
       z.object({
         userID: z.string(),
-      }),
+      })
     )
-    .mutation(async ({ ctx, input }) => {
+    .query(async ({ ctx, input }) => {
       const { userID } = input;
 
       try {

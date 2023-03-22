@@ -177,9 +177,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
 
   return (
     <>
-      <span className="text-center text-3xl font-medium">
-        Your Payment Cards
-      </span>
+
       <span className="border-b border-gray-300 pt-4 text-left text-xl font-medium">
         Card Information
       </span>

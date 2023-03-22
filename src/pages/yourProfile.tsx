@@ -52,20 +52,71 @@ const Page = () => {
     billingZipCode: "30323",
     userId: "532432fda",
   };
+  const cards: Array<PaymentCard> = [tempCard, tempCard, tempCard];
   return (
     <div className="border-grey mt-4 grid items-center justify-center">
       <div className="grid min-w-[50vw] space-y-0 rounded-xl border px-8 py-8 text-center">
-        {editPaymentCard === 0 ? (
-          <MyProfile user={user} />
+        {editPaymentCard === -1 ? (
+          <>
+            <MyProfile user={user} />
+            <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium"></span>
+            <div className="grid grid-cols-1 items-baseline space-x-6 pt-3">
+              <button
+                className="h-fit w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-1.5 font-medium text-black hover:bg-gray-200"
+                type="submit"
+                onClick={() => setEditPaymentCard(0)}
+              >
+                Edit Payment Cards
+              </button>
+            </div>
+          </>
         ) : (
-          <EditPaymentCard card={tempCard} />
+          <>
+            <span className="text-center text-3xl font-medium">
+              Your Payment Cards
+            </span>
+            <div className="flex justify-center">
+              {cards.map((card, index) => {
+                const selected = editPaymentCard === index;
+                let className =
+                  "my-3 mx-3 grow rounded border bg-gray-50 px-4 py-1.5 hover:bg-gray-200";
+                if (selected) className += "border-black border-2";
+                return (
+                  <button
+                    className={className}
+                    key={card.id}
+                    onClick={() => setEditPaymentCard(index)}
+                  >
+                    Card {index}
+                  </button>
+                );
+              })}
+            </div>
+            <EditPaymentCard card={cards[editPaymentCard]} />
+            <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium"></span>
+            <div className="grid grid-cols-1 items-baseline space-x-6 pt-3">
+              <button
+                className="h-fit w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-1.5 font-medium text-black hover:bg-gray-200"
+                type="submit"
+                onClick={() => setEditPaymentCard(-1)}
+              >
+                Edit Profile
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
   );
 };
 
-const MyProfile = ({ user }: { user: User }) => {
+const MyProfile = ({
+  user,
+  toPaymentCards,
+}: {
+  user: User;
+  toPaymentCards: () => void;
+}) => {
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [oldPassword, setOldPassword] = useState("");
@@ -201,6 +252,11 @@ const MyProfile = ({ user }: { user: User }) => {
             value={user?.email}
             readOnly={true}
           />
+        </div>
+        <div className="grid">
+          <span className="invisible text-left font-medium">
+            Change Password
+          </span>
         </div>
       </div>
       <div className="grid grid-cols-2 space-x-6">

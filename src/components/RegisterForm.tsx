@@ -221,7 +221,7 @@ const RegisterForm = () => {
             onChange={(event) => setEmail(event.target.value)}
           />
         </fieldset>
-        <fieldset className="flex w-full flex-row justify-between space-x-4">
+        <fieldset className="flex w-full flex-row justify-between space-x-3">
           <fieldset className="mb-[15px] flex w-1/2 flex-col justify-start">
             <label
               className="text-violet12 mb-2.5 block text-[13px] leading-none"
@@ -283,50 +283,52 @@ const RegisterForm = () => {
             onChange={(event) => setHomeAddress(event.target.value)}
           />
         </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="phone"
-          >
-            Home City
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="home city" // Added value and change
-            value={homeCity}
-            defaultValue=""
-            onChange={(event) => setHomeCity(event.target.value)}
-          />
-        </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="phone"
-          >
-            Home State
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="home state" // Added value and change
-            value={homeState}
-            defaultValue=""
-            onChange={(event) => setHomeState(event.target.value)}
-          />
-        </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="phone"
-          >
-            Home Zip Code
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="home zip code" // Added value and change
-            value={homeZipCode}
-            defaultValue=""
-            onChange={(event) => setHomeZip(event.target.value)}
-          />
+        <fieldset className="flex w-full flex-row justify-between space-x-3">
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="phone"
+            >
+              City
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home city" // Added value and change
+              value={homeCity}
+              defaultValue=""
+              onChange={(event) => setHomeCity(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="phone"
+            >
+              State
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home state" // Added value and change
+              value={homeState}
+              defaultValue=""
+              onChange={(event) => setHomeState(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="phone"
+            >
+              Zip Code
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home zip code" // Added value and change
+              value={homeZipCode}
+              defaultValue=""
+              onChange={(event) => setHomeZip(event.target.value)}
+            />
+          </fieldset>
         </fieldset>
         <fieldset className="mb-[5px] flex w-full flex-row justify-end gap-3">
           <label

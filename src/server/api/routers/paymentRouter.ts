@@ -17,12 +17,11 @@ export const paymentRouter = createTRPCRouter({
         userId: z.string(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input}) => {
       try {
-        const {cardNumber, cardType, billingAddress, expirationMonth, expirationYear, billingCity, billingState, billingZipCode, userId} = input;
-        
+        const {cardNumber, cardType, billingAddress, expirationMonth, expirationYear, billingCity, billingState, billingZipCode, userId } = input; // userId
         // TODO: Check to see if this works and can only add three payment cards
-        const cardCount = await ctx.prisma.paymentCard.count({ where: { userId: userId } });
+        const cardCount = await ctx.prisma.paymentCard.count({ where: { userId } });
         if (cardCount >= 3) {
           throw new Error('A user can only have up to three payment cards');
         }
@@ -51,6 +50,7 @@ export const paymentRouter = createTRPCRouter({
         });
         return newCard;
       } catch (error) {
+        // ctx.prisma.user.delete({where: {id: input.userId}});
         console.error('Error creating payment info:', error);
         throw new Error('Could not create payment info');
       }

@@ -23,6 +23,7 @@ export const userRouter = createTRPCRouter({
     createAccount: publicProcedure
       .input(
         z.object({
+          // User Validation
           email: z.string().email(),
           firstName: z.string().min(1, {message: "Name is required"}),
           lastName: z.string().min(1, {message: "Last name is required"}),
@@ -33,11 +34,20 @@ export const userRouter = createTRPCRouter({
           homeCity: z.string().min(1, {message: "Home city is required"}),
           homeState: z.string().min(1, {message: "Home state is required"}),
           homeZipCode: z.string().length(5, {message: "Please enter a valid zip code."}),
+          //Payment Validation
+          cardNumber: z.string().refine(value => validator.isCreditCard(value), {message: "Please enter a valid credit card number."}), 
+          cardType: z.enum(["VISA", "MASTERCARD", "DISCOVER", "AMEX"]),
+          billingAddress: z.string().max(100),
+          expirationMonth: z.number().min(1, {message: "Please enter a valid month."}).max(12, {message: "Please enter a valid month."}),
+          expirationYear: z.number().min(new Date().getFullYear()).max(9999),
+          billingCity: z.string().min(1, {message: "Please enter a valid city."}), 
+          billingState: z.string().min(1), 
+          billingZipCode: z.string().length(5, {message: "Please enter a valid zip code."}),
         }),
       )
       .mutation(async ({ ctx, input }) => {
-        const {email, firstName, lastName, password, isSignedUpPromos, phoneNumber, homeAddress,
-          homeCity, homeState, homeZipCode } = input;
+        const {email, firstName, lastName, password, isSignedUpPromos, phoneNumber, homeAddress,homeCity, homeState, homeZipCode } = input; // User info
+        const {cardNumber, cardType, billingAddress, expirationMonth, expirationYear, billingCity, billingState, billingZipCode } = input; // payment info
 
         try {
           // Validate home address, city, state, and zip code
@@ -115,12 +125,29 @@ export const userRouter = createTRPCRouter({
                         expires: new Date('2023-11-31T23:59:59Z'),
                     }
                 ]
-            }
-             
+            }   
         };
 
-        let createdUser;
+        const paymentCardDetails = {
+            cardNumber: cardNumber,
+            cardType: cardType, 
+            billingAddress: billingAddress, // TODO: Build and Validate building address, // TODO: make sure their can only be one shipping address
+            expirationMonth: expirationMonth,  
+            expirationYear: expirationYear, 
+            billingCity: billingCity,
+            billingState: billingState,
+            billingZipCode: billingZipCode, 
+            userId: fullUserDetails.id,
+        }
 
+        let createdCard;
+        try {
+          const createdCard = await ctx.prisma.paymentCard.create({data: paymentCardDetails})
+        } catch (error) {
+          throw new Error('Failed to create payment card.' )
+        }
+
+        let createdUser;
         try {
           createdUser = await ctx.prisma.user.create({ data: fullUserDetails }); 
         } catch (error) {
@@ -153,7 +180,7 @@ export const userRouter = createTRPCRouter({
             console.log(`Confirmation Email sent to ${email}.` + info.response);
           }
         });
-        return createdUser;
+        return [createdUser, createdCard];
       }),
     delete: publicProcedure.input(z.string()).mutation(({ ctx, input }) => {
       return ctx.prisma.user.delete({ where: { id: input } });

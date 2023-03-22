@@ -6,6 +6,7 @@ import { useState } from "react";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { z } from "zod";
 
 // NEEDS: Need a page that says basically thank you for signing
 
@@ -24,7 +25,7 @@ const RegisterForm = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [cardType, setCardType] = useState<
     "VISA" | "MASTERCARD" | "DISCOVER" | "AMEX"
-    >("VISA");
+  >("VISA");
   const [billingAddress, setBillingAddress] = useState("");
   const [billingCity, setBillingCity] = useState("");
   const [billingState, setBillingState] = useState("");
@@ -35,6 +36,22 @@ const RegisterForm = () => {
   const [homeCity, setHomeCity] = useState("");
   const [homeState, setHomeState] = useState("");
   const [homeZipCode, setHomeZip] = useState("");
+
+  const User = z.object({
+    email: z.string().email(),
+    firstName: z.string(),
+    lastName: z.string(),
+    password: z.string(),
+    confirmPassword: z.string(),
+    isSignedUpPromos: z.boolean(),
+    phoneNumber: z.string(),
+    cardNumber: z.string(),
+    cardType: z.string(),
+    address: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zipCode: z.number(),
+  });
 
   // Hooks
   const createAccount = api.user.createAccount.useMutation();
@@ -73,36 +90,37 @@ const RegisterForm = () => {
       let errorMessage;
       if (error instanceof TRPCClientError) {
         const errorResult = error.message;
-        errorMessage = "Please correct your information regarding: \n" + errorResult;
+        errorMessage =
+          "Please correct your information regarding: \n" + errorResult;
         toast.error(errorMessage);
-        const popup = document.createElement('div');
+        const popup = document.createElement("div");
         popup.innerText = errorMessage;
-        popup.style.position = 'fixed';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.backgroundColor = '#fff';
-        popup.style.color = '#000';
-        popup.style.padding = '20px';
-        popup.style.borderRadius = '5px';
-        popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.5)';
-        popup.style.maxWidth = '80%';
-        popup.style.maxHeight = '80%';
-        popup.style.overflow = 'auto';
-        popup.style.zIndex = '9999';
+        popup.style.position = "fixed";
+        popup.style.top = "50%";
+        popup.style.left = "50%";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.backgroundColor = "#fff";
+        popup.style.color = "#000";
+        popup.style.padding = "20px";
+        popup.style.borderRadius = "5px";
+        popup.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+        popup.style.maxWidth = "80%";
+        popup.style.maxHeight = "80%";
+        popup.style.overflow = "auto";
+        popup.style.zIndex = "9999";
         document.body.appendChild(popup);
         const hidePopup = () => {
           popup.remove();
         };
         setTimeout(hidePopup, 20000);
-        popup.addEventListener('click', hidePopup);
+        popup.addEventListener("click", hidePopup);
       } else {
         alert(error); // should be coming from backend
       }
     }
     router.push("/checkEmail");
     return createAccountResult;
-  }
+  };
 
   return (
     <Tabs.Root
@@ -484,7 +502,6 @@ const RegisterForm = () => {
             defaultValue=""
             onChange={(event) => setConfirmPassword(event.target.value)}
             type="password"
-
           />
         </fieldset>
         <form onSubmit={handleFormSubmit}>

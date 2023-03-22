@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import MovieCard from "../components/MovieCard";
 
-
 const Home: NextPage = () => {
   const testmovie = {
     title: "Shrek",
@@ -15,13 +14,14 @@ const Home: NextPage = () => {
     synopsis:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     reviews: [],
-    trailerPicture: "https://img.nbc.com/sites/nbcunbc/files/images/2020/11/03/02b2cc2f-ba71-3a3c-a274-c2e4bd14cd74.jpg",
+    trailerPicture:
+      "https://img.nbc.com/sites/nbcunbc/files/images/2020/11/03/02b2cc2f-ba71-3a3c-a274-c2e4bd14cd74.jpg",
     trailerVideoId: "W37DlG1i61s",
     MPAAUSFilmRating: "PG",
     showDates: [],
     showTimes: [],
   };
-  const movies = new Array(10).fill(testmovie);
+  const movies = new Array(3).fill(testmovie);
   const categories = [
     "Currently Showing",
     "Coming Soon",
@@ -58,11 +58,21 @@ const Home: NextPage = () => {
             );
           })}
         </div>
-
+        <div className="mx-64 mt-10 font-bold">Now Showing</div>
         <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
           {movies.map((movie, index) => {
             return (
-
+              <MovieCard
+                movie={movie}
+                key={`MovieCard-${index}-${movie.title}`}
+              />
+            );
+          })}
+        </div>
+        <div className="mx-64 mt-10 font-bold">Coming Soon</div>
+        <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
+          {movies.map((movie, index) => {
+            return (
               <MovieCard
                 movie={movie}
                 key={`MovieCard-${index}-${movie.title}`}

@@ -26,7 +26,6 @@ const cardTypes = Object.values(CardTypeEnum);
 const DEBOUNCE_DELAY = 500;
 
 const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
-  const {data: card} = 
   const [billingAddress, setBillingAddress] = useState(card.billingAddress);
   const [state, setState] = useState(card.billingState);
   const [city, setCity] = useState(card.billingCity);

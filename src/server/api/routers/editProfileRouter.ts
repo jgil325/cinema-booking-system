@@ -269,15 +269,15 @@ export const editProfileRouter = createTRPCRouter({
     resetPassword: publicProcedure
         .input(
             z.object({
-               // email: z.string(),
+                uid: z.string(),
                 newPassword: z.string()
             }))
         .mutation(async ({ ctx, input }) => { 
             try {
-                const userID = ctx.session?.user.id;
+                //const userID = ctx.session?.user.id;
                 const resetUserPassword = await ctx.prisma.user.update({
                     where: {
-                        id: userID
+                        id: input.uid
                     },
                     data : {
                         password: input.newPassword

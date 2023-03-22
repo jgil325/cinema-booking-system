@@ -1,10 +1,9 @@
 import React, { type InputHTMLAttributes, useState } from "react";
-import { useSession } from "next-auth/react";
 import { stateList } from "../data/states";
-import { cardTypes } from "../data/cardTypes";
 import { api } from "../utils/api";
 import { debounce } from "../utils/debounce";
-
+import { PaymentCard, User } from "@prisma/client";
+import EditPaymentCard from "../components/forms/EditPaymentCard";
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
 }
@@ -22,24 +21,51 @@ const InputField = ({ title, ...props }: InputFieldProps) => {
   );
 };
 
-const MyProfile = () => {
-  const { data: session } = useSession();
-  const { data: user, isLoading } = api.user.byId.useQuery({
-    email: session?.user.email,
-  });
+const Page = () => {
+  const [editPaymentCard, setEditPaymentCard] = useState(0);
 
-  const [firstName, setFirstName] = useState(user ? user.firstName : "");
-  const [lastName, setLastName] = useState(user ? user.lastName : "");
+  const { data: user, isLoading, error } = api.user.byId.useQuery();
+  if (isLoading) return null;
+  if (error)
+    return (
+      <div>
+        <h1>Something Went Wrong</h1>
+        <span>{JSON.stringify(error)}</span>
+      </div>
+    );
+  if (!user)
+    return (
+      <div>
+        <h1>Something Went Wrong</h1>
+        <span>User Not Found</span>
+      </div>
+    );
+  const tempCard: PaymentCard = {
+    id: "1234",
+    cardNumber: "123432432432412",
+    cardType: "VISA",
+    expirationMonth: 5,
+    expirationYear: 23,
+    billingAddress: "1234 road road rd.",
+    billingCity: "Atlanta",
+    billingState: "GA",
+    billingZipCode: "30323",
+    userId: "532432fda",
+  };
+  if (editPaymentCard !== -1) return <EditPaymentCard card={tempCard} />;
+  return <MyProfile user={user} />;
+};
+
+const MyProfile = ({ user }: { user: User }) => {
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPassConfirm, setNewPassConfirm] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [zipcode, setZipcode] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardType, setCardType] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
+  const [billingAddress, setBillingAddress] = useState(user.homeAddress);
+  const [state, setState] = useState(user.homeState);
+  const [city, setCity] = useState(user.homeCity);
+  const [zipcode, setZipcode] = useState(user.homeZipCode);
 
   const { mutate: saveFirstName } =
     api.editProfile.changeFirstName.useMutation();
@@ -77,7 +103,8 @@ const MyProfile = () => {
   const { mutate: changePassword } =
     api.editProfile.changePassword.useMutation();
   const handleChangePassword = () => {
-    if (newPassword === newPassConfirm) throw "Passwords Do Not Match";
+    if (newPassword.localeCompare(newPassConfirm) !== 0)
+      return window.alert("New Passwords Do Not Match");
     changePassword({ newPassword, oldPassword });
   };
 
@@ -259,46 +286,9 @@ const MyProfile = () => {
             type="number"
           />
         </div>
-        <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
-          Payment Card
-        </span>
-        <div className="grid grid-cols-4 space-x-6 pt-3">
-          <div className="col-span-2">
-            <InputField
-              title={"Card Number"}
-              type="text"
-              value={cardNumber}
-              onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                setCardNumber(e.currentTarget.value);
-              }}
-            />
-          </div>
-          <div className="grid">
-            <span className="text-left font-medium">Card Type</span>
-            <select
-              className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              value={cardType}
-              onChange={(e: React.FormEvent<HTMLSelectElement>) => {
-                setCardType(e.currentTarget.value);
-              }}
-            >
-              {cardTypes.map((type) => (
-                <option key={type}>{type}</option>
-              ))}
-            </select>
-          </div>
-          <InputField
-            title={"Expiration Date"}
-            type="number"
-            value={expirationDate}
-            onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setExpirationDate(e.currentTarget.value);
-            }}
-          />
-        </div>
       </div>
     </div>
   );
 };
 
-export default MyProfile;
+export default Page;

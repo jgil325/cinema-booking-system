@@ -25,6 +25,7 @@ const Page = () => {
   const [editPaymentCard, setEditPaymentCard] = useState(-1);
 
   const { data: user, isLoading, error } = api.user.byId.useQuery();
+  const { data: cards } = api.paymentCard.byId.useQuery();
   if (isLoading) return null;
   if (error)
     return (
@@ -52,7 +53,7 @@ const Page = () => {
     billingZipCode: "30323",
     userId: "532432fda",
   };
-  const cards: Array<PaymentCard> = [tempCard, tempCard, tempCard];
+  //const cards: Array<PaymentCard> = [tempCard, tempCard, tempCard];
   return (
     <div className="border-grey mt-4 grid items-center justify-center">
       <div className="grid min-w-[50vw] space-y-0 rounded-xl border px-8 py-8 text-center">

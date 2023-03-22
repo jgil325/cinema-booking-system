@@ -110,8 +110,8 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
         <span className="border-b border-gray-300 pt-4 text-left text-xl font-medium">
           Card Information
         </span>
-        <div className="grid grid-cols-5 space-x-6 pt-3">
-          <div className="col-span-2">
+        <div className="grid grid-cols-8 space-x-6 pt-3">
+          <div className="col-span-5">
             <InputField title={"Card Number"} type="text" value={cardNumber} />
           </div>
           <div className="grid">
@@ -132,6 +132,8 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               setExpirationMonth(e.currentTarget.value);
             }}
+            min="0"
+            max="12"
           />
           <InputField
             title={"Expiration Date"}
@@ -140,6 +142,8 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               setExpirationYear(e.currentTarget.value);
             }}
+            min="23"
+            max="30"
           />
         </div>
         <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">

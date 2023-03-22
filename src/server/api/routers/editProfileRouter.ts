@@ -2,7 +2,7 @@ import { createTRPCRouter, publicProcedure } from '../trpc'
 import {z} from 'zod'
 import { CardType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
-
+import bcrypt from 'bcrypt';
 
 const sendUpdateEmail = (email: string) => {
     try {
@@ -275,12 +275,13 @@ export const editProfileRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => { 
             try {
                 //const userID = ctx.session?.user.id;
+                const encodedPassword = await bcrypt.hash(input.newPassword, 10);
                 const resetUserPassword = await ctx.prisma.user.update({
                     where: {
                         id: input.uid
                     },
                     data : {
-                        password: input.newPassword
+                        password: encodedPassword
                     }
                 })
                 sendUpdateEmail(ctx.session?.user.email || '');

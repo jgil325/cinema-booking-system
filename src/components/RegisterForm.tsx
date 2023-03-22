@@ -245,7 +245,7 @@ const RegisterForm = () => {
               className="text-violet12 mb-2.5 block text-[13px] leading-none"
               htmlFor="phone"
             >
-              City
+              Home City
             </label>
             <input
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
@@ -260,7 +260,7 @@ const RegisterForm = () => {
               className="text-violet12 mb-2.5 block text-[13px] leading-none"
               htmlFor="phone"
             >
-              State
+              Home State
             </label>
             <input
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
@@ -275,7 +275,7 @@ const RegisterForm = () => {
               className="text-violet12 mb-2.5 block text-[13px] leading-none"
               htmlFor="phone"
             >
-              Zip Code
+              Home Zip
             </label>
             <input
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
@@ -309,15 +309,15 @@ const RegisterForm = () => {
         className="grow rounded-b-md bg-white p-5 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"
         value="tab2"
       >
-        <div>
+        <div className="mb-[15px] flex flex-row justify-between">
           <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
+            className="text-violet12 my-1 w-1/3 text-[15px]"
             htmlFor="card-type"
           >
             Card Type
           </label>
           <select
-            className="rounded-lg border border-gray-400 px-2 py-2"
+            className="w-2/3 rounded-lg border border-gray-400 px-2 py-2"
             value={cardType}
             onChange={(event) =>
               setCardType(
@@ -350,35 +350,37 @@ const RegisterForm = () => {
             onChange={(event) => setCardNumber(event.target.value)}
           />
         </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="card-exp"
-          >
-            Expiration Month
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="expirationMonth" // Added value and change
-            value={expirationMonth}
-            defaultValue="12"
-            onChange={(event) => setExpirationMonth(event.target.value)}
-          />
-        </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="card-exp"
-          >
-            Expiration Year
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="expirationYear" // Added value and change
-            value={expirationYear}
-            defaultValue="23"
-            onChange={(event) => setExpirationYear(event.target.value)}
-          />
+        <fieldset className="flex w-full flex-row justify-between space-x-3">
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="card-exp"
+            >
+              Expiration Month
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="expirationMonth" // Added value and change
+              value={expirationMonth}
+              defaultValue="12"
+              onChange={(event) => setExpirationMonth(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="card-exp"
+            >
+              Expiration Year
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="expirationYear" // Added value and change
+              value={expirationYear}
+              defaultValue="23"
+              onChange={(event) => setExpirationYear(event.target.value)}
+            />
+          </fieldset>
         </fieldset>
         <fieldset className="mb-[15px] flex w-full flex-col justify-start">
           <label
@@ -395,50 +397,52 @@ const RegisterForm = () => {
             onChange={(event) => setBillingAddress(event.target.value)}
           />
         </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="Billing-city"
-          >
-            Billing City
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="billing-city"
-            value={billingCity}
-            defaultValue=""
-            onChange={(event) => setBillingCity(event.target.value)}
-          />
-        </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="billing-State"
-          >
-            Billing State
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="billing-state"
-            value={billingState}
-            defaultValue=""
-            onChange={(event) => setBillingState(event.target.value)}
-          />
-        </fieldset>
-        <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-          <label
-            className="text-violet12 mb-2.5 block text-[13px] leading-none"
-            htmlFor="home-address"
-          >
-            Billing Zip Code
-          </label>
-          <input
-            className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-            id="home-zip"
-            value={billingZipCode}
-            defaultValue=""
-            onChange={(event) => setBillingZip(event.target.value)}
-          />
+        <fieldset className="flex w-full flex-row justify-between space-x-3">
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="Billing-city"
+            >
+              Billing City
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="billing-city"
+              value={billingCity}
+              defaultValue=""
+              onChange={(event) => setBillingCity(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="billing-State"
+            >
+              Billing State
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="billing-state"
+              value={billingState}
+              defaultValue=""
+              onChange={(event) => setBillingState(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="home-address"
+            >
+              Billing Zip
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home-zip"
+              value={billingZipCode}
+              defaultValue=""
+              onChange={(event) => setBillingZip(event.target.value)}
+            />
+          </fieldset>
         </fieldset>
       </Tabs.Content>
       <Tabs.Content

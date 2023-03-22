@@ -22,7 +22,7 @@ const InputField = ({ title, ...props }: InputFieldProps) => {
 };
 
 const Page = () => {
-  const [editPaymentCard, setEditPaymentCard] = useState(0);
+  const [editPaymentCard, setEditPaymentCard] = useState(1);
 
   const { data: user, isLoading, error } = api.user.byId.useQuery();
   if (isLoading) return null;
@@ -52,8 +52,17 @@ const Page = () => {
     billingZipCode: "30323",
     userId: "532432fda",
   };
-  if (editPaymentCard !== -1) return <EditPaymentCard card={tempCard} />;
-  return <MyProfile user={user} />;
+  return (
+    <div className="border-grey mt-4 grid items-center justify-center">
+      <div className="grid min-w-[50vw] space-y-0 rounded-xl border px-8 py-8 text-center">
+        {editPaymentCard === 0 ? (
+          <MyProfile user={user} />
+        ) : (
+          <EditPaymentCard card={tempCard} />
+        )}
+      </div>
+    </div>
+  );
 };
 
 const MyProfile = ({ user }: { user: User }) => {
@@ -176,118 +185,116 @@ const MyProfile = ({ user }: { user: User }) => {
   );
 
   return (
-    <div className="border-grey mt-4 grid items-center justify-center">
-      <div className="grid min-w-[50vw] space-y-0 rounded-xl border px-8 py-8 text-center">
-        <span className="text-center text-3xl font-medium">Your Profile</span>
-        <span className="border-b border-gray-300 pt-4 text-left text-xl font-medium">
-          Personal Information
-        </span>
-        <div className="grid grid-cols-2 space-x-6 pt-3">
-          <div className="grid">
-            <span className="text-left font-medium">Email</span>
-            <input
-              className="select-none rounded border border-gray-400 bg-gray-300 px-3 py-1.5 outline-none hover:cursor-not-allowed"
-              type="text"
-              id="email"
-              placeholder="Email Address"
-              value={user?.email}
-              readOnly={true}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 space-x-6">
-          <InputField
-            title={"First Name"}
-            value={firstName}
-            onChange={handleChangeFirstName}
-          />
-          <InputField
-            title={"Last Name"}
-            value={lastName}
-            onChange={handleChangeLastName}
-          />
-        </div>
-        <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
-          Change Password
-        </span>
-        <div className="grid grid-cols-2 space-x-6  pt-3">
-          <InputField
-            title={"New Password"}
-            value={newPassword}
-            type="password"
-            onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setNewPassword(e.currentTarget.value);
-            }}
-          />
-          <InputField
-            title={"Old Password"}
-            value={oldPassword}
-            type="password"
-            onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setOldPassword(e.currentTarget.value);
-            }}
-          />
-        </div>
-        <div className="grid grid-cols-2 space-x-6">
-          <InputField
-            title={"Confirm New Password"}
-            type="password"
-            value={newPassConfirm}
-            onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setNewPassConfirm(e.currentTarget.value);
-            }}
-          />
-          <div className="grid">
-            <span className="invisible text-left font-medium">
-              Change Password
-            </span>
-            <button
-              className="h-fit rounded-lg bg-indigo-500 px-3 py-1.5 font-medium text-white hover:bg-indigo-700"
-              type="submit"
-              onClick={handleChangePassword}
-            >
-              Change Password
-            </button>
-          </div>
-        </div>
-
-        <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
-          Home Address
-        </span>
-        <div className="grid grid-cols-1 space-x-6 pt-3">
-          <InputField
-            title={"Home Address"}
-            value={billingAddress}
-            onChange={handleChangeHomeStreet}
-          />
-        </div>
-        <div className="grid grid-cols-3 items-baseline space-x-6 pt-3">
-          <div className="grid">
-            <span className="text-left font-medium">State</span>
-            <select
-              value={state}
-              onChange={handleChangeHomeState}
-              className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            >
-              {stateList.map((state) => (
-                <option key={state}>{state}</option>
-              ))}
-            </select>
-          </div>
-          <InputField
-            title={"Town / City"}
-            value={city}
-            onChange={handleChangeHomeCity}
-          />
-          <InputField
-            title={"Zipcode"}
-            value={zipcode}
-            onChange={handleChangeHomeZip}
-            type="number"
+    <>
+      <span className="text-center text-3xl font-medium">Your Profile</span>
+      <span className="border-b border-gray-300 pt-4 text-left text-xl font-medium">
+        Personal Information
+      </span>
+      <div className="grid grid-cols-2 space-x-6 pt-3">
+        <div className="grid">
+          <span className="text-left font-medium">Email</span>
+          <input
+            className="select-none rounded border border-gray-400 bg-gray-300 px-3 py-1.5 outline-none hover:cursor-not-allowed"
+            type="text"
+            id="email"
+            placeholder="Email Address"
+            value={user?.email}
+            readOnly={true}
           />
         </div>
       </div>
-    </div>
+      <div className="grid grid-cols-2 space-x-6">
+        <InputField
+          title={"First Name"}
+          value={firstName}
+          onChange={handleChangeFirstName}
+        />
+        <InputField
+          title={"Last Name"}
+          value={lastName}
+          onChange={handleChangeLastName}
+        />
+      </div>
+      <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
+        Change Password
+      </span>
+      <div className="grid grid-cols-2 space-x-6  pt-3">
+        <InputField
+          title={"New Password"}
+          value={newPassword}
+          type="password"
+          onChange={(e: React.FormEvent<HTMLInputElement>) => {
+            setNewPassword(e.currentTarget.value);
+          }}
+        />
+        <InputField
+          title={"Old Password"}
+          value={oldPassword}
+          type="password"
+          onChange={(e: React.FormEvent<HTMLInputElement>) => {
+            setOldPassword(e.currentTarget.value);
+          }}
+        />
+      </div>
+      <div className="grid grid-cols-2 space-x-6">
+        <InputField
+          title={"Confirm New Password"}
+          type="password"
+          value={newPassConfirm}
+          onChange={(e: React.FormEvent<HTMLInputElement>) => {
+            setNewPassConfirm(e.currentTarget.value);
+          }}
+        />
+        <div className="grid">
+          <span className="invisible text-left font-medium">
+            Change Password
+          </span>
+          <button
+            className="h-fit rounded-lg bg-indigo-500 px-3 py-1.5 font-medium text-white hover:bg-indigo-700"
+            type="submit"
+            onClick={handleChangePassword}
+          >
+            Change Password
+          </button>
+        </div>
+      </div>
+
+      <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
+        Home Address
+      </span>
+      <div className="grid grid-cols-1 space-x-6 pt-3">
+        <InputField
+          title={"Home Address"}
+          value={billingAddress}
+          onChange={handleChangeHomeStreet}
+        />
+      </div>
+      <div className="grid grid-cols-3 items-baseline space-x-6 pt-3">
+        <div className="grid">
+          <span className="text-left font-medium">State</span>
+          <select
+            value={state}
+            onChange={handleChangeHomeState}
+            className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          >
+            {stateList.map((state) => (
+              <option key={state}>{state}</option>
+            ))}
+          </select>
+        </div>
+        <InputField
+          title={"Town / City"}
+          value={city}
+          onChange={handleChangeHomeCity}
+        />
+        <InputField
+          title={"Zipcode"}
+          value={zipcode}
+          onChange={handleChangeHomeZip}
+          type="number"
+        />
+      </div>
+    </>
   );
 };
 

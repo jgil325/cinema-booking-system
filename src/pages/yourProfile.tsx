@@ -3,11 +3,12 @@ import { useSession } from "next-auth/react";
 import { stateList } from "../data/states";
 import { cardTypes } from "../data/cardTypes";
 import { api } from "../utils/api";
+import { debounce } from "../utils/debounce";
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
 }
-
+const DEBOUNCE_DELAY = 500;
 const InputField = ({ title, ...props }: InputFieldProps) => {
   return (
     <div className="grid">
@@ -23,15 +24,14 @@ const InputField = ({ title, ...props }: InputFieldProps) => {
 
 const MyProfile = () => {
   const { data: session } = useSession();
-
   const { data: user, isLoading } = api.user.byId.useQuery({
-    id: session?.user.id || "",
+    email: session?.user.email,
   });
 
-  const [firstName, setFirstName] = useState(user?.firstName);
-  const [lastName, setLastName] = useState(user?.firstName);
-  const [oldPass, setOldPass] = useState("");
-  const [newPass, setNewPass] = useState("");
+  const [firstName, setFirstName] = useState(user ? user.firstName : "");
+  const [lastName, setLastName] = useState(user ? user.lastName : "");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [newPassConfirm, setNewPassConfirm] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
   const [state, setState] = useState("");
@@ -40,6 +40,113 @@ const MyProfile = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [cardType, setCardType] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
+
+  const { mutate: saveFirstName } =
+    api.editProfile.changeFirstName.useMutation();
+  const debouncedSaveFirstName = React.useMemo(
+    () =>
+      debounce((newFirstName: string) => {
+        saveFirstName({ newFirstName });
+      }, DEBOUNCE_DELAY),
+    [saveFirstName]
+  );
+  const handleChangeFirstName = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setFirstName(e.currentTarget.value);
+      debouncedSaveFirstName(e.currentTarget.value);
+    },
+    [debouncedSaveFirstName]
+  );
+
+  const { mutate: saveLastName } = api.editProfile.changeLastName.useMutation();
+  const debouncedSaveLastName = React.useMemo(
+    () =>
+      debounce((newLastName: string) => {
+        saveLastName({ newLastName });
+      }, DEBOUNCE_DELAY),
+    [saveLastName]
+  );
+  const handleChangeLastName = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setLastName(e.currentTarget.value);
+      debouncedSaveLastName(e.currentTarget.value);
+    },
+    [debouncedSaveLastName]
+  );
+
+  const { mutate: changePassword } =
+    api.editProfile.changePassword.useMutation();
+  const handleChangePassword = () => {
+    if (newPassword === newPassConfirm) throw "Passwords Do Not Match";
+    changePassword({ newPassword, oldPassword });
+  };
+
+  const { mutate: saveHomeStreet } =
+    api.editProfile.changeHomeStreet.useMutation();
+  const debouncedSaveHomeStreet = React.useMemo(
+    () =>
+      debounce((newStreetName: string) => {
+        saveHomeStreet({ newStreetName });
+      }, DEBOUNCE_DELAY),
+    [saveHomeStreet]
+  );
+  const handleChangeHomeStreet = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setBillingAddress(e.currentTarget.value);
+      debouncedSaveHomeStreet(e.currentTarget.value);
+    },
+    [debouncedSaveHomeStreet]
+  );
+
+  const { mutate: saveHomeState } =
+    api.editProfile.changeHomeState.useMutation();
+  const debouncedSaveHomeState = React.useMemo(
+    () =>
+      debounce((newStateName: string) => {
+        saveHomeState({ newStateName });
+      }, DEBOUNCE_DELAY),
+    [saveHomeState]
+  );
+  const handleChangeHomeState = React.useCallback(
+    (e: React.FormEvent<HTMLSelectElement>) => {
+      setState(e.currentTarget.value);
+      debouncedSaveHomeState(e.currentTarget.value);
+    },
+    [debouncedSaveHomeState]
+  );
+
+  const { mutate: saveHomeCity } = api.editProfile.changeHomeCity.useMutation();
+  const debouncedSaveHomeCity = React.useMemo(
+    () =>
+      debounce((newCityName: string) => {
+        saveHomeCity({ newCityName });
+      }, DEBOUNCE_DELAY),
+    [saveHomeCity]
+  );
+  const handleChangeHomeCity = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setCity(e.currentTarget.value);
+      debouncedSaveHomeCity(e.currentTarget.value);
+    },
+    [debouncedSaveHomeCity]
+  );
+
+  const { mutate: saveHomeZip } =
+    api.editProfile.changeHomeZipCode.useMutation();
+  const debouncedSaveHomeZip = React.useMemo(
+    () =>
+      debounce((newZipName: string) => {
+        saveHomeZip({ newZipName });
+      }, DEBOUNCE_DELAY),
+    [saveHomeZip]
+  );
+  const handleChangeHomeZip = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setZipcode(e.currentTarget.value);
+      debouncedSaveHomeZip(e.currentTarget.value);
+    },
+    [debouncedSaveHomeZip]
+  );
 
   return (
     <div className="border-grey mt-4 grid items-center justify-center">
@@ -62,8 +169,16 @@ const MyProfile = () => {
           </div>
         </div>
         <div className="grid grid-cols-2 space-x-6">
-          <InputField title={"First Name"} value={firstName} />
-          <InputField title={"Last Name"} value={lastName} />
+          <InputField
+            title={"First Name"}
+            value={firstName}
+            onChange={handleChangeFirstName}
+          />
+          <InputField
+            title={"Last Name"}
+            value={lastName}
+            onChange={handleChangeLastName}
+          />
         </div>
         <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
           Change Password
@@ -71,18 +186,18 @@ const MyProfile = () => {
         <div className="grid grid-cols-2 space-x-6  pt-3">
           <InputField
             title={"New Password"}
-            value={newPass}
+            value={newPassword}
             type="password"
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setNewPass(e.currentTarget.value);
+              setNewPassword(e.currentTarget.value);
             }}
           />
           <InputField
             title={"Old Password"}
-            value={oldPass}
+            value={oldPassword}
             type="password"
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setOldPass(e.currentTarget.value);
+              setOldPassword(e.currentTarget.value);
             }}
           />
         </div>
@@ -102,7 +217,7 @@ const MyProfile = () => {
             <button
               className="h-fit rounded-lg bg-indigo-500 px-3 py-1.5 font-medium text-white hover:bg-indigo-700"
               type="submit"
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
+              onClick={handleChangePassword}
             >
               Change Password
             </button>
@@ -110,15 +225,13 @@ const MyProfile = () => {
         </div>
 
         <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
-          Billing Address
+          Home Address
         </span>
         <div className="grid grid-cols-1 space-x-6 pt-3">
           <InputField
-            title={"Billing Address"}
+            title={"Home Address"}
             value={billingAddress}
-            onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setBillingAddress(e.currentTarget.value);
-            }}
+            onChange={handleChangeHomeStreet}
           />
         </div>
         <div className="grid grid-cols-3 items-baseline space-x-6 pt-3">
@@ -126,9 +239,7 @@ const MyProfile = () => {
             <span className="text-left font-medium">State</span>
             <select
               value={state}
-              onChange={(e: React.FormEvent<HTMLSelectElement>) => {
-                setState(e.currentTarget.value);
-              }}
+              onChange={handleChangeHomeState}
               className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             >
               {stateList.map((state) => (
@@ -139,16 +250,12 @@ const MyProfile = () => {
           <InputField
             title={"Town / City"}
             value={city}
-            onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setCity(e.currentTarget.value);
-            }}
+            onChange={handleChangeHomeCity}
           />
           <InputField
             title={"Zipcode"}
             value={zipcode}
-            onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              setZipcode(e.currentTarget.value);
-            }}
+            onChange={handleChangeHomeZip}
             type="number"
           />
         </div>

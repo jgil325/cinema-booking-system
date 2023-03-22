@@ -110,13 +110,7 @@ const Page = () => {
   );
 };
 
-const MyProfile = ({
-  user,
-  toPaymentCards,
-}: {
-  user: User;
-  toPaymentCards: () => void;
-}) => {
+const MyProfile = ({ user }: { user: User }) => {
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [oldPassword, setOldPassword] = useState("");

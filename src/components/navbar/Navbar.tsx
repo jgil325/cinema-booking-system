@@ -44,11 +44,18 @@ const Navbar = () => {
             </Link>
           </div>
         ) : (
-          <Link href={"/signIn"}>
-            <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
-              Sign In
-            </button>
-          </Link>
+          <div className="gap-30 flex flex-row space-x-8">
+            <Link href={"/register"}>
+              <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
+                Create Account
+              </button>
+            </Link>
+            <Link href={"/signIn"}>
+              <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
+                Sign In
+              </button>
+            </Link>
+          </div>
         )}
       </div>
     </div>

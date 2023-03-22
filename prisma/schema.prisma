@@ -26,12 +26,16 @@ model User {
     firstName String
     lastName  String
     email     String    @unique
-    phoneNumber String // ADD
+    phoneNumber String
     statusType StatusType 
-    isSignedUpPromos Boolean 
+    isSignedUpPromos Boolean
+    homeAddress  String
+    homeCity     String 
+    homeState    String 
+    homeZipCode  String 
     Account   Account[]
     Session   Session[]
-    paymentCards PaymentCard[] // ADD
+    paymentCards PaymentCard[] // max 3?
 }
 
 // Necessary for Next auth
@@ -174,20 +178,18 @@ enum CardType {
   AMEX
   DISCOVER
 }
-model PaymentCard { // I think payment card deletes from database when user is deleted. But it throws errors when you click on it, but the error says null.
-    id String @id @default(cuid()) // autoincrement?
-    cardNumber      String // changed from BigInt to String
+model PaymentCard { 
+    id              String @id @default(cuid()) // also acts as index
+    cardNumber      String 
     cardType        CardType
-    billingAddress  String
-    expirationMonth Int // combine for expiration date?
+    expirationMonth Int 
     expirationYear  Int
-    homeAddress     String // ADD
-    //homeStreet String // ADD
-    homeCity        String // ADD
-    homeState       String // ADD
-    homeZipCode     String // ADD
-    userId          String // Dont know if this is right // ADD
-    User            User @relation(fields: [userId], references: [id], onDelete: Cascade) // ADD
+    billingAddress  String
+    billingCity     String 
+    billingState    String 
+    billingZipCode  String 
+    userId          String 
+    User            User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Promotion {

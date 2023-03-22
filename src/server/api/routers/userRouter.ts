@@ -23,11 +23,38 @@ export const userRouter = createTRPCRouter({
           lastName: z.string().min(1, {message: "Last name is required"}),
           password: z.string().min(8, {message: "Length must be at least 8 characters long."}), // .includes(string) TODO: ensure that password has combination of uppercase, lowercase, and symbols
           isSignedUpPromos: z.boolean(),
-          phoneNumber: z.string().refine(validator.isMobilePhone, {message: "Please enter a valid phone number."})
+          phoneNumber: z.string().refine(validator.isMobilePhone, {message: "Please enter a valid phone number."}),
+          homeAddress: z.string().min(1, {message: "Home address is required"}),
+          homeCity: z.string().min(1, {message: "Home city is required"}),
+          homeState: z.string().min(1, {message: "Home state is required"}),
+          homeZipCode: z.string().length(5, {message: "Please enter a valid zip code."}),
         }),
       )
       .mutation(async ({ ctx, input }) => {
-        const {email, firstName, lastName, password, isSignedUpPromos, phoneNumber} = input;
+        const {email, firstName, lastName, password, isSignedUpPromos, phoneNumber, homeAddress,
+          homeCity, homeState, homeZipCode } = input;
+
+        try {
+          // Validate home address, city, state, and zip code
+          if (!homeAddress.trim()) {
+            throw new Error('Home address is required');
+          }
+          if (!homeCity.trim()) {
+            throw new Error('City is required');
+          }
+          if (!homeState.trim()) {
+            throw new Error('State is required');
+          }
+          if (!homeZipCode.trim()) {
+            throw new Error('Zip code is required');
+          }
+          if (!/^[0-9]{5}$/.test(homeZipCode.trim())) {
+            throw new Error('Zip code must be a 5-digit number');
+          }
+        } catch (error) {
+          console.error('Error creating payment info:', error);
+          throw new Error('Could not create payment info. Check billing information.');
+        }
 
         let existingUser;
         
@@ -43,6 +70,7 @@ export const userRouter = createTRPCRouter({
           throw new Error('A user with this email already exists!'); // TODO: I dont want this to go to the next page, rn it goes to the confirmation page.
         }
 
+
         const bcrypt = require('bcrypt');
         const encodedPassword = await bcrypt.hash(password, 10);
 
@@ -56,6 +84,10 @@ export const userRouter = createTRPCRouter({
             isSignedUpPromos: isSignedUpPromos,
             phoneNumber: phoneNumber,
             statusType: StatusType.INACTIVE,
+            homeAddress: homeAddress, 
+            homeCity: homeCity,
+            homeState: homeState,
+            homeZipCode: homeZipCode,
             Account: {
                 create: [{
                   id: uuidv4(), // unique

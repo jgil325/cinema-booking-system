@@ -24,12 +24,16 @@ const RegisterForm = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [cardType, setCardType] = useState<"VISA" | "MASTERCARD" | "DISCOVER" | "AMEX">("VISA");
   const [billingAddress, setBillingAddress] = useState("");
+  const [billingCity, setBillingCity] = useState("");
+  const [billingState, setBillingState] = useState("");
+  const [billingZipCode, setBillingZip] = useState("");
   const [expirationMonth, setExpirationMonth] = useState("");
   const [expirationYear, setExpirationYear] = useState("");
   const [homeAddress, setHomeAddress] = useState("");
   const [homeCity, setHomeCity] = useState("");
   const [homeState, setHomeState] = useState("");
   const [homeZipCode, setHomeZip] = useState("");
+
 
   // Hooks
   const createAccount = api.user.createAccount.useMutation();
@@ -51,6 +55,10 @@ const RegisterForm = () => {
         password,
         isSignedUpPromos,
         phoneNumber,
+        homeAddress,
+        homeCity,
+        homeState,
+        homeZipCode,
       });
 
       try { // if create account succeeds and payment card fails then it struggles to add payment card. Need to separate these tasks.
@@ -60,10 +68,9 @@ const RegisterForm = () => {
           billingAddress,
           expirationMonth: Number(expirationMonth),
           expirationYear: Number(expirationYear),
-          homeAddress,
-          homeCity,
-          homeState,
-          homeZipCode,
+          billingCity,
+          billingState,
+          billingZipCode,
           userId: createAccountResult.id,
         });
         // TODO: Navigate to success page or show success message
@@ -251,6 +258,66 @@ const RegisterForm = () => {
               onChange={event => setPhoneNumber(event.target.value)}
             />
           </fieldset> 
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="phone"
+            >
+              Home Address
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home address" // Added value and change
+              value={homeAddress}
+              defaultValue=""
+              onChange={event => setHomeAddress(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="phone"
+            >
+              Home City
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home city" // Added value and change
+              value={homeCity}
+              defaultValue=""
+              onChange={event => setHomeCity(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="phone"
+            >
+              Home State
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home state" // Added value and change
+              value={homeState}
+              defaultValue=""
+              onChange={event => setHomeState(event.target.value)}
+            />
+          </fieldset>
+          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
+            <label
+              className="text-violet12 mb-2.5 block text-[13px] leading-none"
+              htmlFor="phone"
+            >
+              Home Zip Code
+            </label>
+            <input
+              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+              id="home zip code" // Added value and change
+              value={homeZipCode}
+              defaultValue=""
+              onChange={event => setHomeZip(event.target.value)}
+            />
+          </fieldset>
           <fieldset className="mb-[5px] flex w-full flex-row justify-end gap-3">
             <label
                 className="text-violet12 mb-2.5 block text-[13px] leading-none pt-2"
@@ -353,46 +420,31 @@ const RegisterForm = () => {
           <fieldset className="mb-[15px] flex w-full flex-col justify-start">
             <label
               className="text-violet12 mb-2.5 block text-[13px] leading-none"
-              htmlFor="home-address"
+              htmlFor="Billing-city"
             >
-              Home Address
+              Billing City
             </label>
             <input
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-              id="homeAddress" // Added value and change
-              value={homeAddress}
+              id="billing-city"
+              value={billingCity}
               defaultValue=""
-              onChange={event => setHomeAddress(event.target.value)}
+              onChange={event => setBillingCity(event.target.value)}
             />
           </fieldset>
           <fieldset className="mb-[15px] flex w-full flex-col justify-start">
             <label
               className="text-violet12 mb-2.5 block text-[13px] leading-none"
-              htmlFor="home-city"
+              htmlFor="billing-State"
             >
-              Home City
+              Billing State
             </label>
             <input
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-              id="home-city"
-              value={homeCity}
+              id="billing-state"
+              value={billingState}
               defaultValue=""
-              onChange={event => setHomeCity(event.target.value)}
-            />
-          </fieldset>
-          <fieldset className="mb-[15px] flex w-full flex-col justify-start">
-            <label
-              className="text-violet12 mb-2.5 block text-[13px] leading-none"
-              htmlFor="home-address"
-            >
-              Home State
-            </label>
-            <input
-              className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-              id="home-state"
-              value={homeState}
-              defaultValue=""
-              onChange={event => setHomeState(event.target.value)}
+              onChange={event => setBillingState(event.target.value)}
             />
           </fieldset>
           <fieldset className="mb-[15px] flex w-full flex-col justify-start">
@@ -400,14 +452,14 @@ const RegisterForm = () => {
               className="text-violet12 mb-2.5 block text-[13px] leading-none"
               htmlFor="home-address"
             >
-              Home Zip Code
+              Billing Zip Code
             </label>
             <input
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
               id="home-zip"
-              value={homeZipCode}
+              value={billingZipCode}
               defaultValue=""
-              onChange={event => setHomeZip(event.target.value)}
+              onChange={event => setBillingZip(event.target.value)}
             />
           </fieldset>
         </Tabs.Content>

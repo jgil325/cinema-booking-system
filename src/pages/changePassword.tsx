@@ -41,7 +41,7 @@ const ChangePassword = () => {
           <span className="text-2xl font-medium">Change Password</span>
           <input
             className="rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            type="text"
+            type="password"
             id="email"
             placeholder="Password"
             value={password}

@@ -1,4 +1,4 @@
-import React, { type InputHTMLAttributes } from "react";
+import React, { useEffect, type InputHTMLAttributes } from "react";
 import { type PaymentCard } from "@prisma/client";
 import { useState } from "react";
 import { api } from "../../utils/api";
@@ -26,6 +26,15 @@ const cardTypes = Object.values(CardTypeEnum);
 const DEBOUNCE_DELAY = 500;
 
 const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
+  useEffect(() => {
+    setBillingAddress(card.billingAddress);
+    setState(card.billingState);
+    setCity(card.billingCity);
+    setZipcode(card.billingCity);
+    setCardType(card.cardType);
+    setExpirationMonth(card.expirationMonth);
+    setExpirationYear(card.expirationYear);
+  }, [card]);
   const [billingAddress, setBillingAddress] = useState(card.billingAddress);
   const [state, setState] = useState(card.billingState);
   const [city, setCity] = useState(card.billingCity);
@@ -177,7 +186,6 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
 
   return (
     <>
-
       <span className="border-b border-gray-300 pt-4 text-left text-xl font-medium">
         Card Information
       </span>

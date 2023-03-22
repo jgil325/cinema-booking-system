@@ -266,6 +266,38 @@ export const editProfileRouter = createTRPCRouter({
                 });
             }
         }),
+    resetPassword: publicProcedure
+        .input(
+            z.object({
+               // email: z.string(),
+                newPassword: z.string()
+            }))
+        .mutation(async ({ ctx, input }) => { 
+            try {
+                const userID = ctx.session?.user.id;
+                const resetUserPassword = await ctx.prisma.user.update({
+                    where: {
+                        id: userID
+                    },
+                    data : {
+                        password: input.newPassword
+                    }
+                })
+                sendUpdateEmail(ctx.session?.user.email || '');
+                return(
+                    {
+                        status: 'success',
+                        operation: 'updated user password',
+                        newUser: resetUserPassword
+                    }
+                );
+            } catch {
+                throw new TRPCError({
+                    code: 'BAD_REQUEST',
+                    message: 'Error resetting password!',
+                });
+            }
+        }),
     changeHomeStreet: publicProcedure
         .input(
             z.object({

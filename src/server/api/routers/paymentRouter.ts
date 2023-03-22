@@ -35,6 +35,9 @@ export const paymentRouter = createTRPCRouter({
         }
 
         const encodedCard = await bcrypt.hash(cardNumber, 10);
+        //const encodedCard = Buffer.from(cardNumber).toString('base64') // using string -> base64 encode
+        //const encodedCard = btoa(cardNumber);
+        //console.log(encodedCard);
 
         const newCard = await ctx.prisma.paymentCard.create({ 
           data: {
@@ -79,6 +82,14 @@ export const paymentRouter = createTRPCRouter({
             userId: userID 
           },
         });
+        // decrypt card number
+        //const compare = await bcrypt.compare(input.password, dbUserPass);
+        /*for (let i = 0; i< cards.length; i++) {
+          const encryptedCardNumber = cards[i]!.cardNumber
+          //const plainTextCardNumber = Buffer.from(encryptedCardNumber || '','base64').toString('ascii') // base64 back to ascii
+          const plainTextCardNumber = atob(encryptedCardNumber);
+          cards[i]!.cardNumber = plainTextCardNumber;
+        }*/
         return cards;
       } catch {
         throw new TRPCError({

@@ -37,12 +37,12 @@ const RegisterForm = () => {
   const [homeState, setHomeState] = useState("");
   const [homeZipCode, setHomeZip] = useState("");
 
-  const User = z.object({
-    email: z.string().email(),
+  const validationSchema = z.object({
+    email: z.string().email().min(5),
     firstName: z.string(),
     lastName: z.string(),
-    password: z.string(),
-    confirmPassword: z.string(),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
     isSignedUpPromos: z.boolean(),
     phoneNumber: z.string(),
     cardNumber: z.string(),

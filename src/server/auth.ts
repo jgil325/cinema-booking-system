@@ -113,7 +113,7 @@ export const authOptions: NextAuthOptions = {
           user: {
             ...session.user,
             ...userInfo,
-            id: token.id as string,
+            //id: token.id as string,
             // role: token.role as string,
           },
         };

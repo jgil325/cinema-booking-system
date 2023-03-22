@@ -11,11 +11,15 @@ export const userRouter = createTRPCRouter({
       return ctx.prisma.user.findMany({ orderBy: { id: "desc" } });
     }),
     byId: publicProcedure
-      .input(z.object({ email: z.string() }))
-      .query(async ({ ctx, input }) => {
-        
-        return await ctx.prisma.user.findUnique({ where: { email: input.email } });
-      }),
+      .query(async ({ ctx }) => {
+        const userID = ctx.session?.user.id;
+        const foundUser = await ctx.prisma.user.findUnique({ 
+          where: { 
+            id: userID 
+          } 
+        });
+        return foundUser;
+    }),
     createAccount: publicProcedure
       .input(
         z.object({

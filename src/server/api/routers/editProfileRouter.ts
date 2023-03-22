@@ -168,7 +168,7 @@ export const editProfileRouter = createTRPCRouter({
                         id: userID,
                     },
                     data: {
-                        firstName: input.newLastName
+                        lastName: input.newLastName
                     }
                 })
                 sendUpdateEmail(ctx.session?.user.email || '');

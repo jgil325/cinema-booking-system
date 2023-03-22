@@ -26,7 +26,7 @@ model User {
     firstName String
     lastName  String
     email     String    @unique
-    phoneNumber String // ADD
+    phoneNumber String
     statusType StatusType 
     isSignedUpPromos Boolean
     homeAddress  String

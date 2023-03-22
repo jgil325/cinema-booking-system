@@ -11,16 +11,15 @@ export const paymentRouter = createTRPCRouter({
         billingAddress: z.string().max(100),
         expirationMonth: z.number().min(1, {message: "Please enter a valid month."}).max(12, {message: "Please enter a valid month."}),
         expirationYear: z.number().min(new Date().getFullYear()).max(9999),
-        homeAddress: z.string().min(1, {message: "Please enter a valid home address."}), 
-        homeCity: z.string().min(1, {message: "Please enter a valid city."}), 
-        homeState: z.string().min(1), // TODO: need a way to validate states
-        homeZipCode: z.string().length(5, {message: "Please enter a valid zip code."}),
+        billingCity: z.string().min(1, {message: "Please enter a valid city."}), 
+        billingState: z.string().min(1), 
+        billingZipCode: z.string().length(5, {message: "Please enter a valid zip code."}),
         userId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const {cardNumber, cardType, billingAddress, expirationMonth, expirationYear, homeAddress, homeCity, homeState, homeZipCode, userId} = input;
+        const {cardNumber, cardType, billingAddress, expirationMonth, expirationYear, billingCity, billingState, billingZipCode, userId} = input;
         
         // TODO: Check to see if this works and can only add three payment cards
         const cardCount = await ctx.prisma.paymentCard.count({ where: { userId: userId } });
@@ -34,23 +33,6 @@ export const paymentRouter = createTRPCRouter({
           throw new Error('Card has already expired');
         }
 
-        // Validate home address, city, state, and zip code
-        if (!homeAddress.trim()) {
-          throw new Error('Home address is required');
-        }
-        if (!homeCity.trim()) {
-          throw new Error('City is required');
-        }
-        if (!homeState.trim()) {
-          throw new Error('State is required');
-        }
-        if (!homeZipCode.trim()) {
-          throw new Error('Zip code is required');
-        }
-        if (!/^[0-9]{5}$/.test(homeZipCode.trim())) {
-          throw new Error('Zip code must be a 5-digit number');
-        }
-
         const bcrypt = require('bcrypt');
         const encodedCard = await bcrypt.hash(cardNumber, 10);
 
@@ -61,10 +43,9 @@ export const paymentRouter = createTRPCRouter({
             billingAddress: billingAddress, // TODO: Build and Validate building address, // TODO: make sure their can only be one shipping address
             expirationMonth: expirationMonth,  
             expirationYear: expirationYear, 
-            homeAddress: homeAddress, 
-            homeCity: homeCity,
-            homeState: homeState,
-            homeZipCode: homeZipCode, 
+            billingCity: billingCity,
+            billingState: billingState,
+            billingZipCode: billingZipCode, 
             userId: userId,
           },
         });

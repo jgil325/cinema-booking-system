@@ -20,6 +20,11 @@ enum StatusType {
     INACTIVE
     SUSPENDED
 }
+
+enum UserRole {
+    CUSTOMER
+    ADMIN
+}
 model User {
     id        String    @id @default(cuid())
     password  String
@@ -32,7 +37,8 @@ model User {
     homeAddress  String
     homeCity     String 
     homeState    String 
-    homeZipCode  String 
+    homeZipCode  String
+    role UserRole 
     Account   Account[]
     Session   Session[]
     paymentCards PaymentCard[] // max 3?

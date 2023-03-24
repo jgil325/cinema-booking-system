@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { StatusType } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import validator from "validator";
 import { TRPCError } from "@trpc/server";
 import nodemailer from "nodemailer";
@@ -143,6 +144,7 @@ export const userRouter = createTRPCRouter({
         homeCity: homeCity,
         homeState: homeState,
         homeZipCode: homeZipCode,
+        role: UserRole.CUSTOMER,
         Account: {
           create: [
             {

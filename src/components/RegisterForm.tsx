@@ -68,6 +68,7 @@ const RegisterForm = () => {
       });
 
       // TODO: Navigate to success page or show success message
+      router.push("/checkEmail");
     } catch (error) {
       let errorMessage;
       if (error instanceof TRPCClientError) {
@@ -100,7 +101,6 @@ const RegisterForm = () => {
         alert(error); // should be coming from backend
       }
     }
-    router.push("/checkEmail");
     return createAccountResult;
   };
 

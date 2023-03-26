@@ -8,15 +8,44 @@ export const paymentRouter = createTRPCRouter({
   createPaymentInfo: publicProcedure
     .input(
       z.object({ // TODO: Need some way to make all these errors user friendly.
-        cardNumber: z.string().refine(value => validator.isCreditCard(value), {message: "Please enter a valid credit card number."}), 
+        //Payment Validation
+        cardNumber: z
+          .union([z.string().refine((value) => validator.isCreditCard(value), {
+            message: "Please enter a valid credit card number.",
+          }), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
         cardType: z.enum(["VISA", "MASTERCARD", "DISCOVER", "AMEX"]),
-        billingAddress: z.string().max(100),
-        expirationMonth: z.number().min(1, {message: "Please enter a valid month."}).max(12, {message: "Please enter a valid month."}),
-        expirationYear: z.number().min(new Date().getFullYear()).max(9999),
-        billingCity: z.string().min(1, {message: "Please enter a valid city."}), 
-        billingState: z.string().min(1), 
-        billingZipCode: z.string().length(5, {message: "Please enter a valid zip code."}),
+        billingAddress: z
+          .union([z.string().max(100), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
+        expirationMonth: z
+          .union([z.number().min(1, { message: "Please enter a valid month." }).max(12, { message: "Please enter a valid month." }), z.number().optional()]),
+        expirationYear: z
+          .union([z.number().min(1, { message: "Please enter a valid expiration year." }), z.number().optional()]),
+        billingCity: z
+          .union([z.string().min(1, { message: "Please enter a valid city." }), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
+        billingState: z
+          .union([z.string().min(1), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
+        billingZipCode: z
+          .union([z.string().length(5, { message: "Please enter a valid zip code."}), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
         userId: z.string(),
+      })
+      .refine((value) => {
+        if (
+          (!value.cardNumber && !value.billingAddress && !value.expirationMonth && !value.expirationYear && !value.billingCity && !value.billingState && !value.billingZipCode) ||
+          (value.cardNumber && value.billingAddress && value.expirationMonth && value.expirationYear && value.billingCity && value.billingState && value.billingZipCode)
+        ) {
+          return true;
+        }
+        throw new Error('All payment fields are required if you want to add a payment card. \nPlease remove all data from fields if you do not want to create a payment card.')
       }),
     )
     .mutation(async ({ ctx, input}) => {

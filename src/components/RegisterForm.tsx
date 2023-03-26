@@ -68,7 +68,7 @@ const RegisterForm = () => {
       });
 
       // TODO: Navigate to success page or show success message
-      router.push("/checkEmail");
+        router.push("/checkEmail").catch(error => console.error(error));
     } catch (error) {
       let errorMessage;
       if (error instanceof TRPCClientError) {

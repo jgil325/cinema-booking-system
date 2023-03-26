@@ -45,25 +45,42 @@ export const userRouter = createTRPCRouter({
           .length(5, { message: "Please enter a valid zip code." }),
         //Payment Validation
         cardNumber: z
-          .string()
-          .refine((value) => validator.isCreditCard(value), {
+          .union([z.string().refine((value) => validator.isCreditCard(value), {
             message: "Please enter a valid credit card number.",
-          }),
+          }), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
         cardType: z.enum(["VISA", "MASTERCARD", "DISCOVER", "AMEX"]),
-        billingAddress: z.string().max(100),
+        billingAddress: z
+          .union([z.string().max(100), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
         expirationMonth: z
-          .number()
-          .min(1, { message: "Please enter a valid month." })
-          .max(12, { message: "Please enter a valid month." }),
-        expirationYear: z.number().min(new Date().getFullYear()).max(9999),
+          .union([z.number().min(1, { message: "Please enter a valid month." }).max(12, { message: "Please enter a valid month." }), z.number().optional()]),
+        expirationYear: z
+          .union([z.number().min(1, { message: "Please enter a valid expiration year." }), z.number().optional()]),
         billingCity: z
-          .string()
-          .min(1, { message: "Please enter a valid city." }),
-        billingState: z.string().min(1),
+          .union([z.string().min(1, { message: "Please enter a valid city." }), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
+        billingState: z
+          .union([z.string().min(1), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
         billingZipCode: z
-          .string()
-          .length(5, { message: "Please enter a valid zip code." }),
+          .union([z.string().length(5, { message: "Please enter a valid zip code."}), z.string().length(0)])
+          .optional()
+          .transform(e => e === "" ? undefined : e),
       })
+      .refine((value) => {
+        if (
+          (!value.cardNumber && !value.billingAddress && !value.expirationMonth && !value.expirationYear && !value.billingCity && !value.billingState && !value.billingZipCode) ||
+          (value.cardNumber && value.billingAddress && value.expirationMonth && value.expirationYear && value.billingCity && value.billingState && value.billingZipCode)
+        ) {
+          return true;
+        }
+        throw new Error('All payment fields are required if you want to add a payment card. \nPlease remove all data from fields if you do not want to create a payment card.')
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const {
@@ -185,13 +202,17 @@ export const userRouter = createTRPCRouter({
       };
 
       let createdCard;
-      try {
-        const createdCard = await ctx.prisma.paymentCard.create({
-          data: paymentCardDetails,
-        });
-      } catch (error) {
-        throw new Error("Failed to create payment card.");
+      if (cardNumber != undefined) {
+        try { // need to only create a payment card if there is information to create a payment card
+          createdCard = await ctx.prisma.paymentCard.create({
+            data: paymentCardDetails,
+          });
+          console.log("Creating payment card on registration of account.")
+        } catch (error) {
+          throw new Error("Failed to create payment card.");
+        }
       }
+  
 
       let createdUser;
       try {

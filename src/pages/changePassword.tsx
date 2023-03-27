@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { api } from "../utils/api";
+import { z, ZodError } from 'zod';
+
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -11,12 +13,29 @@ const ChangePassword = () => {
   const { uid } = router.query;
 
   const { mutate } = api.editProfile.resetPassword.useMutation();
-  console.log(uid)
+  //console.log(uid) // it gets the uid just fine
+  const validate = z.object({
+    uid: z.string().min(10),
+    password: z.string().min(4, {message: 'New password must be at least 4 characters'})
+  })
+
   function handleChangePass() {
     if (password.localeCompare(confirmPassword) !== 0)
       return window.alert("Passwords must match");
-    mutate({ newPassword: password, uid });
-    setShowSuccess(true);
+    try {
+      console.log(password+typeof(password))
+      validate.parse({uid, password}); // parser will catch if uid is missing or invalid
+      mutate({uid: uid+'p' as string, newPassword: password});
+      setShowSuccess(true);
+    } catch (err) {
+      if (err instanceof ZodError) {
+        console.log(err.flatten().fieldErrors.password)
+        alert('Error: '+err.flatten().fieldErrors.password)
+      } else {
+        alert(err)
+      }
+    }
+    
   }
 
   if (showSuccess)

@@ -10,6 +10,8 @@ import { env } from "../env.mjs";
 import { prisma } from "./db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { StatusType } from "@prisma/client";
+import { boolean, z } from 'zod';
+import { genSaltSync, hashSync, compareSync } from "bcrypt-ts"; // uses bcrypt-ts instead of bcrypt
 /**
  * Module augmentation for `next-auth` types.
  * Allows us to add custom properties to the `session` object and keep type
@@ -67,7 +69,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         // TODO find correct user and decrypt password and stuff
-        const { email, password} = credentials || {};
+        const { email, password } = credentials || {};
 
         if (!email || !password) {
           console.log("Email and password are required")
@@ -75,16 +77,14 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Find the user by email
-        const user = await prisma.user.findFirst({ // findUnique: might need to change schema @@unique([email, password])
+        const user = await prisma.user.findUnique({
           where: { email } 
         });
         if (!user) {
-          console.log("Invalid email or password.")
-          throw new Error("Invalid email or password")
+          console.log("Could not find user with that email address.")
+          throw new Error("Could not find user with that email address.")
         }
-
-        const bcrypt = require('bcrypt');
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = compareSync(password, user.password) // uses bcrypt-ts
         if (!passwordMatch) {
           console.log("Invalid password.")
           throw new Error("Invalid password");

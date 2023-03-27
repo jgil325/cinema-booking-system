@@ -1,15 +1,35 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { api } from "../utils/api";
+import { z, ZodError } from 'zod';
+import { TRPCError } from "@trpc/server";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const { mutate } = api.user.sendPasswordResetLink.useMutation();
 
+  const verifyEmail = z.object({
+    email: z.string().email({ message: 'Please provide a valid email address'})
+  })
+
   function handleChangePassClick() {
-    mutate({ email });
-    setEmailSent(true);
+    try {
+      const result = verifyEmail.parse({email: email})
+      mutate({ email });
+      setEmailSent(true);
+    } catch (err) {
+      if (err instanceof ZodError) {
+        console.log(err.flatten().fieldErrors.email)
+        alert('Error: '+err.flatten().fieldErrors.email)
+      } else if (err instanceof TRPCError) {
+        console.log(err.message)
+        alert('Error: '+err.message)
+      } else {
+        console.log('unknown error, debug this')
+        alert('unknown error, debug this')
+      }
+    }
   }
 
   return (

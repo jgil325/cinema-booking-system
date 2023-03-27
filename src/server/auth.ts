@@ -9,6 +9,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "../env.mjs";
 import { prisma } from "./db";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { StatusType } from "@prisma/client";
 /**
  * Module augmentation for `next-auth` types.
  * Allows us to add custom properties to the `session` object and keep type
@@ -88,6 +89,14 @@ export const authOptions: NextAuthOptions = {
           console.log("Invalid password.")
           throw new Error("Invalid password");
         }
+        if (user.statusType == StatusType.INACTIVE) {
+          console.log("User email has not been verified yet. Please verfiy your email.")
+          throw new Error("User email has not been verified yet. Please verfiy your email.");
+        }
+        if (user.statusType == StatusType.SUSPENDED) {
+          console.log("Your account has been suspended.")
+          throw new Error("Your account has been suspended.");
+        }
         return user;
       },
     }),
@@ -99,6 +108,7 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
+    // eslint-disable-next-line @typescript-eslint/require-await
     async redirect({ url, baseUrl }) {
       return url.startsWith(baseUrl) ? url : baseUrl;
     },

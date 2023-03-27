@@ -277,6 +277,18 @@ export const userRouter = createTRPCRouter({
               message: "non matching passwords",
             });
           }
+          if (userFound.statusType == StatusType.INACTIVE) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Account Email not verified. Please verify email to login.",
+            })
+          }
+          if (userFound.statusType == StatusType.SUSPENDED) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Your account has been suspended.",
+            })
+          }
           return {
             status: "success",
             data: {

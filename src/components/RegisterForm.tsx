@@ -5,6 +5,7 @@ import { useState } from "react";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { z, ZodError } from 'zod';
 
 // NEEDS: Need a page that says basically thank you for signing
 
@@ -21,9 +22,7 @@ const RegisterForm = () => {
 
   // Payment Account Information
   const [cardNumber, setCardNumber] = useState("");
-  const [cardType, setCardType] = useState<
-    "VISA" | "MASTERCARD" | "DISCOVER" | "AMEX"
-  >("VISA");
+  const [cardType, setCardType] = useState<'Select Card' | "VISA" | "MASTERCARD" | "DISCOVER" | "AMEX">("Select Card");
   const [billingAddress, setBillingAddress] = useState("");
   const [billingCity, setBillingCity] = useState("");
   const [billingState, setBillingState] = useState("");
@@ -35,70 +34,178 @@ const RegisterForm = () => {
   const [homeState, setHomeState] = useState("");
   const [homeZipCode, setHomeZip] = useState("");
 
+  const requiredBillingSchema = z.object({
+    cardType: z.enum(["Select Card", "VISA", "MASTERCARD", "DISCOVER", "AMEX"]),
+    cardNumber: z.union([z.string().length(16,{message: 'Invalid card number'}), z.literal("")]),
+    expirationMonth: z.string().min(1,{message: 'Invalid expiration month'}),
+    expirationYear: z.string().length(4,{message: 'Invalid expiration year'}),
+    billingAddress: z.string().min(1,{message: 'Invalid billing address'}),
+    billingCity: z.string().min(1,{message: 'Invalid billing city'}),
+    billingState: z.string().min(1,{message: 'Invalid billing state'}),
+    billingZipCode: z.string().length(5,{message: 'Invalid billing zip code'})
+  });
+
+  const optionalBillingSchema = z.object({
+    cardType: z.enum(["Select Card", "VISA", "MASTERCARD", "DISCOVER", "AMEX"]), // select card default val
+    cardNumber: z.unknown(),
+    expirationMonth: z.unknown(),
+    expirationYear: z.unknown(),
+    billingAddress: z.unknown(),
+    billingCity: z.unknown(),
+    billingState: z.unknown(),
+    billingZipCode: z.unknown(),
+  });
+
+  const billingSchema = requiredBillingSchema.or(optionalBillingSchema);
+
+  const userDetailsSchema = z.object({
+    email: z.string().email({message: 'Invalid email address'}),
+    firstName: z.string().min(1,{message: 'Invalid first name'}),
+    lastName: z.string().min(1,{message: 'Invalid last name'}),
+    phoneNumber: z.string().length(10,{message: 'Invalid phone number'}),
+    homeAddress: z.string().min(1,{message: 'Invalid home address'}),
+    homeCity: z.string().min(1,{message: 'Invalid home city'}),
+    homeState: z.string().min(1,{message: 'Invalid home state'}),
+    homeZipCode: z.string().length(5,{message: 'Invalid home zip code'}),
+    isSignedUpPromos: z.boolean(),
+
+    cardType: z.union([z.enum(["Select Card", "VISA", "MASTERCARD", "DISCOVER", "AMEX"],), z.literal("")]),
+    cardNumber: z.union([z.string().length(16,{message: 'Invalid card number'}), z.literal("")]),
+    expirationMonth: z.union([z.string().min(1,{message: 'Invalid expiration month'}), z.literal("")]),
+    expirationYear: z.union([z.string().length(4,{message: 'Invalid expiration year'}), z.literal("")]),
+    billingAddress: z.union([z.string().min(1,{message: 'Invalid billing address'}), z.literal("")]),
+    billingCity: z.union([z.string().min(1,{message: 'Invalid billing city'}), z.literal("")]),
+    billingState: z.union([z.string().min(1,{message: 'Invalid billing state'}), z.literal("")]),
+    billingZipCode: z.union([z.string().length(5,{message: 'Invalid billing zip code'}), z.literal("")]),
+
+    password: z.string().min(1,{message: 'Invalid password'}),
+    confirmPassword: z.string().min(1,{message: 'Invalid confirm password'})
+  })
+  .refine((value) => { // actually fuck this method but whatever
+    if ((value.cardType=='Select Card')&&(value.cardNumber=="")&&(value.expirationMonth=="")&&(value.expirationYear=="")&&
+      (value.billingAddress=="")&&(value.billingCity=="")&&(value.billingState=="")&&(value.billingZipCode=="")) {
+        return true
+      } else if ((value.cardType!='Select Card')&&(value.cardNumber!="")&&(value.expirationMonth!="")&&(value.expirationYear!="")&&
+      (value.billingAddress!="")&&(value.billingCity!="")&&(value.billingState!="")&&(value.billingZipCode!="")) {
+        return true
+      } else {
+        return false
+      }
+  }, {message: 'All payment info fields must be filled in or none of them!'});
+
+  const validateFormData = () => {
+    try {
+      userDetailsSchema.parse({
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+        homeAddress: homeAddress,
+        homeCity: homeCity,
+        homeState: homeState,
+        homeZipCode: homeZipCode,
+        isSignedUpPromos: isSignedUpPromos,
+
+        cardType: cardType,
+        cardNumber: cardNumber,
+        expirationMonth: expirationMonth,
+        expirationYear: expirationYear,
+        billingAddress: billingAddress,
+        billingCity: billingCity,
+        billingState: billingState,
+        billingZipCode: billingZipCode,
+
+        password: password,
+        confirmPassword: confirmPassword
+
+      })
+      return true
+    } catch (err) {
+      if (err instanceof ZodError) {
+        let fielderrors = Object.values(err.flatten().fieldErrors)
+        let formerrors = Object.values(err.flatten().formErrors)
+        alert('Please address the following registry errors:\n------------------------------------------------\n'
+              +formerrors.join('\r\n')+'\n\n'+fielderrors.join('\r\n'))
+      }
+      return false
+    }
+  }
+
   // Hooks
   const createAccount = api.user.createAccount.useMutation();
   // const handleFormSubmit = console.log("placeholder");
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (password !== confirmPassword) {
-      alert("Password and confirm password must match. Please try again.");
+      alert("Passwords do not match. Please try again.");
       return;
     }
+    console.log('attempt to validate with zod')
+    const validatorResult = validateFormData();
     let createAccountResult;
-    try {
-      createAccountResult = await createAccount.mutateAsync({
-        email,
-        firstName,
-        lastName,
-        password,
-        isSignedUpPromos,
-        phoneNumber,
-        homeAddress,
-        homeCity,
-        homeState,
-        homeZipCode,
-        cardNumber,
-        cardType: cardType,
-        billingAddress,
-        expirationMonth: Number(expirationMonth),
-        expirationYear: Number(expirationYear),
-        billingCity,
-        billingState,
-        billingZipCode,
-      });
-
-      // TODO: Navigate to success page or show success message
-        router.push("/checkEmail").catch(error => console.error(error));
-    } catch (error) {
-      let errorMessage;
-      if (error instanceof TRPCClientError) {
-        const errorResult = error.message;
-        errorMessage =
-          "Please correct your information regarding: \n" + errorResult;
-        toast.error(errorMessage);
-        const popup = document.createElement("div");
-        popup.innerText = errorMessage;
-        popup.style.position = "fixed";
-        popup.style.top = "50%";
-        popup.style.left = "50%";
-        popup.style.transform = "translate(-50%, -50%)";
-        popup.style.backgroundColor = "#fff";
-        popup.style.color = "#000";
-        popup.style.padding = "20px";
-        popup.style.borderRadius = "5px";
-        popup.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
-        popup.style.maxWidth = "80%";
-        popup.style.maxHeight = "80%";
-        popup.style.overflow = "auto";
-        popup.style.zIndex = "9999";
-        document.body.appendChild(popup);
-        const hidePopup = () => {
-          popup.remove();
-        };
-        setTimeout(hidePopup, 20000);
-        popup.addEventListener("click", hidePopup);
-      } else {
-        alert(error); // should be coming from backend
+    if (validatorResult) {
+      try {
+        createAccountResult = await createAccount.mutateAsync({
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+          
+          homeAddress: homeAddress,
+          homeCity: homeCity,
+          homeState: homeState,
+          homeZipCode: homeZipCode,
+          isSignedUpPromos: isSignedUpPromos,
+      
+          cardType: cardType,
+          cardNumber: cardNumber,
+          expirationMonth: expirationMonth,
+          expirationYear: expirationYear,
+          billingAddress: billingAddress,
+          billingCity: billingCity,
+          billingState: billingState,
+          billingZipCode: billingZipCode,
+      
+          password: password,
+          confirmPassword: confirmPassword
+        });
+        // TODO: Navigate to success page or show success message
+          router.push("/checkEmail").catch(error => console.error(error));
+      } catch (error) {
+        /*let errorMessage;
+        if (error instanceof TRPCClientError) {
+          const errorResult = error.message;
+          errorMessage =
+            "Please correct your information regarding: \n" + errorResult;
+          toast.error(errorMessage);
+          const popup = document.createElement("div");
+          popup.innerText = errorMessage;
+          popup.style.position = "fixed";
+          popup.style.top = "50%";
+          popup.style.left = "50%";
+          popup.style.transform = "translate(-50%, -50%)";
+          popup.style.backgroundColor = "#fff";
+          popup.style.color = "#000";
+          popup.style.padding = "20px";
+          popup.style.borderRadius = "5px";
+          popup.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+          popup.style.maxWidth = "80%";
+          popup.style.maxHeight = "80%";
+          popup.style.overflow = "auto";
+          popup.style.zIndex = "9999";
+          document.body.appendChild(popup);
+          const hidePopup = () => {
+            popup.remove();
+          };
+          setTimeout(hidePopup, 20000);
+          popup.addEventListener("click", hidePopup);
+        } else {
+          alert(error); // should be coming from backend
+        }
+        */
+       alert('System Failure while attempting to create account. Try again in a couple of seconds.')
+       console.log(error)
+       // ^^ catch all for back end issues?????
       }
     }
     return createAccountResult;
@@ -177,6 +284,8 @@ const RegisterForm = () => {
             value={email}
             defaultValue="example@gmail.com"
             onChange={(event) => setEmail(event.target.value)}
+            required={true}
+            type=""
           />
         </fieldset>
         <fieldset className="flex w-full flex-row justify-between space-x-3">
@@ -193,6 +302,8 @@ const RegisterForm = () => {
               value={firstName}
               defaultValue="john"
               onChange={(event) => setFirstName(event.target.value)}
+              required={true}
+              type=""
             />
           </fieldset>
           <fieldset className="mb-[15px] flex w-1/2 flex-col ">
@@ -208,6 +319,8 @@ const RegisterForm = () => {
               value={lastName}
               defaultValue="smith"
               onChange={(event) => setLastName(event.target.value)}
+              required={true}
+              type=""
             />
           </fieldset>
         </fieldset>
@@ -224,6 +337,8 @@ const RegisterForm = () => {
             value={phoneNumber}
             defaultValue="XXX-XXX-XXXX"
             onChange={(event) => setPhoneNumber(event.target.value)}
+            required={true}
+            type=""
           />
         </fieldset>
         <fieldset className="mb-[15px] flex w-full flex-col justify-start">
@@ -239,6 +354,8 @@ const RegisterForm = () => {
             value={homeAddress}
             defaultValue=""
             onChange={(event) => setHomeAddress(event.target.value)}
+            required={true}
+            type=""
           />
         </fieldset>
         <fieldset className="flex w-full flex-row justify-between space-x-3">
@@ -255,6 +372,8 @@ const RegisterForm = () => {
               value={homeCity}
               defaultValue=""
               onChange={(event) => setHomeCity(event.target.value)}
+              required={true}
+              type=""
             />
           </fieldset>
           <fieldset className="mb-[15px] flex w-full flex-col justify-start">
@@ -270,6 +389,8 @@ const RegisterForm = () => {
               value={homeState}
               defaultValue=""
               onChange={(event) => setHomeState(event.target.value)}
+              required={true}
+              type=""
             />
           </fieldset>
           <fieldset className="mb-[15px] flex w-full flex-col justify-start">
@@ -285,6 +406,7 @@ const RegisterForm = () => {
               value={homeZipCode}
               defaultValue=""
               onChange={(event) => setHomeZip(event.target.value)}
+              required={true}
             />
           </fieldset>
         </fieldset>
@@ -324,13 +446,16 @@ const RegisterForm = () => {
             onChange={(event) =>
               setCardType(
                 event.target.value as
+                  | 'Select Card'
                   | "VISA"
                   | "MASTERCARD"
                   | "DISCOVER"
                   | "AMEX"
               )
             }
+            
           >
+            <option value="Select Card">Select Card</option>
             <option value="VISA">VISA</option>
             <option value="MASTERCARD">MASTERCARD</option>
             <option value="DISCOVER">DISCOVER</option>
@@ -348,7 +473,7 @@ const RegisterForm = () => {
             className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
             id="cardNumber" // Added value and change
             value={cardNumber}
-            defaultValue="VISA"
+            type="number"
             onChange={(event) => setCardNumber(event.target.value)}
           />
         </fieldset>
@@ -364,7 +489,7 @@ const RegisterForm = () => {
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
               id="expirationMonth" // Added value and change
               value={expirationMonth}
-              defaultValue="12"
+              type="number"
               onChange={(event) => setExpirationMonth(event.target.value)}
             />
           </fieldset>
@@ -379,7 +504,7 @@ const RegisterForm = () => {
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
               id="expirationYear" // Added value and change
               value={expirationYear}
-              defaultValue="23"
+              type="number"
               onChange={(event) => setExpirationYear(event.target.value)}
             />
           </fieldset>
@@ -395,7 +520,7 @@ const RegisterForm = () => {
             className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
             id="billingAddress" // Added value and change
             value={billingAddress}
-            defaultValue="124 Conch Street, Bikini Bottom, Pacific Ocean"
+            type=""
             onChange={(event) => setBillingAddress(event.target.value)}
           />
         </fieldset>
@@ -411,7 +536,7 @@ const RegisterForm = () => {
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
               id="billing-city"
               value={billingCity}
-              defaultValue=""
+              type=""
               onChange={(event) => setBillingCity(event.target.value)}
             />
           </fieldset>
@@ -426,7 +551,7 @@ const RegisterForm = () => {
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
               id="billing-state"
               value={billingState}
-              defaultValue=""
+              type=""
               onChange={(event) => setBillingState(event.target.value)}
             />
           </fieldset>
@@ -441,7 +566,7 @@ const RegisterForm = () => {
               className="text-violet11 shadow-violet7 focus:shadow-violet8 h-[35px] w-full shrink-0 grow rounded px-2.5 text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
               id="home-zip"
               value={billingZipCode}
-              defaultValue=""
+              type=""
               onChange={(event) => setBillingZip(event.target.value)}
             />
           </fieldset>
@@ -467,7 +592,8 @@ const RegisterForm = () => {
             value={password}
             defaultValue=""
             onChange={(event) => setPassword(event.target.value)}
-            type="password"
+            type=""
+            required={true}
           />
         </fieldset>
         <fieldset className="mb-[15px] flex w-full flex-col justify-start">

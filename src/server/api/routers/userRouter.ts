@@ -1,12 +1,12 @@
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-import { StatusType } from "@prisma/client";
-import { UserRole } from "@prisma/client";
+import { StatusType, UserRole, CardType } from "@prisma/client";
 import validator from "validator";
 import { TRPCError } from "@trpc/server";
 import nodemailer from "nodemailer";
-import bcrypt from "bcrypt";
+//import bcrypt from "bcrypt";
+import { genSaltSync, hashSync, compareSync } from "bcrypt-ts";
 
 export const userRouter = createTRPCRouter({
   all: publicProcedure.query(({ ctx }) => {
@@ -23,7 +23,7 @@ export const userRouter = createTRPCRouter({
   }),
   createAccount: publicProcedure
     .input(
-      z.object({
+      /*z.object({
         // User Validation
         email: z.string().email(),
         firstName: z.string().min(1, { message: "Name is required" }),
@@ -80,8 +80,43 @@ export const userRouter = createTRPCRouter({
           return true;
         }
         throw new Error('All payment fields are required if you want to add a payment card. \nPlease remove all data from fields if you do not want to create a payment card.')
-      }),
+      }),*/
+      z.object({ // same sanitation as front end, needs better billing options which are likely above
+        email: z.string().email({message: 'Invalid email address'}),
+        firstName: z.string().min(1,{message: 'Invalid first name'}),
+        lastName: z.string().min(1,{message: 'Invalid last name'}),
+        phoneNumber: z.string().length(10,{message: 'Invalid phone number'}),
+        homeAddress: z.string().min(1,{message: 'Invalid home address'}),
+        homeCity: z.string().min(1,{message: 'Invalid home city'}),
+        homeState: z.string().min(1,{message: 'Invalid home state'}),
+        homeZipCode: z.string().length(5,{message: 'Invalid home zip code'}),
+        isSignedUpPromos: z.boolean(),
+    
+        cardType: z.union([z.enum(["Select Card", "VISA", "MASTERCARD", "DISCOVER", "AMEX"],), z.literal("")]),
+        cardNumber: z.union([z.string().min(16,{message: 'Invalid card number'}), z.literal("")]),
+        expirationMonth: z.union([z.string().min(1,{message: 'Invalid expiration month'}), z.literal("")]),
+        expirationYear: z.union([z.string().length(4,{message: 'Invalid expiration year'}), z.literal("")]),
+        billingAddress: z.union([z.string().min(1), z.literal("")]),
+        billingCity: z.union([z.string().min(1), z.literal("")]),
+        billingState: z.union([z.string().min(1), z.literal("")]),
+        billingZipCode: z.union([z.string().length(5), z.literal("")]),
+    
+        password: z.string().min(1,{message: 'Invalid password'}),
+        confirmPassword: z.string().min(1,{message: 'Invalid confirm password'})
+      })
+      .refine((value) => { // actually fuck this method but whatever
+        if ((value.cardType=='Select Card')&&(value.cardNumber=="")&&(value.expirationMonth=="")&&(value.expirationYear=="")&&
+          (value.billingAddress=="")&&(value.billingCity=="")&&(value.billingState=="")&&(value.billingZipCode=="")) {
+            return true
+          } else if ((value.cardType!='Select Card')&&(value.cardNumber!="")&&(value.expirationMonth!="")&&(value.expirationYear!="")&&
+          (value.billingAddress!="")&&(value.billingCity!="")&&(value.billingState!="")&&(value.billingZipCode!="")) {
+            return true
+          } else {
+            return false
+          }
+      }, {message: 'All payment info fields must be filled in or none of them!'})      
     )
+    
     .mutation(async ({ ctx, input }) => {
       const {
         email,
@@ -105,8 +140,8 @@ export const userRouter = createTRPCRouter({
         billingState,
         billingZipCode,
       } = input; // payment info
-
-      try {
+      // might already be or should be moved to zod schema
+      /*try {
         // Validate home address, city, state, and zip code
         if (!homeAddress.trim()) {
           throw new Error("Home address is required");
@@ -128,7 +163,7 @@ export const userRouter = createTRPCRouter({
         throw new Error(
           "Could not create payment info. Check billing information."
         );
-      }
+      }*/
 
       let existingUser;
 
@@ -146,11 +181,12 @@ export const userRouter = createTRPCRouter({
         throw new Error("A user with this email already exists!"); // TODO: I dont want this to go to the next page, rn it goes to the confirmation page.
       }
 
-      const encodedPassword = await bcrypt.hash(password, 10);
+      //const encodedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = hashSync(password, genSaltSync(10))
 
       const fullUserDetails = {
         id: uuidv4(), // unique
-        password: encodedPassword,
+        password: hashedPassword,
         email: email,
         firstName: firstName,
         lastName: lastName,
@@ -188,31 +224,30 @@ export const userRouter = createTRPCRouter({
           ],
         },
       };
-
-      const paymentCardDetails = {
-        cardNumber: cardNumber,
-        cardType: cardType,
-        billingAddress: billingAddress, // TODO: Build and Validate building address, // TODO: make sure their can only be one shipping address
-        expirationMonth: expirationMonth,
-        expirationYear: expirationYear,
-        billingCity: billingCity,
-        billingState: billingState,
-        billingZipCode: billingZipCode,
-        userId: fullUserDetails.id,
-      };
-
       let createdCard;
-      if (cardNumber != undefined) {
+      if (cardType != 'Select Card') { // indicates no payment card added
+        const paymentCardDetails = {
+          cardNumber: cardNumber,
+          cardType: CardType.VISA, // because enums are messed up right now
+          billingAddress: billingAddress, // TODO: Build and Validate building address, // TODO: make sure their can only be one shipping address
+          expirationMonth: Number(expirationMonth),
+          expirationYear: Number(expirationYear),
+          billingCity: billingCity,
+          billingState: billingState,
+          billingZipCode: billingZipCode,
+          userId: fullUserDetails.id,
+        };
+
         try { // need to only create a payment card if there is information to create a payment card
           createdCard = await ctx.prisma.paymentCard.create({
-            data: paymentCardDetails,
+            data: paymentCardDetails
           });
           console.log("Creating payment card on registration of account.")
         } catch (error) {
           throw new Error("Failed to create payment card.");
         }
+        
       }
-  
 
       let createdUser;
       try {
@@ -249,7 +284,7 @@ export const userRouter = createTRPCRouter({
           }
         }
       );
-      return [createdUser, createdCard];
+      return [createdUser,createdCard];
     }),
   delete: publicProcedure.input(z.string()).mutation(({ ctx, input }) => {
     return ctx.prisma.user.delete({ where: { id: input } });
@@ -270,7 +305,7 @@ export const userRouter = createTRPCRouter({
         });
         if (userFound) {
           const dbUserPass = userFound.password;
-          const compare = await bcrypt.compare(input.password, dbUserPass);
+          const compare = compareSync(input.password, dbUserPass);
           if (!compare) {
             throw new TRPCError({
               code: "CONFLICT",
@@ -307,7 +342,7 @@ export const userRouter = createTRPCRouter({
             id: true,
           },
         });
-        const activationLink = `http://localhost:3000/changePassword?uid=${user.id}`;
+        const activationLink = `http://localhost:3000/changePassword?uid=${user}`;
 
         const transporter = nodemailer.createTransport({
           service: "Gmail",

@@ -47,6 +47,11 @@ const ForgotPassword = () => {
               >
                 Change Password
               </button>
+              <Link href="/signIn" className="my-3">
+                <span className="font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
+                  Back to Login
+                </span>
+          </Link>
             </>
           )}
         </div>

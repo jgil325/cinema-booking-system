@@ -3,26 +3,28 @@ import React, { useState } from "react";
 import { api } from "../utils/api";
 import { z, ZodError } from 'zod';
 import { TRPCError } from "@trpc/server";
+import { TRPCClientError } from "@trpc/client";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
-  const { mutate } = api.user.sendPasswordResetLink.useMutation();
+  const sendReset = api.user.sendPasswordResetLink.useMutation();
 
   const verifyEmail = z.object({
     email: z.string().email({ message: 'Please provide a valid email address'})
   })
 
-  function handleChangePassClick() {
+  const handleChangePassClick = async () => {
     try {
       const result = verifyEmail.parse({email: email})
-      mutate({ email });
+      const change = await sendReset.mutateAsync({ email });
       setEmailSent(true);
+      //setEmail("");
     } catch (err) {
       if (err instanceof ZodError) {
         console.log(err.flatten().fieldErrors.email)
         alert('Error: '+err.flatten().fieldErrors.email)
-      } else if (err instanceof TRPCError) {
+      } else if (err instanceof TRPCClientError) {
         console.log(err.message)
         alert('Error: '+err.message)
       } else {
@@ -58,7 +60,7 @@ const ForgotPassword = () => {
                 type="text"
                 id="email"
                 placeholder="Email Address"
-                value={email}
+                value=""
                 onChange={(e) => setEmail(e.target.value)}
               />
               <button

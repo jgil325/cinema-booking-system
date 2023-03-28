@@ -3,9 +3,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const Navbar = () => {
   const { data: session } = useSession();
+  const router = useRouter()
+
+  const signOutHandler = async() => {
+    // redirects to home page then signs out
+    await router.push("/")
+    await signOut();
+  }
   return (
     <div className="shadow-b sticky top-0 z-50 border-b border-gray-400 bg-blue-700 shadow-xl">
       <div className="align-end mr-6 flex flex-row justify-between space-x-6">
@@ -33,7 +41,7 @@ const Navbar = () => {
             <button
               className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200"
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onClick={() => signOut()}
+              onClick={signOutHandler}
             >
               Sign Out
             </button>

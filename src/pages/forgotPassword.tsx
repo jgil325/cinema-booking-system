@@ -19,7 +19,6 @@ const ForgotPassword = () => {
       const result = verifyEmail.parse({email: email})
       const change = await sendReset.mutateAsync({ email });
       setEmailSent(true);
-      //setEmail("");
     } catch (err) {
       if (err instanceof ZodError) {
         console.log(err.flatten().fieldErrors.email)

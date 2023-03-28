@@ -20,7 +20,7 @@ const ManageMovies = () => {
     showTimes: [],
   };
   const movies = new Array(10).fill(testmovie); // GET ALL MOVIES
-  const [selectedMovie, setSelectedMovie] = useState(movies.at(0));
+  const [selectedMovie, setSelectedMovie] = useState<Movie>(movies.at(0) as Movie);
 
   return (
     <div className="grid h-[40rem] grow grid-cols-3">
@@ -48,7 +48,13 @@ const ManageMovies = () => {
             <tbody className="divide-y divide-gray-200">
               {movies.map((movie) => {
                 return (
-                  <tr className="hover:bg-gray-100" key={movie.id}>
+                  <tr
+                    className="hover:bg-gray-100"
+                    key={movie.id}
+                    onClick={() => {
+                      setSelectedMovie(movie);
+                    }}
+                  >
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800">
                       {movie.title}
                     </td>
@@ -72,7 +78,7 @@ const ManageMovies = () => {
       <div className="space-y-2">
         <span className="text-xl font-medium">Edit Movie</span>
         <div className="a-start mx-4 flex flex-col rounded-lg border px-4">
-          <MovieForm movie={selectedMovie as Movie} onSubmit={() => null} />
+          <MovieForm defaultValues={selectedMovie} onSubmit={() => null} />
         </div>
       </div>
       <div className="space-y-2">

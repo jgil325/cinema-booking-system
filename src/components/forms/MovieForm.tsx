@@ -1,5 +1,5 @@
 import { type Movie } from "@prisma/client";
-import React, { type HTMLInputTypeAttribute, useState } from "react";
+import React, { type HTMLInputTypeAttribute, useState, useEffect } from "react";
 
 type MovieFormFields = Omit<Movie, "updatedAt" | "createdAt" | "id">;
 
@@ -63,6 +63,9 @@ const MovieForm = ({
   const [error, setError] = useState<MovieFormFields>(EmptyMovieFormFields);
   const [form, setForm] = useState<MovieFormFields>(defaultValues);
 
+  useEffect(() => {
+    setForm(defaultValues);
+  }, [defaultValues]);
   const handleChange = (
     event: React.FormEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement

@@ -32,8 +32,7 @@ const Page = () => {
       },
     });
 
-  const { data: cards, refetch: refetchCards } =
-    api.paymentCard.byId.useQuery();
+  const { data: cards, refetch: refetchCards } = api.paymentCard.byId.useQuery();
 
   useEffect(() => {
     async function doFetch() {
@@ -163,11 +162,11 @@ const MyProfile = ({ user }: { user: User }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPassConfirm, setNewPassConfirm] = useState("");
+  const [isPromos, setIsPromos] = useState(user.isSignedUpPromos)
   const [billingAddress, setBillingAddress] = useState(user.homeAddress);
   const [state, setState] = useState(user.homeState);
   const [city, setCity] = useState(user.homeCity);
   const [zipcode, setZipcode] = useState(user.homeZipCode);
-
   const { mutate: saveFirstName } =
     api.editProfile.changeFirstName.useMutation();
   const debouncedSaveFirstName = React.useMemo(
@@ -208,6 +207,23 @@ const MyProfile = ({ user }: { user: User }) => {
       return window.alert("New Passwords Do Not Match");
     changePassword({ newPassword, oldPassword });
   };
+
+  const { mutate: changePromoStatus } = 
+    api.editProfile.changePromoStatus.useMutation();
+  const debouncedSavePromos = React.useMemo(
+    () =>
+      debounce((newPromoStatus: boolean) => {
+        changePromoStatus({ newPromoStatus });
+      }, DEBOUNCE_DELAY),
+    [changePromoStatus]
+  );
+  const changePromoHandler = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setIsPromos(e.currentTarget.checked);
+      debouncedSavePromos(e.currentTarget.checked);
+    },
+    [debouncedSavePromos]
+  );
 
   const { mutate: saveHomeStreet } =
     api.editProfile.changeHomeStreet.useMutation();
@@ -355,7 +371,20 @@ const MyProfile = ({ user }: { user: User }) => {
           </button>
         </div>
       </div>
-
+      <div className="flex">
+        <span className="pt-8 text-right text-l font-medium">
+          Opt into Promotions
+        </span>
+        <div className="pl-4 pt-9">
+          <input
+            type="checkbox"
+            id="promos"
+            defaultChecked={isPromos}
+            className="h-4 w-4 border-gray-900 bg-gray-50 hover:cursor-pointer hover:border-gray-500"
+            onChange={changePromoHandler}
+          />
+        </div>
+      </div>
       <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
         Home Address
       </span>

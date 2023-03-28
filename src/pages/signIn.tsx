@@ -6,6 +6,7 @@ import { redirect } from "next/dist/server/api-utils";
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false); // pass to auth so session token only stored if remember me checked
   const router = useRouter();
 
   async function doSignIn() {
@@ -60,6 +61,7 @@ const SignIn = () => {
               <input
                 type="checkbox"
                 id="rememberMe"
+                onChange={() => setRememberMe(!rememberMe)}
                 className="h-4 w-4 border-gray-900 bg-gray-50 hover:cursor-pointer hover:border-gray-500"
               />
               <label

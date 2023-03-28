@@ -1,15 +1,36 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { api } from "../utils/api";
+import { z, ZodError } from 'zod';
+import { TRPCError } from "@trpc/server";
+import { TRPCClientError } from "@trpc/client";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
-  const { mutate } = api.user.sendPasswordResetLink.useMutation();
+  const sendReset = api.user.sendPasswordResetLink.useMutation();
 
-  function handleChangePassClick() {
-    mutate({ email });
-    setEmailSent(true);
+  const verifyEmail = z.object({
+    email: z.string().email({ message: 'Please provide a valid email address'})
+  })
+
+  const handleChangePassClick = async () => {
+    try {
+      const result = verifyEmail.parse({email: email})
+      const change = await sendReset.mutateAsync({ email });
+      setEmailSent(true);
+    } catch (err) {
+      if (err instanceof ZodError) {
+        console.log(err.flatten().fieldErrors.email)
+        alert('Error: '+err.flatten().fieldErrors.email)
+      } else if (err instanceof TRPCClientError) {
+        console.log(err.message)
+        alert('Error: '+err.message)
+      } else {
+        console.log('unknown error, debug this')
+        alert('unknown error, debug this')
+      }
+    }
   }
 
   return (
@@ -38,7 +59,7 @@ const ForgotPassword = () => {
                 type="text"
                 id="email"
                 placeholder="Email Address"
-                value={email}
+                value=""
                 onChange={(e) => setEmail(e.target.value)}
               />
               <button
@@ -47,6 +68,11 @@ const ForgotPassword = () => {
               >
                 Change Password
               </button>
+              <Link href="/signIn" className="my-3">
+                <span className="font-sm text-sm text-gray-900 hover:cursor-pointer hover:text-gray-500">
+                  Back to Login
+                </span>
+          </Link>
             </>
           )}
         </div>

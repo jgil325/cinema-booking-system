@@ -3,7 +3,8 @@ import { userRouter } from "./routers/userRouter";
 import { paymentRouter } from "./routers/paymentRouter";
 import { activateRouter } from "./routers/activateRouter";
 import { editProfileRouter } from "./routers/editProfileRouter";
-import { promoRouter } from "./routers/promoRouter";
+import { promoRouter } from "./routers/admin/promoRouter";
+import { manageUsersRouter } from "./routers/admin/manageUsers";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   activateUser: activateRouter,
   editProfile: editProfileRouter,
   promos: promoRouter,
+  manageUsers: manageUsersRouter,
 });
 
 export type AppRouter = typeof appRouter;

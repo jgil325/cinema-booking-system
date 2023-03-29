@@ -199,8 +199,7 @@ model PaymentCard {
 }
 
 model Promotion {
-    id String @id @default(cuid())
-
+    id          String @id @default(cuid())
     title       String
     description String
     discount    Float

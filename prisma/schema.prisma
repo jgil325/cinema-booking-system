@@ -1,181 +1,200 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider     = "mysql"
-    // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url          = env("DATABASE_URL")
-    relationMode = "prisma"
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-enum StatusType {
-    ACTIVE
-    INACTIVE
-    SUSPENDED
-}
-
-enum UserRole {
-    CUSTOMER
-    ADMIN
-}
 model User {
-    id        String    @id @default(cuid())
-    password  String
-    firstName String
-    lastName  String
-    email     String    @unique
-    phoneNumber String
-    statusType StatusType 
-    isSignedUpPromos Boolean
-    homeAddress  String
-    homeCity     String 
-    homeState    String 
-    homeZipCode  String
-    role UserRole 
-    Account   Account[]
-    Session   Session[]
-    paymentCards PaymentCard[] // max 3?
+  id               String        @id @default(cuid())
+  password         String
+  firstName        String
+  lastName         String
+  email            String        @unique
+  phoneNumber      String
+  statusType       StatusType
+  isSignedUpPromos Boolean
+  homeAddress      String
+  homeCity         String
+  homeState        String
+  homeZipCode      String
+  role             UserRole
+  Account          Account[]
+  Session          Session[]
+  paymentCards     PaymentCard[]
 }
 
-// Necessary for Next auth
-model Account { // TODO: DELETE WHEN USE DELETES
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId]) // I think this needs to be changed
+  @@unique([provider, providerAccountId])
 }
 
-model Session { // TODO: DELETE WHEN USER DELETES
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  token      String   @unique
+  expires    DateTime
+  identifier String
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }
 
 model Movie {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    title     String
-    category  String // if we want this to be a String[] we need to change our database type
-    cast      String
-    director  String
-    producer  String
-    synopsis  String
-    Review    Review[]
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  category  String
+  cast      String
+  director  String
+  producer  String
+  synopsis  String
+  rating    String
+  Showing   Show[]
+  Review    Review[]
 }
 
 model Review {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    rating    Int
-    title     String
-    content   String
-    author    String // this is the userID of creator of this
-    movieId   String
-    Movie     Movie    @relation(fields: [movieId], references: [id])
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rating    Int
+  title     String
+  content   String
+  author    String
+  movieId   String
+  Movie     Movie    @relation(fields: [movieId], references: [id])
 }
 
 model Show {
-    id                  String       @id @default(cuid())
-    createdAt           DateTime     @default(now())
-    updatedAt           DateTime     @updatedAt
-    showDate            DateTime
-    showTime            DateTime
-    showDurationMinutes Int
-    showRoom            ShowRoom     @relation(fields: [showRoomId], references: [id])
-    showRoomId          String
-    SeatInShow          SeatInShow[]
+  id                  String       @id @default(cuid())
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  showDate            DateTime
+  showTime            DateTime
+  showDurationMinutes Int
+  showRoomId          String
+  movieId             String
+  showRoom            ShowRoom     @relation(fields: [showRoomId], references: [id])
+  SeatInShow          SeatInShow[]
+  Movie               Movie        @relation(fields: [movieId], references: [id])
 }
 
 model ShowRoom {
-    id             String   @id @default(cuid())
-    createdAt      DateTime @default(now())
-    updatedAt      DateTime @updatedAt
-    numberOfSeats  Int
-    name           String
-    currentShowing Show[]
-    seats          Seat[]
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  numberOfSeats  Int
+  name           String
+  currentShowing Show[]
+  seats          Seat[]
 }
 
 model Seat {
-    seatNumber  Int
-    isOccupied  Boolean
-    doesRecline Boolean      @default(false)
-    showRoomId  String
-    ShowRoom    ShowRoom     @relation(fields: [showRoomId], references: [id])
-    SeatInShow  SeatInShow[]
+  seatNumber  Int
+  isOccupied  Boolean
+  doesRecline Boolean      @default(false)
+  showRoomId  String
+  ShowRoom    ShowRoom     @relation(fields: [showRoomId], references: [id])
+  SeatInShow  SeatInShow[]
 
-    @@id(fields: [showRoomId, seatNumber])
+  @@id([showRoomId, seatNumber])
 }
 
 model SeatInShow {
-    show Show @relation(fields: [showId], references: [id])
-    seat Seat @relation(fields: [seatShowRoomId, seatNumber], references: [showRoomId, seatNumber])
+  isOccupied     Boolean
+  showId         String
+  seatShowRoomId String
+  seatNumber     Int
+  show           Show     @relation(fields: [showId], references: [id])
+  seat           Seat     @relation(fields: [seatShowRoomId, seatNumber], references: [showRoomId, seatNumber])
+  Ticket         Ticket[]
 
-    isOccupied     Boolean
-    showId         String
-    seatShowRoomId String
-    seatNumber     Int
-    Ticket         Ticket[]
-
-    @@id(fields: [showId, seatNumber])
-}
-
-enum TicketType {
-    ADULT
-    SENIOR
-    CHILD
+  @@id([showId, seatNumber])
 }
 
 model Ticket {
-    id    String     @id @default(cuid())
-    price Float
-    type  TicketType
-
-    seatInShow SeatInShow @relation(fields: [showId, seatNumber], references: [showId, seatNumber])
-    showId     String
-    seatNumber Int
-    Booking    Booking?   @relation(fields: [bookingId], references: [id])
-    bookingId  String?
+  id         String     @id @default(cuid())
+  price      Float
+  type       TicketType
+  showId     String
+  seatNumber Int
+  bookingId  String?
+  seatInShow SeatInShow @relation(fields: [showId, seatNumber], references: [showId, seatNumber])
+  Booking    Booking?   @relation(fields: [bookingId], references: [id])
 }
 
 model Booking {
-    id                String   @id @default(cuid())
-    tickets           Ticket[]
-    bookingFee        Float
-    tax               Float
-    totalPrice        Float
-    promoDiscount     Float
-    isPaymentComplete Boolean
+  id                String   @id @default(cuid())
+  bookingFee        Float
+  tax               Float
+  totalPrice        Float
+  promoDiscount     Float
+  isPaymentComplete Boolean
+  tickets           Ticket[]
+}
+
+model PaymentCard {
+  id              String   @id @default(cuid())
+  cardNumber      String
+  cardType        CardType
+  expirationMonth Int
+  expirationYear  Int
+  billingAddress  String
+  billingCity     String
+  billingState    String
+  billingZipCode  String
+  userId          String
+  User            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Promotion {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  discount    Float
+  code        String   @unique
+  startDate   DateTime
+  endDate     DateTime
+}
+
+enum StatusType {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum TicketType {
+  ADULT
+  SENIOR
+  CHILD
 }
 
 enum CardType {
@@ -183,27 +202,4 @@ enum CardType {
   MASTERCARD
   AMEX
   DISCOVER
-}
-model PaymentCard { 
-    id              String @id @default(cuid()) // also acts as index
-    cardNumber      String 
-    cardType        CardType
-    expirationMonth Int 
-    expirationYear  Int
-    billingAddress  String
-    billingCity     String 
-    billingState    String 
-    billingZipCode  String 
-    userId          String 
-    User            User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Promotion {
-    id          String  @id @default(cuid())
-    title       String
-    description String
-    discount    Float
-    code        String  @unique
-    startDate   DateTime
-    endDate     DateTime
 }

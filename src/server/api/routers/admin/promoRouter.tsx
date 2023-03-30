@@ -82,7 +82,7 @@ export const promoRouter = createTRPCRouter({
         )
         .mutation(async ({ ctx, input }) => {
             // patches all fields regardless of change, api call should supply all args
-            // required arg is promo id, this field is passed to front end upon byID or getAllPromos
+            // required arg is promo id, this field is passed to front end upon byCode or getAllPromos
             const modifiedPromo = await ctx.prisma.promotion.update({
                 where: {
                     id: input.id

@@ -102,6 +102,24 @@ export const promoRouter = createTRPCRouter({
                 throw new Error('Issue updating promotion details')
             }
         }),
+    deletePromo: publicProcedure
+        .input(
+            z.object({
+                id: z.string()   
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const deletedPromo = await ctx.prisma.promotion.delete({
+                where: {
+                    id: input.id
+                }
+            });
+            if (deletedPromo) {
+                return deletedPromo
+            } else {
+                throw new Error('Issue finding or deleting promotion. Try again in a minute.')
+            }
+        }),
     sendPromoEmail: publicProcedure
         .input(
             z.object({

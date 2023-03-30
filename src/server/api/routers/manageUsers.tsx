@@ -1,4 +1,4 @@
-import { createTRPCRouter, publicProcedure } from '../../trpc';
+import { createTRPCRouter, publicProcedure } from '../trpc';
 import {z} from 'zod'
 import { v4 as uuidv4 } from "uuid";
 import { StatusType, UserRole } from '@prisma/client';
@@ -24,7 +24,28 @@ export const manageUsersRouter = createTRPCRouter({
             }
             return userToSuspend;
         }),
+    unsuspendUser: publicProcedure
+        .input(
+            z.object({
+                email: z.string().email({message: 'Provide a valid email address'})
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const userToUnsuspend = await ctx.prisma.user.update({
+                where: {
+                    email: input.email
+                },
+                data: {
+                    statusType: StatusType.ACTIVE
+                }
+            });
+            if (!userToUnsuspend) {
+                throw new Error('No user exists with this email address')
+            }
+            return userToUnsuspend;
+        }),
     promoteToAdmin: publicProcedure
+    // unused
         .input(
             z.object({
                 email: z.string().email({message: 'Provide a valid email address'})
@@ -45,6 +66,7 @@ export const manageUsersRouter = createTRPCRouter({
             return userToPromote;
         }),
     demoteToUser: publicProcedure
+    // unused
         .input(
             z.object({
                 email: z.string().email({message: 'Provide a valid email address'})

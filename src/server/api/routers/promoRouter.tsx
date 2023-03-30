@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from '../trpc';
 import {z} from 'zod'
 import { v4 as uuidv4 } from "uuid";
 import nodemailer from 'nodemailer';
+import { StatusType } from '@prisma/client';
 
 export const promoRouter = createTRPCRouter({
     createPromo: publicProcedure // should this be private later since only admin access???
@@ -13,16 +14,16 @@ export const promoRouter = createTRPCRouter({
                     .lte(1, {message: 'Percentage must be less than or equal to 100%'}),
                 discountCode: z.string().min(3, {message: 'Discount code must be 3 characters or greater'}),
                 startDate: z.date().min(new Date(), {message: 'Promotion date cannot start prior to now'}),
-                endDate: z.date().max(new Date('2024-01-01'), {message: 'Promotion end date must be before January 1st, 2024'})
+                endDate: z.date().max(new Date(2025, 11, 31), {message: 'Promotion end date must be before January 1st, 2024'})
             })
             .refine((inputs) => {
                 if (inputs.startDate >= inputs.endDate) {
-                    throw new Error('Promo start date must be before the promo end date!')
+                    return false
                 }
-            })
+                return true
+            }, {message: 'Promo start date must be before the promo end date!'})
         )
         .mutation(async ({ ctx, input }) => {
-            // currently no unique descriptor for promos thus same promo can be create twice
             const newPromotion = await ctx.prisma.promotion.create({
                 data: {
                     id: uuidv4(),
@@ -46,7 +47,7 @@ export const promoRouter = createTRPCRouter({
                 code: z.string().min(3, {message: 'Please provide a valid promotion code'})
             })
         )
-        .query(async ({ ctx, input }) => {
+        .mutation(async ({ ctx, input }) => {
             const foundPromo = await ctx.prisma.promotion.findUnique({
                 where: {
                     code: input.code
@@ -64,7 +65,7 @@ export const promoRouter = createTRPCRouter({
                 id: z.string().min(1, {message: 'Please provide a valid promotion id'})
             })
         )
-        .query(async ({ ctx, input }) => {
+        .mutation(async ({ ctx, input }) => {
             const foundPromo = await ctx.prisma.promotion.findUnique({
                 where: {
                     id: input.id
@@ -150,7 +151,8 @@ export const promoRouter = createTRPCRouter({
             // callable query conditionally initiated after promo creation or otherwise
             const usersSignedUpForPromos = await ctx.prisma.user.findMany({
                 where: {
-                    isSignedUpPromos: true
+                    isSignedUpPromos: true,
+                    statusType: StatusType.ACTIVE
                 },
                 select: {
                     email: true

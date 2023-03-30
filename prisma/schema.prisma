@@ -62,9 +62,9 @@ model VerificationToken {
 }
 
 model Movie {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   title     String
   category  String
   cast      String
@@ -74,7 +74,7 @@ model Movie {
   rating    String
   status    MovieStatus
   Showing   Show[]
-  Review    Review[]
+  Review    Review[] // review string
 }
 
 model Review {

@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import {z} from 'zod'
 import { v4 as uuidv4 } from "uuid";
-//import { MovieStatus } from '@prisma/client';
+import { MovieStatus } from '@prisma/client';
 
 export const moviesRouter = createTRPCRouter({
     createMovie: publicProcedure
@@ -14,6 +14,8 @@ export const moviesRouter = createTRPCRouter({
                 producer: z.string().min(1, {message: 'Movie must have a producer'}),
                 synopsis: z.string().min(1, {message: 'Movie must have a synopsis'}),
                 rating: z.string().min(1, {message: 'Movie must have a rating'}),
+                //review: z.number().gte(0, {message: 'Rating must be greater than or equal to 0})
+                    //.lte(10, {message: 'Rating must be less than or equal to 10})
                 // reviews, showing added afterward im guessing, thus not included in input
             })
         )
@@ -28,8 +30,8 @@ export const moviesRouter = createTRPCRouter({
                     producer: input.producer,
                     synopsis: input.synopsis,
                     rating: input.rating,
-                    // status: MovieStatus.COMINGSOON,
-                    //review added after initial creation
+                    status: MovieStatus.COMINGSOON,
+                    //review: input.review
                     // showing added after initial creation
                     //createdAt and updatedAt already generate i think
                 }
@@ -138,21 +140,6 @@ export const moviesRouter = createTRPCRouter({
                                     contains: input.keyword
                                 }},
                             {category: {
-                                    contains: input.keyword
-                                }},
-                            {cast: {
-                                    contains: input.keyword
-                                }},
-                            {director: {
-                                    contains: input.keyword
-                                }},
-                            {producer: {
-                                    contains: input.keyword
-                                }},
-                            {synopsis: {
-                                    contains: input.keyword
-                                }},
-                            {rating: {
                                     contains: input.keyword
                                 }},
                         ]

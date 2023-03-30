@@ -1,6 +1,7 @@
-import { createTRPCRouter, publicProcedure } from '../../trpc';
+import { createTRPCRouter, publicProcedure } from '../trpc';
 import {z} from 'zod'
 import { v4 as uuidv4 } from "uuid";
+//import { MovieStatus } from '@prisma/client';
 
 export const moviesRouter = createTRPCRouter({
     createMovie: publicProcedure
@@ -27,6 +28,7 @@ export const moviesRouter = createTRPCRouter({
                     producer: input.producer,
                     synopsis: input.synopsis,
                     rating: input.rating,
+                    // status: MovieStatus.COMINGSOON,
                     //review added after initial creation
                     // showing added after initial creation
                     //createdAt and updatedAt already generate i think
@@ -39,6 +41,7 @@ export const moviesRouter = createTRPCRouter({
             }
         }),
     editMovie: publicProcedure
+    // unused
         .input(
             z.object({
                 id: z.string(),
@@ -75,6 +78,7 @@ export const moviesRouter = createTRPCRouter({
             }
         }),
     deleteMovie: publicProcedure
+    // unused
         .input(
             z.object({
                 id: z.string()   

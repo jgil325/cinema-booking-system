@@ -72,6 +72,7 @@ model Movie {
   producer  String
   synopsis  String
   rating    String
+  status    MovieStatus
   Showing   Show[]
   Review    Review[]
 }
@@ -202,4 +203,9 @@ enum CardType {
   MASTERCARD
   AMEX
   DISCOVER
+}
+
+enum MovieStatus {
+  COMINGSOON
+  CURRENTLYSHOWING
 }

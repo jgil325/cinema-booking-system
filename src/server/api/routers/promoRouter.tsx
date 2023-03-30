@@ -1,4 +1,4 @@
-import { createTRPCRouter, publicProcedure } from '../../trpc';
+import { createTRPCRouter, publicProcedure } from '../trpc';
 import {z} from 'zod'
 import { v4 as uuidv4 } from "uuid";
 import nodemailer from 'nodemailer';
@@ -58,6 +58,24 @@ export const promoRouter = createTRPCRouter({
                 throw new Error('No promotion exists by this specific promotion code')
             }
         }),
+    byId: publicProcedure
+        .input(
+            z.object({
+                id: z.string().min(1, {message: 'Please provide a valid promotion id'})
+            })
+        )
+        .query(async ({ ctx, input }) => {
+            const foundPromo = await ctx.prisma.promotion.findUnique({
+                where: {
+                    id: input.id
+                }
+            });
+            if (foundPromo) {
+                return foundPromo
+            } else {
+                throw new Error('No promotion exists by this specific promotion id')
+            }
+        }),
     getAllPromos: publicProcedure
         .query(async ({ ctx }) => {
             const allPromos = await ctx.prisma.promotion.findMany();
@@ -68,6 +86,7 @@ export const promoRouter = createTRPCRouter({
             }
         }),
     editPromo: publicProcedure
+    // unused
         .input(
             z.object({
                 id: z.string(),
@@ -103,6 +122,7 @@ export const promoRouter = createTRPCRouter({
             }
         }),
     deletePromo: publicProcedure
+    // unused
         .input(
             z.object({
                 id: z.string()   

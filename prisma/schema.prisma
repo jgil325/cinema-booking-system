@@ -93,12 +93,11 @@ model Show {
   id                  String       @id @default(cuid())
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
-  showDate            DateTime
-  showTime            DateTime
+  showTime            DateTime    // includes date and time in one
   showDurationMinutes Int
-  showRoomId          String
+  showRoomId          String?
   movieId             String
-  showRoom            ShowRoom     @relation(fields: [showRoomId], references: [id])
+  showRoom            ShowRoom?     @relation(fields: [showRoomId], references: [id])
   SeatInShow          SeatInShow[]
   Movie               Movie        @relation(fields: [movieId], references: [id])
 }

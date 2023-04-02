@@ -1,23 +1,22 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import {z} from 'zod'
 import { v4 as uuidv4 } from "uuid";
-//import { MovieStatus } from '@prisma/client';
+import { MovieStatus } from '@prisma/client';
 
 export const showingsRouter = createTRPCRouter({
     createShow: publicProcedure
         .input(
             z.object({
                 movieId: z.string().min(1, {message: 'Provide a movie ID to schedule show'}),
-                showDate: z.date(), // just date
                 showTime: z.date(), // just time
                 // other args?
             })
             .refine((inputs) => {
-                if (inputs.showDate < new Date()) {
-                    throw new Error('Show start date must be after current date!')
+                if (inputs.showTime < new Date()) {
+                    return false
                 }
-                // showTime refine??
-            })
+                return true
+            }, {message: 'Show start date must be after current date!'})
         )
         .mutation(async ({ ctx, input }) => {
             const foundMovie = await ctx.prisma.movie.findUnique({
@@ -29,15 +28,17 @@ export const showingsRouter = createTRPCRouter({
                 throw new Error('No movie exists by this ID')
             } else {
                 const currentShowDateTimes = await ctx.prisma.show.findMany({
+                    where: {
+                        movieId: input.movieId
+                    },
                     select: {
-                        showDate: true,
                         showTime: true
                     }
                 })
-                var uniqueShowTime = true
+                var uniqueShowTime = true // maybe not necessary
                 for (var show of currentShowDateTimes) {
-                    if ((show.showDate == input.showDate)&&(show.showTime == input.showTime)) {
-                        uniqueShowTime = false
+                    if (show.showTime.getTime() === input.showTime.getTime()) {
+                        uniqueShowTime = false // maybe not necessary
                         throw new Error('Cannot schedule show at same time and date as another show.')
                     }
                 }
@@ -45,15 +46,24 @@ export const showingsRouter = createTRPCRouter({
                     const newShow = await ctx.prisma.show.create({
                         data: {
                             id: uuidv4(),
-                            //createdAt and updatedAt already generate i think
-                            showDate: input.showDate,
                             showTime: input.showTime,
-                            showDurationMinutes: 120,
+                            showDurationMinutes: 120, // default value, not sure if keeping
                             movieId: input.movieId,
-                            showRoomId: 'null' // no showRoomId yet
+                            showRoomId: 'temp' // no showRoomId yet
                         }
                     });
                     if (newShow) {
+                        const updatedMovieStatus = await ctx.prisma.movie.update({
+                            where: {
+                                id: input.movieId
+                            },
+                            data: {
+                                status: MovieStatus.CURRENTLYSHOWING
+                            }
+                        });
+                        if (!updatedMovieStatus) {
+                            throw new Error(`Issue updating showing status for movie: ${input.movieId}`)
+                        }
                         return newShow
                     } else {
                         throw new Error(`Issue creating showing for movie: ${input.movieId}`)
@@ -61,10 +71,10 @@ export const showingsRouter = createTRPCRouter({
                 }
             }
         }),
-    deleteShow: publicProcedure
+    deleteShow: publicProcedure // maybe unused, not tested
         .input(
             z.object({
-                id: z.string()   
+                id: z.string().min(1, {message: 'Provide a valid show ID'})  
             })
         )
         .mutation(async ({ ctx, input }) => {
@@ -80,4 +90,31 @@ export const showingsRouter = createTRPCRouter({
             }
         }),
     // editShow:?
+    byId: publicProcedure
+        .input(
+            z.object({
+                id: z.string().min(1, {message: 'Provide a valid show ID'})
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const foundShow = await ctx.prisma.show.findUnique({
+                where: {
+                    id: input.id
+                }
+            });
+            if (foundShow) {
+                return foundShow
+            } else {
+                throw new Error('Could not find a show with provided ID');
+            }
+        }),
+    getAllShows: publicProcedure
+        .query(async ({ ctx }) => {
+            const allShows = await ctx.prisma.show.findMany();
+            if (allShows) {
+                return allShows
+            } else {
+                throw new Error('No shows are currently active')
+            }
+        }),
 });

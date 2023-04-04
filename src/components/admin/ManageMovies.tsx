@@ -1,35 +1,38 @@
-import { Movie } from "@prisma/client";
+import { Movie, Show } from "@prisma/client";
 import React, { useState } from "react";
+import { api } from "../../utils/api";
 import MovieForm from "../forms/MovieForm";
+import ScheduleMovieForm from "../forms/ScheduleMovieForm";
 
 const ManageMovies = () => {
-  const testmovie = {
-    title: "Shrek",
-    category: ["Action", "Drama"],
-    cast: ["Actor1", "Actor2", "Actor3"],
-    director: "Andrew Adamson",
-    producer: "DreamWorks Pictures",
-    synopsis:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    reviews: [],
-    trailerPicture:
-      "https://img.nbc.com/sites/nbcunbc/files/images/2020/11/03/02b2cc2f-ba71-3a3c-a274-c2e4bd14cd74.jpg",
-    trailerVideoId: "W37DlG1i61s",
-    MPAAUSFilmRating: "PG",
-    showDates: [],
-    showTimes: [],
-  };
-  const movies = new Array(10).fill(testmovie); // GET ALL MOVIES
-  const [selectedMovie, setSelectedMovie] = useState<Movie>(
-    movies.at(0) as Movie
+  const { data: movies, refetch: refetchMovies } =
+    api.movies.getAllMovies.useQuery();
+
+  const { mutate: createMovie } = api.movies.createMovie.useMutation({
+    onSuccess: (res) => {
+      movies?.push(res);
+    },
+  });
+
+  const { mutate: createShow } = api.showings.createShow.useMutation({});
+
+  const [selectedMovie, setSelectedMovie] = useState<Movie | undefined>(
+    undefined
   );
 
+  const handleSubmit = (movie: Movie) => {
+    createMovie(movie);
+  };
+
+  const doCreateShow = (show: { movieId: string; showTime: Date }) => {
+    createShow(show);
+  };
   return (
     <div className="grid h-[40rem] grow grid-cols-3">
       <div className="space-y-2">
         <span className="text-xl font-medium">Add New Movie</span>
         <div className="a-start mx-4 flex flex-col rounded-lg border px-4">
-          <MovieForm onSubmit={() => null} />
+          <MovieForm onSubmit={handleSubmit} />
         </div>
       </div>
       {/* Movie List */}
@@ -55,11 +58,11 @@ const ManageMovies = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {movies.map((movie) => {
+              {movies?.map((movie) => {
                 return (
                   <tr
                     className={`hover:bg-gray-100 ${
-                      selectedMovie.id === movie.id ? "bg-gray-100" : ""
+                      selectedMovie?.id === movie.id ? "bg-gray-100" : ""
                     }`}
                     key={movie.id}
                     onClick={() => {
@@ -88,8 +91,13 @@ const ManageMovies = () => {
 
       <div className="space-y-2">
         <span className="text-xl font-medium">
-          Schedule Movie {selectedMovie.title}
+          Schedule Movie {selectedMovie?.title}
         </span>
+        <ScheduleMovieForm
+          onSubmit={doCreateShow}
+          submitText="Schedule Show"
+          movieId={selectedMovie?.id || ""}
+        />
       </div>
     </div>
   );

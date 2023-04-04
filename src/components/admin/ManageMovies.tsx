@@ -1,7 +1,8 @@
-import { Movie } from "@prisma/client";
+import { Movie, Show } from "@prisma/client";
 import React, { useState } from "react";
 import { api } from "../../utils/api";
 import MovieForm from "../forms/MovieForm";
+import ScheduleMovieForm from "../forms/ScheduleMovieForm";
 
 const ManageMovies = () => {
   const { data: movies, refetch: refetchMovies } =
@@ -12,12 +13,19 @@ const ManageMovies = () => {
       movies?.push(res);
     },
   });
+
+  const { mutate: createShow } = api.showings.createShow.useMutation({});
+
   const [selectedMovie, setSelectedMovie] = useState<Movie | undefined>(
     undefined
   );
 
   const handleSubmit = (movie: Movie) => {
     createMovie(movie);
+  };
+
+  const doCreateShow = (show: { movieId: string; showTime: Date }) => {
+    createShow(show);
   };
   return (
     <div className="grid h-[40rem] grow grid-cols-3">
@@ -85,7 +93,11 @@ const ManageMovies = () => {
         <span className="text-xl font-medium">
           Schedule Movie {selectedMovie?.title}
         </span>
-        
+        <ScheduleMovieForm
+          onSubmit={doCreateShow}
+          submitText="Schedule Show"
+          movieId={selectedMovie?.id || ""}
+        />
       </div>
     </div>
   );

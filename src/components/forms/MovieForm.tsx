@@ -1,6 +1,6 @@
 import { type Movie } from "@prisma/client";
 import React, { type HTMLInputTypeAttribute, useState, useEffect } from "react";
-
+import FormInput from "../ui/FormInput";
 type MovieFormFields = Omit<Movie, "updatedAt" | "createdAt" | "id">;
 
 const EmptyMovieFormFields = {
@@ -10,47 +10,12 @@ const EmptyMovieFormFields = {
   director: "",
   producer: "",
   synopsis: "",
+  rating: "G"
 };
-interface InputProps {
-  form: MovieFormFields;
-  error: MovieFormFields | null;
-  handleChange: (event: React.FormEvent<HTMLInputElement>) => void;
-  id: string;
-  title?: string;
-  type?: HTMLInputTypeAttribute;
-  className?: string;
-}
 
-const FormInput = ({
-  form,
-  error,
-  handleChange,
-  id,
-  type = "string",
-  title,
-  className = "grid px-1",
-}: InputProps) => {
-  return (
-    <div className={className}>
-      <span className="text-left font-medium">
-        {title}
-        <span className="font-sm pl-2 text-left text-sm text-red-500">
-          * {error ? error[id] : ""}
-        </span>
-      </span>
-      <input
-        className="rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-        value={form[id]}
-        id={id}
-        type={type}
-        onChange={handleChange}
-      />
-    </div>
-  );
-};
 
 interface Props {
-  onSubmit: () => null;
+  onSubmit: Function;
   defaultValues?: MovieFormFields;
   submitText?: string;
 }
@@ -66,7 +31,7 @@ const MovieForm = ({
   useEffect(() => {
     setForm(defaultValues);
   }, [defaultValues]);
-  
+
   const handleChange = (
     event: React.FormEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -81,7 +46,6 @@ const MovieForm = ({
   function handleSubmit() {
     let doSubmit = true;
     Object.keys(form).forEach((key) => {
-      console.log(key, form[key]);
       if ((form[key] as string).length === 0) {
         doSubmit = false;
         setError((prev) => ({
@@ -96,7 +60,8 @@ const MovieForm = ({
       }
     });
 
-    if (doSubmit) onSubmit();
+
+    if (doSubmit) onSubmit(form);
   }
 
   return (
@@ -157,12 +122,13 @@ const MovieForm = ({
         <span className="text-left font-medium">
           MPAA US FilmRating
           <span className="font-sm pl-2 text-left text-sm text-red-500">
-            * {error ? error.MP4AAUSFilmRating : ""}
+            * {error ? error.rating : ""}
           </span>
         </span>
         <select
-          value={form.MPAAUSFilmRating}
+          value={form.rating}
           onChange={handleChange}
+          id="rating"
           className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         >
           {["G", "PG", "PG-13", "R"].map((state) => (

@@ -7,13 +7,13 @@ import { useRouter } from "next/router";
 
 const Navbar = () => {
   const { data: session } = useSession();
-  const router = useRouter()
+  const router = useRouter();
 
-  const signOutHandler = async() => {
+  const signOutHandler = async () => {
     // redirects to home page then signs out
-    await router.push("/")
+    await router.push("/");
     await signOut();
-  }
+  };
   return (
     <div className="shadow-b sticky top-0 z-50 border-b border-gray-400 bg-blue-700 shadow-xl">
       <div className="align-end mr-6 flex flex-row justify-between space-x-6">
@@ -35,6 +35,13 @@ const Navbar = () => {
               Browse Movies
             </button>
           </Link>
+          {session?.user.role === "ADMIN" ? (
+            <Link href={"/admin"}>
+              <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
+                Admin
+              </button>
+            </Link>
+          ) : null}
         </div>
         {session ? (
           <div className="gap-30 flex flex-row space-x-8">

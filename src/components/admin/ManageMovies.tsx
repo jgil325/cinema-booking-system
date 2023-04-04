@@ -20,13 +20,22 @@ const ManageMovies = () => {
     showTimes: [],
   };
   const movies = new Array(10).fill(testmovie); // GET ALL MOVIES
-  const [selectedMovie, setSelectedMovie] = useState<Movie>(movies.at(0) as Movie);
+  const [selectedMovie, setSelectedMovie] = useState<Movie>(
+    movies.at(0) as Movie
+  );
 
   return (
     <div className="grid h-[40rem] grow grid-cols-3">
+      <div className="space-y-2">
+        <span className="text-xl font-medium">Add New Movie</span>
+        <div className="a-start mx-4 flex flex-col rounded-lg border px-4">
+          <MovieForm onSubmit={() => null} />
+        </div>
+      </div>
       {/* Movie List */}
       <div className="space-y-2">
         <span className="text-xl font-medium">Movies</span>
+
         <div className="mx-4 overflow-y-scroll rounded-lg border">
           <table className="min-w-full table-auto divide-y divide-x divide-gray-200 text-left ">
             <thead className="bg-gray-50">
@@ -49,7 +58,9 @@ const ManageMovies = () => {
               {movies.map((movie) => {
                 return (
                   <tr
-                    className="hover:bg-gray-100"
+                    className={`hover:bg-gray-100 ${
+                      selectedMovie.id === movie.id ? "bg-gray-100" : ""
+                    }`}
                     key={movie.id}
                     onClick={() => {
                       setSelectedMovie(movie);
@@ -74,15 +85,11 @@ const ManageMovies = () => {
           </table>
         </div>
       </div>
-      {/* Modify Movie Or Create New Movie Form */}
+
       <div className="space-y-2">
-        <span className="text-xl font-medium">Edit Movie</span>
-        <div className="a-start mx-4 flex flex-col rounded-lg border px-4">
-          <MovieForm defaultValues={selectedMovie} onSubmit={() => null} />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <span className="text-xl font-medium">Schedule Movie</span>
+        <span className="text-xl font-medium">
+          Schedule Movie {selectedMovie.title}
+        </span>
       </div>
     </div>
   );

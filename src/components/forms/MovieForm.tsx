@@ -66,6 +66,7 @@ const MovieForm = ({
   useEffect(() => {
     setForm(defaultValues);
   }, [defaultValues]);
+  
   const handleChange = (
     event: React.FormEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement

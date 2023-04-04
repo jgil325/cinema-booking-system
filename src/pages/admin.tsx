@@ -1,61 +1,58 @@
-import React, { useState, useEffect } from "react";
-import ManageMoviesForm from "../components/forms/ManageMoviesForm";
-import ManageMoviesList from "../components/ManageMoviesList";
-import ManagePromotionsForm from "../components/forms/ManagePromotionsForm";
-import ManagePromotionsList from "../components/ManagePromotionsList";
-
-
-// NONE OF THE SUBMISSION HANDLERS WORK NOR ARE CONNECTED YET
-function MoviesToggle(props : any) {
-  return (
-    <div>
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input type="checkbox" value="" onClick={props.handleClick} className="sr-only peer"/>
-        <div 
-        className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 
-        dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full 
-        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white 
-        after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
-        peer-checked:bg-blue-600">
-        </div>
-      </label>
-    </div>
-  );
-}
+import { useState } from "react";
+import AccessDenied from "../components/AccessDenied";
+import ManageMovies from "../components/admin/ManageMovies";
+import { ManagePromotions } from "../components/admin/ManagePromotions";
+import ManageUsers from "../components/admin/ManageUsers";
 
 const Admin = () => {
-  const [isViewMovies, setIsViewMovies] = useState(true);
+  // REPLACE THIS WITH USER GROUP ISNT ADMIN OR USER NOT LOGGED IN
+  const [tab, setTab] = useState<"movies" | "users" | "promos">("movies");
 
-  function handleClick() {
-    setIsViewMovies(!isViewMovies)
-  }
+  if (false)
+    return <AccessDenied message="You must be an admin to access this page" />;
 
-  const handleSubmit = (movieName: string) => {
-    console.log(`Submitting new movie:`);
-    console.log(`Movie Name: ${movieName}`);
-    // Perform actual login logic here
-  };
-
-  useEffect(() => setIsViewMovies(true), [])
   return (
-    <div>
-      <div className='flex flex-col items-center mt-6 gap-5'>
-        <div className='px-48 py-8 bg-indigo-500 rounded-3xl shadow-lg flex flex-row'>
-          <h1 className='font-semibold text-2xl text-white mr-8'>Admin Movies/Promotions Manager</h1>
-        </div>
-        <MoviesToggle handleClick={handleClick}/>
-        {isViewMovies ?
-          <div className="flex flex-row gap-2">
-            <ManageMoviesList onSubmit={handleSubmit}/>
-            <ManageMoviesForm onSubmit={handleSubmit}/> 
-          </div> :
-          <div className="flex flex-row gap-6">
-            <ManagePromotionsList onSubmit={handleSubmit}/>
-            <ManagePromotionsForm onSubmit={handleSubmit}/>
+    <>
+      <div className="mt-4 px-8">
+        <div className="w-full space-y-0 rounded-xl border py-4 px-4 text-center">
+          <span className="text-center text-3xl font-medium">Admin Panel</span>
+          <div className="grid grid-cols-3 space-x-4 px-3 py-4">
+            <button
+              className={`${
+                tab === "movies" ? "ring-4 ring-black " : "hover:bg-indigo-700 "
+              }h-fit rounded-lg bg-indigo-500 px-3 py-1.5 font-medium text-white`}
+              type="submit"
+              onClick={() => setTab("movies")}
+            >
+              Manage Movies
+            </button>
+            <button
+              className={`${
+                tab === "users" ? "ring-4 ring-black " : "hover:bg-indigo-700 "
+              }h-fit rounded-lg bg-indigo-500 px-3 py-1.5 font-medium text-white `}
+              type="submit"
+              onClick={() => setTab("users")}
+            >
+              Manage Users
+            </button>
+            <button
+              className={`${
+                tab === "promos" ? "ring-4 ring-black " : "hover:bg-indigo-700 "
+              }h-fit rounded-lg bg-indigo-500 px-3 py-1.5 font-medium text-white `}
+              type="submit"
+              onClick={() => setTab("promos")}
+            >
+              Manage Promotions
+            </button>
           </div>
-        }
+        </div>
+        <div className="mt-4 w-full space-y-0 rounded-xl border py-4 px-4 text-center">
+          {tab === "movies" ? <ManageMovies /> : null}
+          {tab === "users" ? <ManageUsers /> : null}
+          {tab === "promos" ? <ManagePromotions /> : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

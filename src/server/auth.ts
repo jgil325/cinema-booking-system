@@ -9,7 +9,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "../env.mjs";
 import { prisma } from "./db";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { StatusType } from "@prisma/client";
+import { StatusType, UserRole } from "@prisma/client";
 import { boolean, z } from 'zod';
 import { genSaltSync, hashSync, compareSync } from "bcrypt-ts"; // uses bcrypt-ts instead of bcrypt
 /**
@@ -26,7 +26,7 @@ declare module "next-auth" {
       email: string;
       firstName: string;
       lastName: string;
-      // role: UserRole;
+      role: UserRole;
     } & DefaultSession["user"];
   }
 
@@ -35,7 +35,7 @@ declare module "next-auth" {
     email: string;
     firstName: string;
     lastName: string;
-    // role: UserRole;
+    role: UserRole;
   }
 }
 

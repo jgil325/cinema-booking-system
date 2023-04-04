@@ -1,20 +1,33 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { signIn } from "next-auth/react";
-import { redirect } from "next/dist/server/api-utils";
+import { signIn, useSession } from "next-auth/react";
+
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false); // pass to auth so session token only stored if remember me checked
   const router = useRouter();
+  const { data: session } = useSession();
+
+  function redirect(location: string) {
+    void router.push(location);
+  }
+
+  if (session)
+    session?.user?.role !== "ADMIN" ? redirect("/") : redirect("/admin");
 
   async function doSignIn() {
     try {
-      const signInResult = await signIn("login", { email, password, redirect: false }); 
+      const signInResult = await signIn("login", {
+        email,
+        password,
+        redirect: false,
+      });
       if (signInResult?.error) {
         throw new Error(signInResult.error);
       }
+
       await router.push("/");
     } catch (error) {
       console.log(error);

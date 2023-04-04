@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import AccessDenied from "../components/AccessDenied";
 import ManageMovies from "../components/admin/ManageMovies";
@@ -8,7 +9,8 @@ const Admin = () => {
   // REPLACE THIS WITH USER GROUP ISNT ADMIN OR USER NOT LOGGED IN
   const [tab, setTab] = useState<"movies" | "users" | "promos">("movies");
 
-  if (false)
+  const { data: session } = useSession();
+  if (session?.user?.role !== "ADMIN")
     return <AccessDenied message="You must be an admin to access this page" />;
 
   return (

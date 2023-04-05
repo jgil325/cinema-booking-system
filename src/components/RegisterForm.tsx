@@ -5,6 +5,8 @@ import { useState } from "react";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { z, ZodError } from 'zod';
+import validator from "validator";
 
 // NEEDS: Need a page that says basically thank you for signing
 
@@ -37,7 +39,66 @@ const RegisterForm = () => {
 
   // Hooks
   const createAccount = api.user.createAccount.useMutation();
-  // const handleFormSubmit = console.log("placeholder");
+  
+  const createAccountDetail = z.object({
+    // User Validation
+    email: z.string().email(),
+    firstName: z.string().min(1, { message: "Name is required" }),
+    lastName: z.string().min(1, { message: "Last name is required" }),
+    password: z
+      .string()
+      .min(8, { message: "Length must be at least 8 characters long." }), // .includes(string) TODO: ensure that password has combination of uppercase, lowercase, and symbols
+    isSignedUpPromos: z.boolean(),
+    phoneNumber: z
+      .string()
+      .refine(validator.isMobilePhone, {
+        message: "Please enter a valid phone number.",
+      }),
+    homeAddress: z.string().min(1, { message: "Home address is required" }),
+    homeCity: z.string().min(1, { message: "Home city is required" }),
+    homeState: z.string().min(1, { message: "Home state is required" }),
+    homeZipCode: z
+      .string()
+      .length(5, { message: "Please enter a valid zip code." }),
+    //Payment Validation
+    cardNumber: z
+      .union([z.string().refine((value) => validator.isCreditCard(value), {
+        message: "Please enter a valid credit card number.",
+      }), z.string().length(0)])
+      .optional()
+      .transform(e => e === "" ? undefined : e),
+    cardType: z.enum(["VISA", "MASTERCARD", "DISCOVER", "AMEX"]),
+    billingAddress: z
+      .union([z.string().max(100), z.string().length(0)])
+      .optional()
+      .transform(e => e === "" ? undefined : e),
+    expirationMonth: z
+      .union([z.number().min(1, { message: "Please enter a valid month." }).max(12, { message: "Please enter a valid month." }), z.number().optional()]),
+    expirationYear: z
+      .union([z.number().min(1, { message: "Please enter a valid expiration year." }), z.number().optional()]),
+    billingCity: z
+      .union([z.string().min(1, { message: "Please enter a valid city." }), z.string().length(0)])
+      .optional()
+      .transform(e => e === "" ? undefined : e),
+    billingState: z
+      .union([z.string().min(1), z.string().length(0)])
+      .optional()
+      .transform(e => e === "" ? undefined : e),
+    billingZipCode: z
+      .union([z.string().length(5, { message: "Please enter a valid zip code."}), z.string().length(0)])
+      .optional()
+      .transform(e => e === "" ? undefined : e),
+  })
+  .refine((value) => {
+    if (
+      (!value.cardNumber && !value.billingAddress && !value.expirationMonth && !value.expirationYear && !value.billingCity && !value.billingState && !value.billingZipCode) ||
+      (value.cardNumber && value.billingAddress && value.expirationMonth && value.expirationYear && value.billingCity && value.billingState && value.billingZipCode)
+    ) {
+      return true;
+    }
+    throw new Error('All payment fields are required if you want to add a payment card. \nPlease remove all data from fields if you do not want to create a payment card.')
+  })
+
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (password !== confirmPassword) {
@@ -46,6 +107,26 @@ const RegisterForm = () => {
     }
     let createAccountResult;
     try {
+      const result = createAccountDetail.parse({
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        password: password,
+        isSignedUpPromos: isSignedUpPromos,
+        phoneNumber: phoneNumber,
+        homeAddress: homeAddress,
+        homeCity: homeCity,
+        homeState: homeState,
+        homeZipCode: homeZipCode,
+        cardNumber: cardNumber,
+        cardType: cardType,
+        billingAddress: billingAddress,
+        expirationMonth: Number(expirationMonth),
+        expirationYear: Number(expirationYear),
+        billingCity: billingCity,
+        billingState: billingState,
+        billingZipCode: billingZipCode,
+      })
       createAccountResult = await createAccount.mutateAsync({
         email,
         firstName,
@@ -66,39 +147,20 @@ const RegisterForm = () => {
         billingState,
         billingZipCode,
       });
-
       // TODO: Navigate to success page or show success message
         router.push("/checkEmail").catch(error => console.error(error));
     } catch (error) {
-      let errorMessage;
-      if (error instanceof TRPCClientError) {
-        const errorResult = error.message;
-        errorMessage =
-          "Please correct your information regarding: \n" + errorResult;
-        toast.error(errorMessage);
-        const popup = document.createElement("div");
-        popup.innerText = errorMessage;
-        popup.style.position = "fixed";
-        popup.style.top = "50%";
-        popup.style.left = "50%";
-        popup.style.transform = "translate(-50%, -50%)";
-        popup.style.backgroundColor = "#fff";
-        popup.style.color = "#000";
-        popup.style.padding = "20px";
-        popup.style.borderRadius = "5px";
-        popup.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
-        popup.style.maxWidth = "80%";
-        popup.style.maxHeight = "80%";
-        popup.style.overflow = "auto";
-        popup.style.zIndex = "9999";
-        document.body.appendChild(popup);
-        const hidePopup = () => {
-          popup.remove();
-        };
-        setTimeout(hidePopup, 20000);
-        popup.addEventListener("click", hidePopup);
+      if (error instanceof ZodError) {
+        const messages = error.errors.map((error) => error.message);
+        const errorMessage = messages.join("\n");
+
+        alert(`Error : ${errorMessage}`);
+      } else if (error instanceof TRPCClientError) {
+        console.log(error.message)
+        alert('Error: '+error.message)
       } else {
-        alert(error); // should be coming from backend
+        console.log('Unhandled Error, Please debug')
+        alert('Unhandled Error. Please debug')
       }
     }
     return createAccountResult;

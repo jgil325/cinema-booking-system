@@ -3,18 +3,19 @@ import React, { useState } from "react";
 import { api } from "../../utils/api";
 import MovieForm from "../forms/MovieForm";
 import ScheduleMovieForm from "../forms/ScheduleMovieForm";
+import Alert, { ErrorAlert } from "../ui/Alert";
 
 const ManageMovies = () => {
   const { data: movies, refetch: refetchMovies } =
     api.movies.getAllMovies.useQuery();
-
+  const [scheduleAlert, setScheduleAlert] = useState<string | undefined>();
   const { mutate: createMovie } = api.movies.createMovie.useMutation({
     onSuccess: (res) => {
       movies?.push(res);
     },
   });
 
-  const { mutate: createShow } = api.showings.createShow.useMutation({});
+  const { mutate: createShow, error } = api.showings.createShow.useMutation({});
 
   const [selectedMovie, setSelectedMovie] = useState<Movie | undefined>(
     undefined
@@ -25,8 +26,14 @@ const ManageMovies = () => {
   };
 
   const doCreateShow = (show: { movieId: string; showTime: Date }) => {
-    createShow(show);
+    try {
+      createShow(show);
+      setScheduleAlert("Show Created");
+    } catch (e) {
+      console.log("err", e);
+    }
   };
+  console.log(error?.data);
   return (
     <div className="grid h-[40rem] grow grid-cols-3">
       <div className="space-y-2">
@@ -98,6 +105,14 @@ const ManageMovies = () => {
           submitText="Schedule Show"
           movieId={selectedMovie?.id || ""}
         />
+        {!error && scheduleAlert ? <Alert message={scheduleAlert} /> : null}
+        {error ? (
+          <ErrorAlert
+            message={
+              "Failed to create showing. Showtime must be after current datetime. Showtime must not intersect another showing."
+            }
+          />
+        ) : null}
       </div>
     </div>
   );

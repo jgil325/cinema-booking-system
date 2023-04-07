@@ -10,30 +10,23 @@ const Home: NextPage = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+  const handleSearchTermChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSearchTerm(event.target.value.toLowerCase());
   };
 
-  const filteredMovies = movies?.filter((movie) => {
-    const title = movie.title.toLowerCase();
-    const category = movie.category?.toLowerCase();
-
-    if (title.includes(searchTerm.toLowerCase())) {
-      return true;
-    }
-
-    if (category && category.includes(searchTerm.toLowerCase())) {
-      return true;
-    }
-
-    return false;
-  });
-
-  const nowShowingMovies = filteredMovies?.filter(
-    (movie) => movie.status === "CURRENTLYSHOWING"
+  const nowShowingMovies = movies?.filter(
+    (movie) =>
+      movie.status === "CURRENTLYSHOWING" &&
+      (movie.title.toLowerCase().includes(searchTerm) ||
+        movie.category.toLowerCase().includes(searchTerm))
   );
-  const comingSoonMovies = filteredMovies?.filter(
-    (movie) => movie.status === "COMINGSOON"
+  const comingSoonMovies = movies?.filter(
+    (movie) =>
+      movie.status === "COMINGSOON" &&
+      (movie.title.toLowerCase().includes(searchTerm) ||
+        movie.category.toLowerCase().includes(searchTerm))
   );
 
   return (
@@ -51,23 +44,43 @@ const Home: NextPage = () => {
           <input
             className="col-span-3 rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
             placeholder="Search Movies"
-            value={searchTerm}
-            onChange={handleSearchChange}
+            onChange={handleSearchTermChange}
           />
         </div>
 
-        <div className="mx-64 mt-10 font-bold">Now Showing</div>
-        <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
-          {nowShowingMovies?.map((movie) => {
-            return <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />;
-          })}
-        </div>
-        <div className="mx-64 mt-10 font-bold">Coming Soon</div>
-        <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
-          {comingSoonMovies?.map((movie) => {
-            return <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />;
-          })}
-        </div>
+        {nowShowingMovies?.length === 0 && comingSoonMovies?.length === 0 ? (
+          <div className="mx-58 my-8 text-center text-gray-800">
+            No movies match the search criteria.
+          </div>
+        ) : (
+          <>
+            {nowShowingMovies?.length > 0 && (
+              <>
+                <div className="mx-64 mt-10 font-bold">Now Showing</div>
+                <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
+                  {nowShowingMovies?.map((movie) => {
+                    return (
+                      <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {comingSoonMovies?.length > 0 && (
+              <>
+                <div className="mx-64 mt-10 font-bold">Coming Soon</div>
+                <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
+                  {comingSoonMovies?.map((movie) => {
+                    return (
+                      <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </>
+        )}
       </main>
     </>
   );

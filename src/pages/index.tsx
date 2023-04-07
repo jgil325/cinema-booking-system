@@ -7,7 +7,9 @@ import MovieCard from "../components/MovieCard";
 
 const Home: NextPage = () => {
   const { data: movies } = api.movies.getAllMovies.useQuery();
-  console.log(movies);
+
+  // console.log(movies);
+
   // const trailerIds = [
   //   "7L8p7_SLzvU",
   //   "DuWEEKeJLMI",

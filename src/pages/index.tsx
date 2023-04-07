@@ -7,6 +7,18 @@ import MovieCard from "../components/MovieCard";
 
 const Home: NextPage = () => {
   const { data: movies } = api.movies.getAllMovies.useQuery();
+  const { data: showings } = api.showings.getAllShows.useQuery();
+  console.log(showings)
+
+  function getShowings(id: string) {
+    var movieShowings = [];
+    for (var show of showings || []) {
+      if (show.movieId == id) {
+        movieShowings.push(show.showTime)
+      }
+    }
+    return movieShowings
+  }
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -57,10 +69,10 @@ const Home: NextPage = () => {
             {nowShowingMovies?.length > 0 && (
               <>
                 <div className="mx-64 mt-10 font-bold">Now Showing</div>
-                <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
+                <div className="mx-20 mt-8 grid grid-cols-3 gap-8">
                   {nowShowingMovies?.map((movie) => {
                     return (
-                      <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />
+                      <MovieCard movie={movie} showings={getShowings(movie.id)} key={`MovieCard-${movie.id}`} />
                     );
                   })}
                 </div>
@@ -70,10 +82,10 @@ const Home: NextPage = () => {
             {comingSoonMovies?.length > 0 && (
               <>
                 <div className="mx-64 mt-10 font-bold">Coming Soon</div>
-                <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
+                <div className="mx-20 mt-8 grid grid-cols-3 gap-8">
                   {comingSoonMovies?.map((movie) => {
                     return (
-                      <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />
+                      <MovieCard movie={movie} showings={getShowings(movie.id)} key={`MovieCard-${movie.id}`} />
                     );
                   })}
                 </div>

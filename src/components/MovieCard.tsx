@@ -47,7 +47,7 @@ const MovieCard = ({ movie }) => {
           {movie.MPAAUSFilmRating}
         </h6>
         <button
-          className="absolute top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
+          className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
           onClick={openModal}
         >
           Book a ticket

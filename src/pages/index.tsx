@@ -8,18 +8,6 @@ import MovieCard from "../components/MovieCard";
 const Home: NextPage = () => {
   const { data: moviesData } = api.movies.getAllMovies.useQuery();
 
-  const categories = [
-    "Currently Showing",
-    "Coming Soon",
-    "Drama",
-    "Comedy",
-    "Action",
-    "Fantasy",
-    "Horror",
-    "Romance",
-    "Western",
-  ];
-
   const trailerIds = [
     "7L8p7_SLzvU",
     "DuWEEKeJLMI",
@@ -46,16 +34,6 @@ const Home: NextPage = () => {
             className="col-span-3 rounded border border-black"
             placeholder="Search Movies"
           />
-          {categories.map((category) => {
-            return (
-              <button
-                className={`rounded-full  bg-cyan-300 hover:bg-cyan-500`}
-                key={category}
-              >
-                {category}
-              </button>
-            );
-          })}
         </div>
         <div className="mx-64 mt-10 font-bold">Now Showing</div>
         <div className="mx-64 mt-8 grid grid-cols-3 gap-8">

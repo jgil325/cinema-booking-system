@@ -14,6 +14,7 @@ export const moviesRouter = createTRPCRouter({
                 producer: z.string().min(1, {message: 'Movie must have a producer'}),
                 synopsis: z.string().min(1, {message: 'Movie must have a synopsis'}),
                 rating: z.string().min(1, {message: 'Movie must have a rating'}),
+                trailerURL: z.string().min(1, {message: 'Movie must have a rating'}),
                 //review: z.number().gte(0, {message: 'Rating must be greater than or equal to 0})
                     //.lte(10, {message: 'Rating must be less than or equal to 10})
                 // reviews, showing added afterward im guessing, thus not included in input
@@ -31,7 +32,7 @@ export const moviesRouter = createTRPCRouter({
                     synopsis: input.synopsis,
                     rating: input.rating,
                     status: MovieStatus.COMINGSOON,
-                    //review: input.review
+                    trailerURL: input.trailerURL,
                     // showing added after initial creation
                     //createdAt and updatedAt already generate i think
                 }

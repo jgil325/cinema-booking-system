@@ -5,6 +5,7 @@ import BookTicketForm from "./forms/BookTicketForm";
 
 const MovieCard = ({ movie }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -12,6 +13,10 @@ const MovieCard = ({ movie }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
   };
 
   const customStyles = {
@@ -52,7 +57,35 @@ const MovieCard = ({ movie }) => {
         >
           Book a ticket
         </button>
+        <button
+          className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
+          onClick={toggleExpansion}
+        >
+          {isExpanded ? "Hide details" : "Show details"}
+        </button>
       </div>
+      {isExpanded && (
+        <div className="px-4 pb-4">
+          <p className="my-2">
+            <strong>Category:</strong> {movie.category}
+          </p>
+          <p className="my-2">
+            <strong>Rating:</strong> {movie.rating}
+          </p>
+          <p className="my-2">
+            <strong>Cast:</strong> {movie.cast}
+          </p>
+          <p className="my-2">
+            <strong>Director:</strong> {movie.director}
+          </p>
+          <p className="my-2">
+            <strong>Producer:</strong> {movie.producer}
+          </p>
+          <p className="my-2">
+            <strong>Synopsis:</strong> {movie.synopsis}
+          </p>
+        </div>
+      )}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}

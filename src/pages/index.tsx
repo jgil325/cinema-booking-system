@@ -8,25 +8,31 @@ import MovieCard from "../components/MovieCard";
 const Home: NextPage = () => {
   const { data: movies } = api.movies.getAllMovies.useQuery();
 
-  // console.log(movies);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // const trailerIds = [
-  //   "7L8p7_SLzvU",
-  //   "DuWEEKeJLMI",
-  //   "JNwNXF9Y6kY",
-  //   "lc0UehYemQA",
-  //   "vZ734NWnAHA",
-  // ];
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
-  // const movies = moviesData?.map((movie, index) => ({
-  //   ...movie,
-  //   trailerVideoId: trailerIds[index % trailerIds.length],
-  // }));
+  const filteredMovies = movies?.filter((movie) => {
+    const title = movie.title.toLowerCase();
+    const category = movie.category?.toLowerCase();
 
-  const nowShowingMovies = movies?.filter(
+    if (title.includes(searchTerm.toLowerCase())) {
+      return true;
+    }
+
+    if (category && category.includes(searchTerm.toLowerCase())) {
+      return true;
+    }
+
+    return false;
+  });
+
+  const nowShowingMovies = filteredMovies?.filter(
     (movie) => movie.status === "CURRENTLYSHOWING"
   );
-  const comingSoonMovies = movies?.filter(
+  const comingSoonMovies = filteredMovies?.filter(
     (movie) => movie.status === "COMINGSOON"
   );
 
@@ -45,6 +51,8 @@ const Home: NextPage = () => {
           <input
             className="col-span-3 rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
             placeholder="Search Movies"
+            value={searchTerm}
+            onChange={handleSearchChange}
           />
         </div>
 

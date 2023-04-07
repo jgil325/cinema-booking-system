@@ -6,12 +6,13 @@ import Alert, { ErrorAlert } from "../ui/Alert";
 
 export const ManagePromotions = () => {
   const { data: promotions } = api.promos.getAllPromos.useQuery();
+  const sendEmail = api.promos.sendPromoEmail.useMutation();
   const [page, setPage] = useState(0);
   const [selectedPromo, setSelectedPromo] = useState<Promotion | undefined>();
   const [showAlert, setShowAlert] = useState(false);
-  const { mutate, error } = api.promos.createPromo.useMutation();
+  const { mutateAsync, error } = api.promos.createPromo.useMutation();
   
-  function createPromo(promo) {
+  async function createPromo(promo) {
     console.log("dc", promo);
     const newPromo = {
       ...promo,
@@ -20,8 +21,9 @@ export const ManagePromotions = () => {
       discountPercent: parseFloat(promo.discount) / 100,
       discountCode: promo.code,
     };
-    mutate(newPromo);
+    const result = await mutateAsync(newPromo)
     promotions?.push(newPromo);
+    sendEmail.mutate({ id: result.id })
   }
 
   return (

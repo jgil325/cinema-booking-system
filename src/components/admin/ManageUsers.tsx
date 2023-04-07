@@ -4,30 +4,42 @@ import { api } from "../../utils/api";
 
 const ManageUsers = () => {
   const [email, setEmail] = useState('')
+  const [error, setError] = useState(false);
   const suspend = api.manageUsers.suspendUser.useMutation()
   const unSuspend = api.manageUsers.unsuspendUser.useMutation()
 
   const handleSuspend = async() => {
-    console.log(email)
-    await suspend.mutateAsync({ email: email })
-    alert(`${email} has been suspended!`)
+    if (email.length == 0) {
+      setError(true)
+    } else {
+      console.log(email)
+      await suspend.mutateAsync({ email: email })
+      alert(`${email} has been suspended!`)
+    }
   }
 
   const handleUnsuspend = async() => {
-    console.log(email)
-    await unSuspend.mutateAsync({ email: email })
-    alert(`${email} has been unsuspended!`)
+    if (email.length == 0) {
+      setError(true)
+    } else {
+      console.log(email)
+      await unSuspend.mutateAsync({ email: email })
+      alert(`${email} has been unsuspended!`)
+    }
   }
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-md">
       <div className="mb-4">
         <label
-          className="mb-2 block font-medium text-gray-700"
+          className="mb-2 block font-medium text-lg text-gray-700"
           htmlFor="username"
         >
           User Email
         </label>
+        <span className="font-sm pl-2 text-left text-sm text-red-500">
+            {error ? "* Field is required. " : ""}
+          </span>
         <input
           className="w-60 rounded-lg border border-gray-400 p-2"
           type="text"

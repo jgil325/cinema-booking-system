@@ -3,9 +3,11 @@ import Image from "next/image";
 import Modal from "react-modal";
 import BookTicketForm from "./forms/BookTicketForm";
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, showings }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  console.log(showings)
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -18,6 +20,14 @@ const MovieCard = ({ movie }) => {
   const toggleExpansion = () => {
     setIsExpanded(!isExpanded);
   };
+
+  function formatShowings() {
+    var formattedString = ''
+    for (var show of showings) {
+      formattedString += (show.toString()).split('G')[0]+'  •  '
+    }
+    return formattedString;
+  }
 
   const customStyles = {
     content: {
@@ -48,15 +58,15 @@ const MovieCard = ({ movie }) => {
         <h3 className="mx-3 text-3xl font-semibold tracking-tight text-black">
           {movie.title}
         </h3>
-        <h6 className="mx-3 text-lg font-semibold tracking-tight text-slate-600">
-          {movie.MPAAUSFilmRating}
+        <h6 className="m-3 text-lg font-semibold tracking-tight text-slate-600">
+          {movie.rating}
         </h6>
-        <button
+        {isExpanded && <button
           className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
           onClick={openModal}
         >
           Book a ticket
-        </button>
+        </button>}
         <button
           className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
           onClick={toggleExpansion}
@@ -84,6 +94,9 @@ const MovieCard = ({ movie }) => {
           <p className="my-2">
             <strong>Synopsis:</strong> {movie.synopsis}
           </p>
+          {showings.length != 0  && <p className="my-2">
+            <strong>Showings:</strong> {formatShowings()}
+          </p>}
         </div>
       )}
       <Modal

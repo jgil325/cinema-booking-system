@@ -10,7 +10,8 @@ const EmptyMovieFormFields = {
   director: "",
   producer: "",
   synopsis: "",
-  rating: "G"
+  rating: "G",
+  trailerURL: ''
 };
 
 
@@ -135,6 +136,13 @@ const MovieForm = ({
             <option key={state}>{state}</option>
           ))}
         </select>
+        <FormInput
+          form={form}
+          error={error}
+          handleChange={handleChange}
+          id="trailerURL"
+          title="Trailer ID"
+        />
       </div>
       <div className="col-span-2 grid px-1 py-3">
         <button

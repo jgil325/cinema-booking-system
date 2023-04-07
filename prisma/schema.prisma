@@ -62,19 +62,20 @@ model VerificationToken {
 }
 
 model Movie {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  title     String
-  category  String
-  cast      String
-  director  String
-  producer  String
-  synopsis  String
-  rating    String
-  status    MovieStatus
-  Showing   Show[]
-  Review    Review[] // review string
+  id         String      @id @default(cuid())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  title      String
+  category   String
+  cast       String
+  director   String
+  producer   String
+  synopsis   String
+  rating     String
+  status     MovieStatus
+  trailerURL String      @default("")
+  Showing    Show[]
+  Review     Review[]
 }
 
 model Review {
@@ -93,11 +94,11 @@ model Show {
   id                  String       @id @default(cuid())
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
-  showTime            DateTime    // includes date and time in one
+  showTime            DateTime
   showDurationMinutes Int
   showRoomId          String?
   movieId             String
-  showRoom            ShowRoom?     @relation(fields: [showRoomId], references: [id])
+  showRoom            ShowRoom?    @relation(fields: [showRoomId], references: [id])
   SeatInShow          SeatInShow[]
   Movie               Movie        @relation(fields: [movieId], references: [id])
 }

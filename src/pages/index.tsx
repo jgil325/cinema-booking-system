@@ -23,6 +23,13 @@ const Home: NextPage = () => {
   //   trailerVideoId: trailerIds[index % trailerIds.length],
   // }));
 
+  const nowShowingMovies = movies?.filter(
+    (movie) => movie.status === "CURRENTLYSHOWING"
+  );
+  const comingSoonMovies = movies?.filter(
+    (movie) => movie.status === "COMINGSOON"
+  );
+
   return (
     <>
       <Head>
@@ -43,13 +50,13 @@ const Home: NextPage = () => {
 
         <div className="mx-64 mt-10 font-bold">Now Showing</div>
         <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
-          {movies?.map((movie) => {
+          {nowShowingMovies?.map((movie) => {
             return <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />;
           })}
         </div>
         <div className="mx-64 mt-10 font-bold">Coming Soon</div>
         <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
-          {movies?.map((movie) => {
+          {comingSoonMovies?.map((movie) => {
             return <MovieCard movie={movie} key={`MovieCard-${movie.id}`} />;
           })}
         </div>

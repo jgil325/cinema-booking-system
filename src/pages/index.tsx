@@ -29,12 +29,16 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="bg-white">
-        <div className="mx-64 mt-8 grid grid-cols-12 gap-8 ">
+        <div className="mx-58 my-8 grid grid-cols-10 gap-8">
+          <div className="col-span-1 flex items-center justify-center text-lg font-bold text-gray-800">
+            Search:
+          </div>
           <input
-            className="col-span-3 rounded border border-black"
+            className="col-span-3 rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
             placeholder="Search Movies"
           />
         </div>
+
         <div className="mx-64 mt-10 font-bold">Now Showing</div>
         <div className="mx-64 mt-8 grid grid-cols-3 gap-8">
           {movies?.map((movie) => {

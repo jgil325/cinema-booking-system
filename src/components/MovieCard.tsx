@@ -31,7 +31,7 @@ const MovieCard = ({ movie }) => {
     <div className="w-[384px] overflow-hidden rounded-lg border border-black shadow-xl hover:shadow-xl hover:shadow-blue-500/50">
       <div className="relative min-h-[216px] overflow-hidden border-b-2 border-black">
         <iframe
-          src={`https://www.youtube.com/embed/${movie.trailerVideoId}/?modestbranding=1`}
+          src={`https://www.youtube.com/embed/${movie.trailerURL}/?modestbranding=1`}
           allowFullScreen
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           className="object-cover"

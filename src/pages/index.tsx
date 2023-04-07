@@ -6,20 +6,20 @@ import { api } from "../utils/api";
 import MovieCard from "../components/MovieCard";
 
 const Home: NextPage = () => {
-  const { data: moviesData } = api.movies.getAllMovies.useQuery();
+  const { data: movies } = api.movies.getAllMovies.useQuery();
+  console.log(movies);
+  // const trailerIds = [
+  //   "7L8p7_SLzvU",
+  //   "DuWEEKeJLMI",
+  //   "JNwNXF9Y6kY",
+  //   "lc0UehYemQA",
+  //   "vZ734NWnAHA",
+  // ];
 
-  const trailerIds = [
-    "7L8p7_SLzvU",
-    "DuWEEKeJLMI",
-    "JNwNXF9Y6kY",
-    "lc0UehYemQA",
-    "vZ734NWnAHA",
-  ];
-
-  const movies = moviesData?.map((movie, index) => ({
-    ...movie,
-    trailerVideoId: trailerIds[index % trailerIds.length],
-  }));
+  // const movies = moviesData?.map((movie, index) => ({
+  //   ...movie,
+  //   trailerVideoId: trailerIds[index % trailerIds.length],
+  // }));
 
   return (
     <>

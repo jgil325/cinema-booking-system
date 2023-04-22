@@ -20,7 +20,7 @@ const BookTicketForm: React.FC<Props> = ({ movie }) => {
     event.preventDefault();
 
     // These are hard coded right now but will need to be changed.
-    const seats = [{ seatInShow: "1", seatNumber: "0" }];
+    const seats = [{ seatInShow: "1", seatNumber: "1" }]; // I think seatInShow needs to be changed? or is not used. POTENTIAL ERROR
     const showId = "088e0395-147b-47ac-a327-9a23e135029c"; // The showing will need to be passed into the booking form
   
     let result;

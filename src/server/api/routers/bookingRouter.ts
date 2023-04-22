@@ -1,8 +1,9 @@
 import { z } from "zod";
-
+import { TRPCError } from '@trpc/server';
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { prisma } from "../../db";
-import { TicketType } from "@prisma/client";
+import { Booking, TicketType } from "@prisma/client";
+import nodemailer from "nodemailer";
 
 export const bookingRouter = createTRPCRouter({
     bookTickets: publicProcedure
@@ -97,34 +98,40 @@ export const bookingRouter = createTRPCRouter({
             }
 
             // Calculate the total price
-            const totalPrice = tickets.reduce((acc, ticket) => acc + ticket.price, 0);
+            const totalPrice = tickets.reduce((acc, ticket) => acc + ticket.price, 0); // Dont want to calculate total price here
 
             // Create the booking
             const booking = await prisma.booking.create({
                 data: {
                     bookingFee: 1,
                     tax: totalPrice * 0.1,
-                    totalPrice: show.Movie.rating === "R" ? 17.5 : 12.5, // replace with your own ticket pricing logic
-                    promoDiscount: 0, // replace with your own promo discount logic
+                    totalPrice: show.Movie.rating === "R" ? 17.5 : 12.5, // replace with ticket pricing logic
+                    promoDiscount: 0, // This may need to be removed
                     isPaymentComplete: false,
                     tickets: {
                         connect: tickets.map(ticket => ({ id: ticket.id })),
                     },
                 },
             });
-
+            console.log(booking)
             return booking;
         }),
         payForBooking: publicProcedure
             .input(
                 z.object({
                     bookingId: z.string(),
-                    paymentCardId: z.string(),
+                    paymentCardId: z.string(), // This may need to be updated
                     promoCode: z.string().optional(),
+                    session: z.object({ // Session is used to help determine the payment card info
+                      user: z.object({
+                        id: z.string(),
+                        email: z.string(),
+                      }),
+                    }),
                 })
             )
             .mutation(async ({ ctx, input }) => {
-                const {bookingId, paymentCardId, promoCode} = input;
+                const {bookingId, paymentCardId, promoCode, session} = input;
 
                 const booking = await prisma.booking.findUnique({
                     where: {
@@ -144,6 +151,7 @@ export const bookingRouter = createTRPCRouter({
                   }
             
                   // Fetch payment card
+                  // I feel like the logic for checking this payment card needs to be checked
                   const paymentCard = await prisma.paymentCard.findUnique({
                     where: {
                       id: paymentCardId,
@@ -157,17 +165,17 @@ export const bookingRouter = createTRPCRouter({
                     throw new Error(`Payment card with id ${paymentCardId} not found`);
                   }
             
-                  if (paymentCard.userId !== ctx.user?.id) {
+                  if (paymentCard.userId !== session.user?.id) {
+                    console.log(paymentCard.userId)
+                    console.log(session.user?.id)
                     throw new Error(`You don't have permission to use this payment card`);
                   }
             
                   const basePrice = booking.totalPrice + booking.tax + booking.bookingFee;
 
-                  // Calculate total price
                   let totalPrice = basePrice;
 
                   if (promoCode) {
-                    // Fetch the promotion with the provided code
                     const promotion = await prisma.promotion.findUnique({
                       where: {
                         code: promoCode,
@@ -202,8 +210,57 @@ export const bookingRouter = createTRPCRouter({
                       isPaymentComplete: true,
                     },
                   });
+
+                  try {
+                    const transporter = nodemailer.createTransport({  
+                        service: 'Gmail',
+                        auth: {
+                        user: process.env.MAIL_USER,
+                        pass: process.env.MAIL_PASS,
+                        }
+                    });
+                    const seats = booking.tickets.map(ticket => ticket.seatNumber).join(', ');
+                    console.log(seats)
+                    // const movieTime = new Date(booking.tickets[0].Show.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    // const movieTime = booking.tickets[0]?.
+                    // console.log(movieTime)
+                    // const showRoom = booking.tickets[0].Show.ShowRoom.name;
+                    // console.log(showRoom)
+                    // const showTime = new Date(booking.tickets[0].Show.date).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    // console.log(showTime)
+                    const email = session.user.email
+                    const mailOptions = {
+                        from: process.env.MAIL_USER,
+                        to: email,
+                        subject: 'Movie Booking Confirmation',
+                        html: `Thank you for choosing to book with Cinema E-Booking.\n
+                        Booking ID: ${booking.id}\n
+                        Number of Tickets booked: ${booking.tickets.length}\n
+                        Seat Numbers: ${seats}\n
+
+                        `,// Need to add this functionality
+                        
+                    };
+                    
+                    transporter.sendMail(mailOptions, function(error: any, info: { response: any; }) {
+                        if (error) {
+                        console.log(error);
+                        } else {
+                        console.log(`Booking Confirmation Email sent to ${email}.`);
+                        }
+                    });
+                    return {
+                        message: 'successfully sent email!',
+                        email: email
+                    }
+                } catch {
+                    return new TRPCError({
+                        code: 'CONFLICT',
+                        message: 'failed sending email'
+                    })
+                }
             
-                  return true;
+                  // return true;
             }),
             cancelBooking: protectedProcedure 
             // Added this functionality as a cancel button so if the user decides to not pay they can cancel their booking

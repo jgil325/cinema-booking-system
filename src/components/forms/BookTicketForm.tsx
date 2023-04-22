@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { api } from "../../utils/api";
 
 interface Props {
   movie: {
@@ -13,11 +14,29 @@ const BookTicketForm: React.FC<Props> = ({ movie }) => {
   const [email, setEmail] = useState("");
   const [seats, setSeats] = useState(1);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const createBooking = api.booking.bookTickets.useMutation();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Implement your booking logic here, e.g. send a request to a server to book the seats
+
+    // These are hard coded right now but will need to be changed.
+    const seats = [{ seatInShow: "1", seatNumber: "0" }];
+    const showId = "088e0395-147b-47ac-a327-9a23e135029c"; // The showing will need to be passed into the booking form
+  
+    let result;
+    try {
+      result = createBooking.mutateAsync({
+        seats,
+        showId,
+      });
+      console.log(result)
+    } catch (error) {
+      console.log(error);
+    }
+    // your code to book tickets here
+    // console.log('Booking tickets for', email);
     console.log(
-      `Booked ${seats} seat(s) for ${name} (${email}) for ${movie.title}`
+      // `Booked ${seats} seat(s) for ${name} (${email}) for ${movie.title}`
     );
   };
 

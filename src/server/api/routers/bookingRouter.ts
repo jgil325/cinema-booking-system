@@ -10,7 +10,6 @@ export const bookingRouter = createTRPCRouter({
             z.object({
                 showId: z.string(),
                 seats: z.array(z.object({
-                    seatInShow: z.string(),
                     seatNumber: z.string(),
                 }))
             })
@@ -43,14 +42,14 @@ export const bookingRouter = createTRPCRouter({
             
             const tickets = [];
             for (const seat of seats) {
-                const { seatInShow, seatNumber } = seat;
+                const { seatNumber } = seat;
 
                 // Check if the seat in the show exists
                 const seatInShowData = await prisma.seatInShow.findUnique({
                     where: {
                         showId_seatNumber: {
                             showId,
-                            seatNumber: parseInt(seatInShow),
+                            seatNumber: parseInt(seatNumber),
                         },
                     },
                     include: {
@@ -63,12 +62,12 @@ export const bookingRouter = createTRPCRouter({
                 });
 
                 if (!seatInShowData) {
-                    throw new Error(`Seat in show with id ${seatInShow} not found`);
+                    throw new Error(`Seat in show with id ${seatNumber} not found`);
                 }
                 
                 // Check if the seat is available
                 if (seatInShowData.isOccupied) {
-                    throw new Error(`Seat in show with id ${seatInShow} is not available`);
+                    throw new Error(`Seat in show with id ${seatNumber} is not available`);
                 }
 
                 // Create the ticket
@@ -77,9 +76,10 @@ export const bookingRouter = createTRPCRouter({
                         price: show.Movie.rating === "R" ? 15 : 10,
                         type: TicketType.ADULT,
                         showId,
-                        seatNumber: parseInt(seatInShow),
+                        seatNumber: parseInt(seatNumber),
                     },
                 });
+                console.log(ticket.id)
                 tickets.push(ticket);
 
                 // Update the seatInShow to mark it as occupied
@@ -87,7 +87,7 @@ export const bookingRouter = createTRPCRouter({
                     where: {
                         showId_seatNumber: {
                             showId,
-                            seatNumber: parseInt(seatInShow),
+                            seatNumber: parseInt(seatNumber),
                         }
                     },
                     data: {

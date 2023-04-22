@@ -120,10 +120,11 @@ export const bookingRouter = createTRPCRouter({
                 z.object({
                     bookingId: z.string(),
                     paymentCardId: z.string(),
+                    promoCode: z.string().optional(),
                 })
             )
             .mutation(async ({ ctx, input }) => {
-                const {bookingId, paymentCardId} = input;
+                const {bookingId, paymentCardId, promoCode} = input;
 
                 const booking = await prisma.booking.findUnique({
                     where: {
@@ -160,8 +161,30 @@ export const bookingRouter = createTRPCRouter({
                     throw new Error(`You don't have permission to use this payment card`);
                   }
             
+                  const basePrice = booking.totalPrice + booking.tax + booking.bookingFee;
+
                   // Calculate total price
-                  const totalPrice = booking.totalPrice + booking.tax + booking.bookingFee;
+                  let totalPrice = basePrice;
+
+                  if (promoCode) {
+                    // Fetch the promotion with the provided code
+                    const promotion = await prisma.promotion.findUnique({
+                      where: {
+                        code: promoCode,
+                      },
+                    });
+
+                    if (!promotion) {
+                      throw new Error(`Promotion with code ${promoCode} not found`);
+                    }
+
+                    const currentDate = new Date();
+                    if (currentDate < promotion.startDate || currentDate > promotion.endDate) {
+                      throw new Error(`Promotion with code ${promoCode} is not valid at this time`);
+                    }
+
+                    totalPrice = basePrice * (1 - promotion.discount);
+                  }
             
                   // Charge payment card
                 //   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {

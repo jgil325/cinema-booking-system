@@ -33,11 +33,6 @@ const BookTicketForm: React.FC<Props> = ({ movie }) => {
     } catch (error) {
       console.log(error);
     }
-    // your code to book tickets here
-    // console.log('Booking tickets for', email);
-    console.log(
-      // `Booked ${seats} seat(s) for ${name} (${email}) for ${movie.title}`
-    );
   };
 
   return (

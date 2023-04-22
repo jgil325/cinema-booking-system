@@ -182,4 +182,61 @@ export const bookingRouter = createTRPCRouter({
             
                   return true;
             }),
+            cancelBooking: protectedProcedure 
+            // Added this functionality as a cancel button so if the user decides to not pay they can cancel their booking
+            .input(
+              z.object({
+                bookingId: z.string(),
+              })
+            )
+            .mutation(async ({ ctx, input }) => {
+              const { bookingId } = input;
+        
+              const booking = await prisma.booking.findUnique({
+                where: {
+                  id: bookingId,
+                },
+                include: {
+                  tickets: true,
+                },
+              });
+        
+              if (!booking) {
+                throw new Error(`Booking with id ${bookingId} not found`);
+              }
+        
+              if (booking.isPaymentComplete) {
+                throw new Error(`Booking with id ${bookingId} has already been paid and cannot be canceled`);
+              }
+        
+              // Delete tickets and mark seats as not occupied
+              for (const ticket of booking.tickets) {
+                await prisma.ticket.delete({
+                  where: {
+                    id: ticket.id,
+                  },
+                });
+        
+                await prisma.seatInShow.update({
+                  where: {
+                    showId_seatNumber: {
+                      showId: booking.showId,
+                      seatNumber: ticket.seatNumber,
+                    },
+                  },
+                  data: {
+                    isOccupied: false,
+                  },
+                });
+              }
+        
+              // Delete booking
+              await prisma.booking.delete({
+                where: {
+                  id: bookingId,
+                },
+              });
+        
+              return true;
+            }),
 });

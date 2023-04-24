@@ -15,8 +15,6 @@ const BookTicketForm: React.FC<Props> = ({ movie }) => {
   const [email, setEmail] = useState("");
   const [seats, setSeats] = useState(1);
 
-  const createBooking = api.booking.bookTickets.useMutation();
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // Most likely going to push to next page

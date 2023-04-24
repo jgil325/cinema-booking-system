@@ -11,7 +11,8 @@ export const bookingRouter = createTRPCRouter({
             z.object({
                 showId: z.string(),
                 seats: z.array(z.object({
-                    seatNumber: z.string(),
+                    seatNumber: z.string(), 
+                    seatType: z.nativeEnum(TicketType),
                 }))
             })
         )
@@ -43,7 +44,7 @@ export const bookingRouter = createTRPCRouter({
             
             const tickets = [];
             for (const seat of seats) {
-                const { seatNumber } = seat;
+                const { seatNumber, seatType } = seat; 
 
                 // Check if the seat in the show exists
                 const seatInShowData = await prisma.seatInShow.findUnique({
@@ -71,11 +72,26 @@ export const bookingRouter = createTRPCRouter({
                     throw new Error(`Seat in show with id ${seatNumber} is not available`);
                 }
 
+                let ticketPrice;
+                switch(seatType) {
+                  case TicketType.CHILD:
+                    ticketPrice = 5;
+                    break;
+                  case TicketType.ADULT:
+                    ticketPrice = 15;
+                    break;
+                  case TicketType.SENIOR:
+                    ticketPrice = 10;
+                    break;
+                  default:
+                    throw new Error(`Invalid ticket type: ${seatType}`);
+                }
+
                 // Create the ticket
                 const ticket = await prisma.ticket.create({
                     data: {
-                        price: show.Movie.rating === "R" ? 15 : 10,
-                        type: TicketType.ADULT,
+                        price: ticketPrice,
+                        type: seatType,
                         showId,
                         seatNumber: parseInt(seatNumber),
                     },
@@ -98,14 +114,14 @@ export const bookingRouter = createTRPCRouter({
             }
 
             // Calculate the total price
-            const totalPrice = tickets.reduce((acc, ticket) => acc + ticket.price, 0); // Dont want to calculate total price here
+            const totalPrice = tickets.reduce((acc, ticket) => acc + ticket.price, 0);
 
             // Create the booking
             const booking = await prisma.booking.create({
                 data: {
                     bookingFee: 1,
                     tax: totalPrice * 0.1,
-                    totalPrice: show.Movie.rating === "R" ? 17.5 : 12.5, // replace with ticket pricing logic
+                    totalPrice: (totalPrice * 0.1) + totalPrice + 1, // Tax plus price plus booking fee
                     promoDiscount: 0, // This may need to be removed
                     isPaymentComplete: false,
                     tickets: {

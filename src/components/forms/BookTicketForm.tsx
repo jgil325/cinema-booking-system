@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { api } from "../../utils/api";
+import { TicketType } from "@prisma/client";
 
 interface Props {
   movie: {
@@ -18,21 +19,7 @@ const BookTicketForm: React.FC<Props> = ({ movie }) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    // These are hard coded right now but will need to be changed.
-    const seats = [{ seatInShow: "1", seatNumber: "1" }]; // I think seatInShow needs to be changed? or is not used. POTENTIAL ERROR
-    const showId = "088e0395-147b-47ac-a327-9a23e135029c"; // The showing will need to be passed into the booking form
-  
-    let result;
-    try {
-      result = createBooking.mutateAsync({
-        seats,
-        showId,
-      });
-      console.log(result)
-    } catch (error) {
-      console.log(error);
-    }
+    // Most likely going to push to next page
   };
 
   return (

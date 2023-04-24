@@ -43,6 +43,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
   const [cardType, setCardType] = useState(card.cardType);
   const [expirationMonth, setExpirationMonth] = useState(card.expirationMonth);
   const [expirationYear, setExpirationYear] = useState(card.expirationYear);
+  const [editStatus, setEditStatus] = useState(true)
   const cardId = card.id;
   const { mutate: saveBillingStreet } =
     api.editProfile.changeBillingAddress.useMutation();
@@ -186,6 +187,20 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
 
   return (
     <>
+      <div className="flex justify-end">
+        <span className="pt-8 text-right text-l font-medium">
+          Editing Mode
+        </span>
+        <div className="pl-4 pt-9">
+          <input
+            type="checkbox"
+            id="editstatus"
+            defaultChecked={!editStatus}
+            className="h-4 w-4 border-gray-900 bg-gray-50 hover:cursor-pointer hover:border-gray-500"
+            onChange={()=>{setEditStatus(!editStatus)}}
+          />
+        </div>
+      </div>
       <span className="border-b border-gray-300 pt-4 text-left text-xl font-medium">
         Card Information
       </span>
@@ -196,6 +211,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
             type="number"
             value={cardNumber}
             onChange={handleChangeCardNumber}
+            readOnly={editStatus}
           />
         </div>
         <div className="grid">
@@ -204,6 +220,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
             className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             value={cardType}
             onChange={handleChangeCardType}
+            disabled={editStatus}
           >
             {cardTypes.map((type) => (
               <option key={type}>{type}</option>
@@ -215,6 +232,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
           type="number"
           value={expirationMonth}
           onChange={handleChangeCardExpirationMonth}
+          readOnly={editStatus}
           min="0"
           max="12"
         />
@@ -223,6 +241,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
           type="number"
           value={expirationYear}
           onChange={handleChangeCardExpirationYear}
+          readOnly={editStatus}
           min="23"
           max="30"
         />
@@ -235,6 +254,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
           title={"Billing Address"}
           value={billingAddress}
           onChange={handleChangeBillingStreet}
+          readOnly={editStatus}
         />
       </div>
       <div className="grid grid-cols-3 items-baseline space-x-6 pt-3">
@@ -243,6 +263,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
           <select
             value={state}
             onChange={handleChangeBillingState}
+            disabled={editStatus}
             className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           >
             {stateList.map((state) => (
@@ -254,11 +275,13 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
           title={"Town / City"}
           value={city}
           onChange={handleChangeBillingCity}
+          readOnly={editStatus}
         />
         <InputField
           title={"Zipcode"}
           value={zipcode}
           onChange={handleChangeBillingZip}
+          readOnly={editStatus}
           type="number"
         />
       </div>

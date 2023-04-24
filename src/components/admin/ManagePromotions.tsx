@@ -21,9 +21,14 @@ export const ManagePromotions = () => {
       discountPercent: parseFloat(promo.discount) / 100,
       discountCode: promo.code,
     };
-    const result = await mutateAsync(newPromo)
-    promotions?.push(newPromo);
-    sendEmail.mutate({ id: result.id })
+    try {
+      const result = await mutateAsync(newPromo)
+      promotions?.push(newPromo);
+      sendEmail.mutate({ id: result.id })
+    } catch (err) {
+      console.log("err", err);
+    }
+    
   }
 
   return (

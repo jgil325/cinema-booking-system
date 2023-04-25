@@ -46,26 +46,59 @@ export const bookingRouter = createTRPCRouter({
             for (const seat of seats) {
                 const { seatNumber, seatType } = seat; 
 
-                // Check if the seat in the show exists
-                const seatInShowData = await prisma.seatInShow.findUnique({
-                    where: {
-                        showId_seatNumber: {
-                            showId,
-                            seatNumber: parseInt(seatNumber),
-                        },
+                // create seat in show if it doesnt exists
+                const seatInShowData = await prisma.seatInShow.upsert({
+                  where: {
+                    showId_seatNumber: {
+                      showId,
+                      seatNumber: parseInt(seatNumber),
                     },
-                    include: {
-                        seat: {
-                            include: {
-                            ShowRoom: true,
-                            },
-                        },
+                  },
+                  create: {
+                    isOccupied: true,
+                    seat: {
+                      connect: {
+                        id: show.SeatInShow[0].seat.id, // This is throwing erros but dont know why.
+                      },
                     },
+                    show: {
+                      connect: {
+                        id: showId,
+                      },
+                    },
+                  },
+                  update: {
+                    isOccupied: true,
+                  },
+                  include: {
+                    seat: {
+                      include: {
+                        ShowRoom: true,
+                      },
+                    },
+                  },
                 });
 
-                if (!seatInShowData) {
-                    throw new Error(`Seat in show with id ${seatNumber} not found`);
-                }
+                // // Check if the seat in the show exists
+                // const seatInShowData = await prisma.seatInShow.findUnique({
+                //     where: {
+                //         showId_seatNumber: {
+                //             showId,
+                //             seatNumber: parseInt(seatNumber),
+                //         },
+                //     },
+                //     include: {
+                //         seat: {
+                //             include: {
+                //             ShowRoom: true,
+                //             },
+                //         },
+                //     },
+                // });
+
+                // if (!seatInShowData) {
+                //     throw new Error(`Seat in show with id ${seatNumber} not found`);
+                // }
                 
                 // Check if the seat is available
                 if (seatInShowData.isOccupied) {
@@ -187,7 +220,7 @@ export const bookingRouter = createTRPCRouter({
                     throw new Error(`You don't have permission to use this payment card`);
                   }
             
-                  const basePrice = booking.totalPrice + booking.tax + booking.bookingFee;
+                  const basePrice = booking.totalPrice;
 
                   let totalPrice = basePrice;
 
@@ -208,6 +241,7 @@ export const bookingRouter = createTRPCRouter({
                     }
 
                     totalPrice = basePrice * (1 - promotion.discount);
+                    console.log(totalPrice)
                   }
             
                   // Charge payment card
@@ -335,4 +369,36 @@ export const bookingRouter = createTRPCRouter({
         
               return true;
             }),
+            getOccupiedSeats: publicProcedure
+              .input(
+                z.object({
+                  showId: z.string(),
+                })
+              )
+              .query(async ({ ctx, input }) => {
+                const { showId } = input;
+
+                // Check if the show exists
+                const show = await prisma.show.findUnique({
+                  where: {
+                    id: showId,
+                  },
+                  include: {
+                    SeatInShow: {
+                      where: {
+                        isOccupied: true,
+                      },
+                      include: {
+                        seat: true,
+                      },
+                    },
+                  },
+                });
+
+                if (!show) {
+                  throw new Error(`Show with id ${showId} not found`);
+                }
+                const occupiedSeats = show.SeatInShow.map((sis) => sis.seat.seatNumber);
+                return occupiedSeats;
+              }),
 });

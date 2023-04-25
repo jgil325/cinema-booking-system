@@ -167,6 +167,7 @@ const MyProfile = ({ user }: { user: User }) => {
   const [state, setState] = useState(user.homeState);
   const [city, setCity] = useState(user.homeCity);
   const [zipcode, setZipcode] = useState(user.homeZipCode);
+  const [editStatus, setEditStatus] = useState(true)
   const { mutate: saveFirstName } =
     api.editProfile.changeFirstName.useMutation();
   const debouncedSaveFirstName = React.useMemo(
@@ -298,7 +299,7 @@ const MyProfile = ({ user }: { user: User }) => {
       <span className="border-b border-gray-300 pt-4 text-left text-xl font-medium">
         Personal Information
       </span>
-      <div className="grid grid-cols-2 space-x-6 pt-3">
+      <div className="grid grid-cols-2 space-x-6 py-3">
         <div className="grid">
           <span className="text-left font-medium">Email</span>
           <input
@@ -308,12 +309,23 @@ const MyProfile = ({ user }: { user: User }) => {
             placeholder="Email Address"
             value={user?.email}
             readOnly={true}
-          />
+          /> 
         </div>
         <div className="grid">
-          <span className="invisible text-left font-medium">
-            Change Password
-          </span>
+          <div className="flex pl-48">
+              <span className="pt-8 text-right text-l font-medium">
+                Editing Mode
+              </span>
+              <div className="pl-4 pt-9">
+                <input
+                  type="checkbox"
+                  id="editstatus"
+                  defaultChecked={!editStatus}
+                  className="h-4 w-4 border-gray-900 bg-gray-50 hover:cursor-pointer hover:border-gray-500"
+                  onChange={()=>{setEditStatus(!editStatus)}}
+                />
+              </div>
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-2 space-x-6">
@@ -321,11 +333,13 @@ const MyProfile = ({ user }: { user: User }) => {
           title={"First Name"}
           value={firstName}
           onChange={handleChangeFirstName}
+          readOnly={editStatus}
         />
         <InputField
           title={"Last Name"}
           value={lastName}
           onChange={handleChangeLastName}
+          readOnly={editStatus}
         />
       </div>
       <span className="border-b border-gray-300 pt-8 text-left text-xl font-medium">
@@ -339,6 +353,7 @@ const MyProfile = ({ user }: { user: User }) => {
           onChange={(e: React.FormEvent<HTMLInputElement>) => {
             setNewPassword(e.currentTarget.value);
           }}
+          readOnly={editStatus}
         />
         <InputField
           title={"Old Password"}
@@ -347,6 +362,7 @@ const MyProfile = ({ user }: { user: User }) => {
           onChange={(e: React.FormEvent<HTMLInputElement>) => {
             setOldPassword(e.currentTarget.value);
           }}
+          readOnly={editStatus}
         />
       </div>
       <div className="grid grid-cols-2 space-x-6">
@@ -357,6 +373,7 @@ const MyProfile = ({ user }: { user: User }) => {
           onChange={(e: React.FormEvent<HTMLInputElement>) => {
             setNewPassConfirm(e.currentTarget.value);
           }}
+          readOnly={editStatus}
         />
         <div className="grid">
           <span className="invisible text-left font-medium">
@@ -366,6 +383,7 @@ const MyProfile = ({ user }: { user: User }) => {
             className="h-fit rounded-lg bg-indigo-500 px-3 py-1.5 font-medium text-white hover:bg-indigo-700"
             type="submit"
             onClick={handleChangePassword}
+            disabled={editStatus}
           >
             Change Password
           </button>
@@ -382,6 +400,7 @@ const MyProfile = ({ user }: { user: User }) => {
             defaultChecked={isPromos}
             className="h-4 w-4 border-gray-900 bg-gray-50 hover:cursor-pointer hover:border-gray-500"
             onChange={changePromoHandler}
+            disabled={editStatus}
           />
         </div>
       </div>
@@ -393,6 +412,7 @@ const MyProfile = ({ user }: { user: User }) => {
           title={"Home Address"}
           value={billingAddress}
           onChange={handleChangeHomeStreet}
+          readOnly={editStatus}
         />
       </div>
       <div className="grid grid-cols-3 items-baseline space-x-6 pt-3">
@@ -401,6 +421,7 @@ const MyProfile = ({ user }: { user: User }) => {
           <select
             value={state}
             onChange={handleChangeHomeState}
+            disabled={editStatus}
             className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           >
             {stateList.map((state) => (
@@ -412,11 +433,13 @@ const MyProfile = ({ user }: { user: User }) => {
           title={"Town / City"}
           value={city}
           onChange={handleChangeHomeCity}
+          readOnly={editStatus}
         />
         <InputField
           title={"Zipcode"}
           value={zipcode}
           onChange={handleChangeHomeZip}
+          readOnly={editStatus}
           type="number"
         />
       </div>

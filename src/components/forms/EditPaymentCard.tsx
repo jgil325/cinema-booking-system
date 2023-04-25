@@ -30,7 +30,7 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
     setBillingAddress(card.billingAddress);
     setState(card.billingState);
     setCity(card.billingCity);
-    setZipcode(card.billingCity);
+    setZipcode(card.billingZipCode);
     setCardType(card.cardType);
     setExpirationMonth(card.expirationMonth);
     setExpirationYear(card.expirationYear);

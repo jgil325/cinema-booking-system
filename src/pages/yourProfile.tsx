@@ -159,6 +159,7 @@ const Page = () => {
 const MyProfile = ({ user }: { user: User }) => {
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPassConfirm, setNewPassConfirm] = useState("");
@@ -199,6 +200,22 @@ const MyProfile = ({ user }: { user: User }) => {
       debouncedSaveLastName(e.currentTarget.value);
     },
     [debouncedSaveLastName]
+  );
+
+  const { mutate: savePhoneNumber } = api.editProfile.changePhoneNumber.useMutation();
+  const debouncedSavePhoneNumber = React.useMemo(
+    () =>
+      debounce((newPhoneNumber: string) => {
+        savePhoneNumber({ newPhoneNumber });
+      }, DEBOUNCE_DELAY),
+    [savePhoneNumber]
+  );
+  const handleChangePhoneNumber = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setPhoneNumber(e.currentTarget.value);
+      debouncedSavePhoneNumber(e.currentTarget.value);
+    },
+    [debouncedSavePhoneNumber]
   );
 
   const { mutate: changePassword } =
@@ -339,6 +356,14 @@ const MyProfile = ({ user }: { user: User }) => {
           title={"Last Name"}
           value={lastName}
           onChange={handleChangeLastName}
+          readOnly={editStatus}
+        />
+      </div>
+      <div className="grid grid-cols-2 space-x-6">
+        <InputField
+          title={"Phone Number"}
+          value={phoneNumber}
+          onChange={handleChangePhoneNumber}
           readOnly={editStatus}
         />
       </div>

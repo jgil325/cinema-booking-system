@@ -369,36 +369,54 @@ export const bookingRouter = createTRPCRouter({
         
               return true;
             }),
-            getOccupiedSeats: publicProcedure
-              .input(
-                z.object({
-                  showId: z.string(),
-                })
-              )
-              .query(async ({ ctx, input }) => {
-                const { showId } = input;
-
-                // Check if the show exists
-                const show = await prisma.show.findUnique({
-                  where: {
-                    id: showId,
-                  },
-                  include: {
-                    SeatInShow: {
-                      where: {
-                        isOccupied: true,
-                      },
-                      include: {
-                        seat: true,
-                      },
-                    },
-                  },
-                });
-
-                if (!show) {
-                  throw new Error(`Show with id ${showId} not found`);
-                }
-                const occupiedSeats = show.SeatInShow.map((sis) => sis.seat.seatNumber);
-                return occupiedSeats;
-              }),
+    getShowingSeats: publicProcedure // returns rows from SeatInShow with matching showId numbers
+      .input(
+        z.object({
+          showId: z.string().min(1),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const seatInShows = await ctx.prisma.seatInShow.findMany({
+          where: {
+            showId: input.showId
+          },
+        })
+        if (!seatInShows) {
+          return [];
+        }
+        return seatInShows;
+      }),
+    getAllUserBookings: publicProcedure // used when getting all bookings on booking page
+      .input(
+        z.object({
+          userID: z.string().min(1),
+      }))
+      .query(async ({ctx, input}) => {
+        const allBookings = await ctx.prisma.booking.findMany({
+          where: {
+            userId: input.userID
+          }
+        });
+        if (!allBookings) {
+          return [];
+        }
+        // decrypt payment card info
+        return allBookings;
+      }),
+    getBookingByID: publicProcedure // used to find user's new booking on order confirmation page
+      .input(
+        z.object({
+          bookingID: z.string().min(1)
+        }))
+      .query(async ({ctx, input}) => {
+        const newBooking = await ctx.prisma.booking.findUnique({
+          where: {
+            id: input.bookingID
+          }
+        });
+        if (!newBooking) {
+          throw new Error('Error finding newly created booking.')
+        }
+        return newBooking;
+      }),
 });

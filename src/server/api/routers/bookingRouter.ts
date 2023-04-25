@@ -386,4 +386,37 @@ export const bookingRouter = createTRPCRouter({
         }
         return seatInShows;
       }),
+    getAllUserBookings: publicProcedure // used when getting all bookings on booking page
+      .input(
+        z.object({
+          userID: z.string().min(1),
+      }))
+      .query(async ({ctx, input}) => {
+        const allBookings = await ctx.prisma.booking.findMany({
+          where: {
+            userId: input.userID
+          }
+        });
+        if (!allBookings) {
+          return [];
+        }
+        // decrypt payment card info
+        return allBookings;
+      }),
+    getBookingByID: publicProcedure // used to find user's new booking on order confirmation page
+      .input(
+        z.object({
+          bookingID: z.string().min(1)
+        }))
+      .query(async ({ctx, input}) => {
+        const newBooking = await ctx.prisma.booking.findUnique({
+          where: {
+            id: input.bookingID
+          }
+        });
+        if (!newBooking) {
+          throw new Error('Error finding newly created booking.')
+        }
+        return newBooking;
+      }),
 });

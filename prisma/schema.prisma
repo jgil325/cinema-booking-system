@@ -25,6 +25,7 @@ model User {
   Account          Account[]
   Session          Session[]
   paymentCards     PaymentCard[]
+  bookings         Booking[]
 }
 
 model Account {
@@ -148,13 +149,17 @@ model Ticket {
 }
 
 model Booking {
-  id                String   @id @default(cuid())
-  bookingFee        Float
-  tax               Float
-  totalPrice        Float
-  promoDiscount     Float
-  isPaymentComplete Boolean
-  tickets           Ticket[]
+  id            String   @id @default(cuid())
+  tax           Float
+  totalPrice    Float
+  promoDiscount Float
+  cardNumber    String
+  showDate      DateTime
+  showTitle     String
+  ticketTotal   Float
+  userId        String
+  tickets       Ticket[]
+  User          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PaymentCard {

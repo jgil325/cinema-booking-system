@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { api } from "../../utils/api";
+import { TicketType } from "@prisma/client";
 
 interface Props {
   movie: {
@@ -13,12 +15,9 @@ const BookTicketForm: React.FC<Props> = ({ movie }) => {
   const [email, setEmail] = useState("");
   const [seats, setSeats] = useState(1);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Implement your booking logic here, e.g. send a request to a server to book the seats
-    console.log(
-      `Booked ${seats} seat(s) for ${name} (${email}) for ${movie.title}`
-    );
+    // Most likely going to push to next page
   };
 
   return (

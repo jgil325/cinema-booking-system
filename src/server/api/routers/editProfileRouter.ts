@@ -189,7 +189,7 @@ export const editProfileRouter = createTRPCRouter({
     changePhoneNumber: publicProcedure
         .input(
             z.object({
-                newPhoneNumber: z.string().length(9)
+                newPhoneNumber: z.string().length(10)
             }))
         .mutation(async ({ ctx, input }) => {
             try {

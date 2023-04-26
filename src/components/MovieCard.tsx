@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import Image from "next/image";
 import Modal from "react-modal";
 import BookTicketForm from "./forms/BookTicketForm";
+import type { Movie, Show } from "@prisma/client";
 
-const MovieCard = ({ movie, showings }) => {
+const MovieCard = ({
+  movie,
+  shows,
+}: {
+  movie: Movie;
+  shows: Array<Show> | undefined;
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  console.log(showings)
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -21,13 +25,7 @@ const MovieCard = ({ movie, showings }) => {
     setIsExpanded(!isExpanded);
   };
 
-  function formatShowings() {
-    var formattedString = ''
-    for (var show of showings) {
-      formattedString += (show.toString()).split('G')[0]+'  •  '
-    }
-    return formattedString;
-  }
+  function formatShowings() {}
 
   const customStyles = {
     content: {
@@ -37,8 +35,8 @@ const MovieCard = ({ movie, showings }) => {
       bottom: "auto",
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
-      maxWidth: "500px",
       maxHeight: "90vh",
+      maxWidth: "70%",
     },
   };
 
@@ -61,12 +59,15 @@ const MovieCard = ({ movie, showings }) => {
         <h6 className="m-3 text-lg font-semibold tracking-tight text-slate-600">
           {movie.rating}
         </h6>
-        {isExpanded && <button
-          className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
-          onClick={openModal}
-        >
-          Book a ticket
-        </button>}
+        {shows && shows.length > 0 && (
+          <button
+            className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
+            onClick={openModal}
+          >
+            Book a ticket
+          </button>
+        )}
+
         <button
           className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
           onClick={toggleExpansion}
@@ -94,9 +95,28 @@ const MovieCard = ({ movie, showings }) => {
           <p className="my-2">
             <strong>Synopsis:</strong> {movie.synopsis}
           </p>
-          {showings.length != 0  && <p className="my-2">
-            <strong>Showings:</strong> {formatShowings()}
-          </p>}
+          <p className="my-2">
+            <strong>Showings:</strong>
+          </p>
+
+          <div className="grid grid-cols-2">
+            {shows?.map((show) => {
+              return (
+                <div
+                  className="font-sm my-1 mx-1 flex justify-between rounded bg-gray-300 px-1 text-sm"
+                  key={show.id}
+                >
+                  {show.showTime.toLocaleString("en-us", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
       <Modal
@@ -105,7 +125,9 @@ const MovieCard = ({ movie, showings }) => {
         contentLabel="Book Ticket Modal"
         style={customStyles}
       >
-        <BookTicketForm movie={movie} closeModal={closeModal} />
+        {shows && (
+          <BookTicketForm movie={movie} closeModal={closeModal} shows={shows} />
+        )}
       </Modal>
     </div>
   );

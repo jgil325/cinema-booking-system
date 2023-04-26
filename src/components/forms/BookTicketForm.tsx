@@ -98,7 +98,9 @@ const BookTicketForm: React.FC<Props> = ({
                   } w-8 text-center`}
                   onClick={() => {
                     if (!selected)
-                      setSeats((prev) => [...prev, seat.seatNumber].sort());
+                      setSeats((prev) =>
+                        [...prev, seat.seatNumber].sort((a, b) => a - b)
+                      );
                     else
                       setSeats((prev) =>
                         prev.filter((item) => item !== seat.seatNumber)

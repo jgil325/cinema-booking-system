@@ -696,8 +696,8 @@ export const editProfileRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const userID = ctx.session?.user.id;
-                const bcrypt = require('bcrypt');
-                const encryptedCardNumber = await bcrypt.hash(input.newCardNumber, 10);
+                const buf = Buffer.from(input.newCardNumber, 'utf8');
+                const encryptedCardNumber = (buf.toString('base64')).toString()
                 const updateUser = await ctx.prisma.user.update({
                     where: {
                         id: userID

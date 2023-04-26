@@ -54,7 +54,7 @@ const Navbar = () => {
             </button>
             <Link href={"/orderHistory"}>
               <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">
-                Your Orders
+                Your Bookings
               </button>
             </Link>
             <Link href={"/yourProfile"}>

@@ -1,8 +1,9 @@
 import { createTRPCRouter, publicProcedure } from '../trpc'
 import {z} from 'zod'
 import validator from 'validator';
-import bcrypt from 'bcrypt';
+//import bcrypt from 'bcrypt';
 import { TRPCError } from '@trpc/server';
+import CryptoES from 'crypto-es';
 
 export const paymentRouter = createTRPCRouter({
   createPaymentInfo: publicProcedure
@@ -63,10 +64,11 @@ export const paymentRouter = createTRPCRouter({
           throw new Error('Card has already expired');
         }
 
-        const encodedCard = await bcrypt.hash(cardNumber, 10);
-        //const encodedCard = Buffer.from(cardNumber).toString('base64') // using string -> base64 encode
-        //const encodedCard = btoa(cardNumber);
-        //console.log(encodedCard);
+        console.log('card:   '+cardNumber)
+        const buf = Buffer.from(cardNumber, 'utf8');
+        const encodedCard = (buf.toString('base64')).toString()
+        //console.log('enc card:    '+encodedCard)
+        //const encCard = encodedCard.toString()
 
         const newCard = await ctx.prisma.paymentCard.create({ 
           data: {
@@ -111,14 +113,15 @@ export const paymentRouter = createTRPCRouter({
             userId: userID 
           },
         });
-        // decrypt card number
-        //const compare = await bcrypt.compare(input.password, dbUserPass);
-        /*for (let i = 0; i< cards.length; i++) {
-          const encryptedCardNumber = cards[i]!.cardNumber
-          //const plainTextCardNumber = Buffer.from(encryptedCardNumber || '','base64').toString('ascii') // base64 back to ascii
-          const plainTextCardNumber = atob(encryptedCardNumber);
-          cards[i]!.cardNumber = plainTextCardNumber;
-        }*/
+        
+        for (var card of cards) {
+          //console.log(card.cardNumber)
+          var encryptedCardNumber = card.cardNumber;
+          var buf = Buffer.from(encryptedCardNumber, 'base64');
+          var de = buf.toString('utf8')
+          card.cardNumber = de
+        }
+
         return cards;
       } catch {
         throw new TRPCError({

@@ -28,6 +28,7 @@ const DEBOUNCE_DELAY = 500;
 const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
   useEffect(() => {
     setBillingAddress(card.billingAddress);
+    setCardNumber('************'+(card.cardNumber).substring(12));
     setState(card.billingState);
     setCity(card.billingCity);
     setZipcode(card.billingZipCode);
@@ -35,11 +36,13 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
     setExpirationMonth(card.expirationMonth);
     setExpirationYear(card.expirationYear);
   }, [card]);
+  //let privateCard = '************'+(card.cardNumber).substring(12);
+  //console.log(privateCard)
   const [billingAddress, setBillingAddress] = useState(card.billingAddress);
   const [state, setState] = useState(card.billingState);
   const [city, setCity] = useState(card.billingCity);
   const [zipcode, setZipcode] = useState(card.billingZipCode);
-  const [cardNumber, setCardNumber] = useState("");
+  const [cardNumber, setCardNumber] = useState('************'+(card.cardNumber).substring(12));
   const [cardType, setCardType] = useState(card.cardType);
   const [expirationMonth, setExpirationMonth] = useState(card.expirationMonth);
   const [expirationYear, setExpirationYear] = useState(card.expirationYear);
@@ -207,8 +210,8 @@ const EditPaymentCard = ({ card }: { card: PaymentCard }) => {
       <div className="flex space-x-6 pt-3  ">
         <div className="grow">
           <InputField
-            title={"Card Number (Hidden)"}
-            type="number"
+            title={"Card Number"}
+            type="text"
             value={cardNumber}
             onChange={handleChangeCardNumber}
             readOnly={editStatus}

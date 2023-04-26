@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { api } from "../../utils/api";
 import { TicketType } from "@prisma/client";
+import Link from "next/link";
 
 interface Props {
   movie: {
@@ -9,47 +10,38 @@ interface Props {
     // Add any other properties from the movie object that you need
   };
 }
-
-const BookTicketForm: React.FC<Props> = ({ movie }) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const tempShows = ['temp1', 'temp2', 'temp3']
+const BookTicketForm: React.FC<Props> = ({ movie, showings }) => {
+  // make sure showing id passed
+  var formattedShowings = []
+  for (var shows of showings) {
+    formattedShowings.push((shows.toString()).split('G')[0])
+  }
+  const [show, setShow] = useState(formattedShowings[0]);
   const [seats, setSeats] = useState(1);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // Most likely going to push to next page
+    console.log(`show: ${show}      seats: ${seats}`)
   };
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-lg">
       <h2 className="mb-4 text-2xl font-semibold">
-        Book a ticket for {movie.title}
+        Book a Ticket For {movie.title}
       </h2>
-      <div className="mb-4">
-        <label htmlFor="name" className="mb-2 block font-semibold">
-          Name
-        </label>
-        <input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          className="w-full rounded border border-gray-400 py-2 px-3"
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="email" className="mb-2 block font-semibold">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className="w-full rounded border border-gray-400 py-2 px-3"
-          required
-        />
+      <div className="grid my-3">
+          <span className="text-left font-medium">Choose a Showing</span>
+          <select
+            value={show}
+            onChange={(event) => setShow(event.target.value)}
+            className="h-fit rounded border border-gray-400 bg-gray-50 px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          >
+            {formattedShowings.map((show) => (
+              <option key={show}>{show}</option>
+            ))}
+          </select>
       </div>
       <div className="mb-4">
         <label htmlFor="seats" className="mb-2 block font-semibold">
@@ -66,12 +58,14 @@ const BookTicketForm: React.FC<Props> = ({ movie }) => {
           required
         />
       </div>
-      <button
-        type="submit"
-        className="rounded bg-green-500 px-4 py-2 font-semibold text-white hover:bg-green-600"
-      >
-        Book {seats} seat(s)
-      </button>
+      <Link href={"/orderHistory"}> // pass show id thru link
+        <button
+          type="submit"
+          className="rounded bg-green-500 px-4 py-2 font-semibold text-white hover:bg-green-600"
+        >
+          Book {seats} seat(s)
+        </button>
+      </Link>
     </form>
   );
 };

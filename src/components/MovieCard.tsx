@@ -105,7 +105,7 @@ const MovieCard = ({ movie, showings }) => {
         contentLabel="Book Ticket Modal"
         style={customStyles}
       >
-        <BookTicketForm movie={movie} closeModal={closeModal} />
+        <BookTicketForm movie={movie} closeModal={closeModal} showings={showings} />
       </Modal>
     </div>
   );

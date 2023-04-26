@@ -7,7 +7,7 @@ const MovieCard = ({ movie, showings }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  console.log(showings)
+  console.log(showings);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -22,9 +22,9 @@ const MovieCard = ({ movie, showings }) => {
   };
 
   function formatShowings() {
-    var formattedString = ''
+    var formattedString = "";
     for (var show of showings) {
-      formattedString += (show.toString()).split('G')[0]+'  •  '
+      formattedString += show.toString().split("G")[0] + "  •  ";
     }
     return formattedString;
   }
@@ -61,12 +61,12 @@ const MovieCard = ({ movie, showings }) => {
         <h6 className="m-3 text-lg font-semibold tracking-tight text-slate-600">
           {movie.rating}
         </h6>
-        {isExpanded && <button
+        <button
           className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
           onClick={openModal}
         >
           Book a ticket
-        </button>}
+        </button>
         <button
           className="relative top-0 right-0 my-3.5 mx-4 rounded border border-black bg-zinc-200 px-3 py-1 hover:bg-zinc-400"
           onClick={toggleExpansion}
@@ -94,9 +94,11 @@ const MovieCard = ({ movie, showings }) => {
           <p className="my-2">
             <strong>Synopsis:</strong> {movie.synopsis}
           </p>
-          {showings.length != 0  && <p className="my-2">
-            <strong>Showings:</strong> {formatShowings()}
-          </p>}
+          {showings.length != 0 && (
+            <p className="my-2">
+              <strong>Showings:</strong> {formatShowings()}
+            </p>
+          )}
         </div>
       )}
       <Modal

@@ -289,6 +289,32 @@ export const bookingRouter = createTRPCRouter({
         }
         return seatInShows;
       }),
+    getOccupiedSeats: publicProcedure
+      .input(
+        z.object({
+          showId: z.string().min(1),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const seatInShows = await ctx.prisma.seatInShow.findMany({
+          where: {
+            showId: input.showId
+          },
+          include: {
+            seat: true,
+          },
+        })
+        if (!seatInShows) {
+          return [];
+        }
+        const occupiedSeats = seatInShows.filter((seatInShow) => seatInShow.isOccupied);
+
+        return occupiedSeats.map((seatInShow) => ({
+          seatNumber: seatInShow.seatNumber,
+          showRoomId: seatInShow.seat.showRoomId,
+        })
+        );
+    }),
     getAllUserBookings: publicProcedure // used when getting all bookings on booking page
       .input(
         z.object({
@@ -350,4 +376,49 @@ export const bookingRouter = createTRPCRouter({
             console.log(show?.showRoomId)
             return show?.showRoomId
         }),
+      getTotalPrice: publicProcedure
+      .input(
+        z.object({
+          tickets: z.array(
+            z.object({
+              id: z.string(),
+              price: z.number(),
+              type: z.enum(['CHILD', 'ADULT', 'SENIOR']),
+              showId: z.string(),
+              seatNumber: z.number(),
+            })
+          ),
+        })
+      )
+      .mutation(async ({ ctx, input}) => {
+        const {tickets} = input
+        const bookingFee = 1;
+        const tax = 0.1;
+
+        // Calculate the total price
+        const ticketTotal = tickets.reduce((acc, ticket) => acc + ticket.price, 0);
+        let totalPrice = ticketTotal + bookingFee;
+
+        const totalTax = totalPrice * tax;
+        totalPrice = totalTax + totalPrice;
+
+        return totalPrice;
+      }),
+      getNumberOfSeatsInShowRoom: publicProcedure
+      .input(
+        z.object({
+          showingId: z.string(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const {showingId} = input
+        const numberOfSeats = await prisma.show.findUnique({
+          where: { id: showingId },
+          select: {
+            showRoom: { select: { numberOfSeats: true } }
+          }
+        })
+        console.log(numberOfSeats)
+        return numberOfSeats;
+      }),
 });

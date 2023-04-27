@@ -13,8 +13,12 @@ const ManageUsers = () => {
       setError(true)
     } else {
       console.log(email)
-      await suspend.mutateAsync({ email: email })
-      alert(`${email} has been suspended!`)
+      try {
+        await suspend.mutateAsync({ email: email })
+        alert(`${email} has been suspended!`)
+      } catch {
+        alert(`Error suspending ${email}. Try again in a minute.`)
+      }
     }
   }
 
@@ -23,8 +27,12 @@ const ManageUsers = () => {
       setError(true)
     } else {
       console.log(email)
-      await unSuspend.mutateAsync({ email: email })
-      alert(`${email} has been unsuspended!`)
+      try {
+        await unSuspend.mutateAsync({ email: email })
+        alert(`${email} has been unsuspended!`)
+      } catch {
+        alert(`Error unsuspending ${email}. Try again in a minute.`)
+      }
     }
   }
 

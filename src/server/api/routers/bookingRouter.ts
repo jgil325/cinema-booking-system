@@ -220,7 +220,7 @@ export const bookingRouter = createTRPCRouter({
         });
       }
 
-      const showTitle = show?.Movie?.title;
+      const showTitle = show.Movie.title;
       // TODO: MAKE SURE THAT A BOOKING CANNOT BE DOUBLE CREATED
       // Create the booking
 
@@ -268,12 +268,26 @@ export const bookingRouter = createTRPCRouter({
           },
         });
         const email = session.user.email;
+
+        const seatsList = []
+        let ticketSeats
+        for (ticketSeats of tickets) {
+          seatsList.push(ticketSeats.seatNumber)
+        }
+        const seatListString = seatsList.join(',');
+        const showDataString = show?.showTime.toString() ?? '';
+
         const mailOptions = {
           from: process.env.MAIL_USER,
           to: email,
           subject: "Movie Booking Confirmation",
           html: `Thank you for choosing to book with Cinema E-Booking.\n
             Booking ID: ${booking.id}\n
+            Show Title: ${showTitle}\n
+            Show Date: ${showDataString}\n
+            Tickets: ${seatListString}\n
+            Total Cost: ${totalPrice}\n
+
             `, // TODO: Need to add this functionality
         };
 

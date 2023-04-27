@@ -292,7 +292,7 @@ export const bookingRouter = createTRPCRouter({
     getOccupiedSeats: publicProcedure
       .input(
         z.object({
-          showId: z.string().min(1),
+          showId: z.string(),
         })
       )
       .query(async ({ ctx, input }) => {

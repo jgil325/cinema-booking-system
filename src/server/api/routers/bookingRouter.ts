@@ -131,7 +131,7 @@ export const bookingRouter = createTRPCRouter({
             seatNumber: z.number(),
           })
         ),
-        paymentCardId: z.string(),
+        paymentCardNumber: z.string(), // USE CARD NUMBER
         promoCode: z.string().optional(),
       })
     )
@@ -142,7 +142,7 @@ export const bookingRouter = createTRPCRouter({
           code: "UNAUTHORIZED",
           message: "Must be logged in to book a ticket",
         });
-      const { tickets, paymentCardId, promoCode } = input;
+      const { tickets, paymentCardNumber, promoCode } = input;
       const bookingFee = 1;
       const tax = 0.1;
 
@@ -153,9 +153,13 @@ export const bookingRouter = createTRPCRouter({
       );
       let totalPrice = ticketTotal + bookingFee;
 
-      const paymentCard = await prisma.paymentCard.findUnique({
+      const buf = Buffer.from(paymentCardNumber, 'utf8');
+      const encodedCard = (buf.toString('base64')).toString()
+
+      const paymentCard = await prisma.paymentCard.findFirst({
         where: {
-          id: paymentCardId,
+          cardNumber: encodedCard,
+          userId: session.user.id,
         },
         include: {
           User: true,
@@ -163,7 +167,9 @@ export const bookingRouter = createTRPCRouter({
       });
 
       if (!paymentCard) {
-        throw new Error(`Payment card with id ${paymentCardId} not found`);
+        throw new Error(`Payment card with id ${paymentCardNumber} not found`);
+      } else {
+        console.log(paymentCard.cardNumber)
       }
 
       if (paymentCard.userId !== session.user?.id) {
@@ -217,9 +223,22 @@ export const bookingRouter = createTRPCRouter({
       const showTitle = show?.Movie?.title;
       // TODO: MAKE SURE THAT A BOOKING CANNOT BE DOUBLE CREATED
       // Create the booking
+
+      // Decrypt
+      // for (var card of cards) {
+      //   //console.log(card.cardNumber)
+      //   var encryptedCardNumber = card.cardNumber;
+      //   var buf = Buffer.from(encryptedCardNumber, 'base64');
+      //   var de = buf.toString('utf8')
+      //   card.cardNumber = de
+      // }
+
+      // encrypt
+      // const buf = Buffer.from(cardNumber, 'utf8');
+      //   const encodedCard = (buf.toString('base64')).toString()
       const booking = await prisma.booking.create({
         data: {
-          cardNumber: paymentCard.cardNumber, // TODO: Add correct procedure to use the cardnumber
+          cardNumber: paymentCard.cardNumber,
           showDate: show.showTime,
           showTitle: showTitle,
           tax: totalTax,

@@ -186,6 +186,14 @@ model Promotion {
   endDate     DateTime
 }
 
+model Fees {
+  id          String   @id @default(cuid())
+  bookingFee  Float
+  adultFee    Float
+  childFee    Float
+  seniorFee   Float  
+}
+
 enum StatusType {
   ACTIVE
   INACTIVE

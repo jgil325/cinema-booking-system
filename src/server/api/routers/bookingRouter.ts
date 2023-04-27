@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { TRPCError } from '@trpc/server';
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure} from "../trpc";
 import { prisma } from "../../db";
-import { Booking, TicketType } from "@prisma/client";
+import { TicketType } from "@prisma/client";
 import nodemailer from "nodemailer";
 
 export const bookingRouter = createTRPCRouter({
@@ -198,16 +198,20 @@ export const bookingRouter = createTRPCRouter({
       if (showId) {
         show = await prisma.show.findFirst({
           where: { id: showId },
-
+          include: {
+            Movie: true
+          },
         });
       }
+
+      const showTitle = show?.Movie?.title
       // TODO: MAKE SURE THAT A BOOKING CANNOT BE DOUBLE CREATED
       // Create the booking
       const booking = await prisma.booking.create({
           data: {
               cardNumber: paymentCard.cardNumber, // TODO: Add correct procedure to use the cardnumber
               showDate: show.showTime,
-              showTitle: "BRUH", // TODO: Get to correct showTitle
+              showTitle: showTitle,
               tax: totalTax,
               totalPrice: totalPrice,
               ticketTotal: ticketTotal,
@@ -241,8 +245,7 @@ export const bookingRouter = createTRPCRouter({
             subject: 'Movie Booking Confirmation',
             html: `Thank you for choosing to book with Cinema E-Booking.\n
             Booking ID: ${booking.id}\n
-            `,// Need to add this functionality
-            
+            `,// TODO: Need to add this functionality
         };
         
         transporter.sendMail(mailOptions, function(error: any, info: { response: any; }) {
@@ -254,7 +257,8 @@ export const bookingRouter = createTRPCRouter({
         });
         return {
             message: 'successfully sent email!',
-            email: email
+            email: email,
+            booking: booking,
         }
     } catch {
         return new TRPCError({
@@ -264,63 +268,10 @@ export const bookingRouter = createTRPCRouter({
     }      
       return booking // Find a better place for this
     }),
+    // Potential add cancel booking 
+    // Checks for booking id
+    // Detel tickets and seats marked as occupied 
     // cancelBooking: protectedProcedure 
-    // // Added this functionality as a cancel button so if the user decides to not pay they can cancel their booking
-    // .input(
-    //   z.object({
-    //     bookingId: z.string(),
-    //   })
-    // )
-    // .mutation(async ({ ctx, input }) => {
-    //   const { bookingId } = input;
-
-    //   const booking = await prisma.booking.findUnique({
-    //     where: {
-    //       id: bookingId,
-    //     },
-    //     include: {
-    //       tickets: true,
-    //     },
-    //   });
-
-    //   if (!booking) {
-    //     throw new Error(`Booking with id ${bookingId} not found`);
-    //   }
-
-    //   if (booking.isPaymentComplete) {
-    //     throw new Error(`Booking with id ${bookingId} has already been paid and cannot be canceled`);
-    //   }
-
-    //   // Delete tickets and mark seats as not occupied
-    //   for (const ticket of booking.tickets) {
-    //     await prisma.ticket.delete({
-    //       where: {
-    //         id: ticket.id,
-    //       },
-    //     });
-
-    //     await prisma.seatInShow.update({
-    //       where: {
-    //         showId_seatNumber: {
-    //           showId: booking.showId,
-    //           seatNumber: ticket.seatNumber,
-    //         },
-    //       },
-    //       data: {
-    //         isOccupied: false,
-    //       },
-    //     });
-    //   }
-
-    //   // Delete booking
-    //   await prisma.booking.delete({
-    //     where: {
-    //       id: bookingId,
-    //     },
-    //   });
-
-    //   return true;
-    // }),
     getShowingSeats: publicProcedure // returns rows from SeatInShow with matching showId numbers
       .input(
         z.object({

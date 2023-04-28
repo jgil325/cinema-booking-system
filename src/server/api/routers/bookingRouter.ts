@@ -307,8 +307,8 @@ export const bookingRouter = createTRPCRouter({
             Booking ID: ${booking.id}\n
             Show Title: ${showTitle}\n
             Show Date: ${showDataString}\n
-            Tickets: ${seatListString}\n
-            Total Cost: ${totalPrice}\n
+            Ticket(s): ${seatListString}\n
+            Total Cost: $${totalPrice.toFixed(2)}\n
 
             `, // TODO: Need to add this functionality
         };

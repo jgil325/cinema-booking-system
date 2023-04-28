@@ -1,9 +1,12 @@
 import type { Ticket } from "@prisma/client";
 import React, { useState } from "react";
+import { api } from "../../utils/api";
 
 const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
   const [paymentCardNumber, setPaymentCardNumber] = useState("");
   const [promoCode, setPromoCode] = useState("");
+
+  const { data: cards } = api.paymentCard.byId.useQuery();
 
   const handlePaymentCardNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -43,6 +46,26 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
           ))}
         </tbody>
       </table>
+      {cards && cards.length > 0 && (
+        <div className="mt-4">
+          <span className="font-medium">
+            Use one of your already existing cards
+          </span>
+
+          <div className="flex">
+            {cards.map((card) => {
+              return (
+                <button
+                  className="rounded border bg-gray-300 px-1"
+                  key={card.id}
+                >
+                  Card Ending In {card.cardNumber.slice(-4)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="mt-8">
         <label htmlFor="paymentCardNumber" className="block font-bold">

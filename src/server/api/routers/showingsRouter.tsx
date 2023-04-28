@@ -49,7 +49,7 @@ export const showingsRouter = createTRPCRouter({
                             showTime: input.showTime,
                             showDurationMinutes: 120, // default value, not sure if keeping
                             movieId: input.movieId,
-                            showRoomId: 'temp' // no showRoomId yet
+                            showRoomId: 'theaterone' // no showRoomId yet
                         }
                     });
                     if (newShow) {

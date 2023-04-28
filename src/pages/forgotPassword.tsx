@@ -59,7 +59,7 @@ const ForgotPassword = () => {
                 type="text"
                 id="email"
                 placeholder="Email Address"
-                value=""
+                defaultValue=""
                 onChange={(e) => setEmail(e.target.value)}
               />
               <button

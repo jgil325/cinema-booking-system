@@ -62,7 +62,7 @@ const Home: NextPage = () => {
                       <MovieCard
                         movie={movie}
                         shows={showings?.filter(
-                          (show) => (show.movieId === movie.id)
+                          (show) => show.movieId === movie.id
                         )}
                         key={`MovieCard-${movie.id}`}
                       />
@@ -81,7 +81,7 @@ const Home: NextPage = () => {
                       <MovieCard
                         movie={movie}
                         shows={showings?.filter(
-                          (show) => (show.movieId === movie.id)
+                          (show) => show.movieId === movie.id
                         )}
                         key={`MovieCard-${movie.id}`}
                       />
@@ -92,10 +92,6 @@ const Home: NextPage = () => {
             )}
           </>
         )}
-
-        <div className="mt-10 bg-gray-200 py-8 text-center">
-          © 2023 Cinema EBooking System. All rights reserved.
-        </div>
       </main>
     </>
   );

@@ -35,8 +35,8 @@ const SignIn = () => {
     }
   }
   return (
-    <div className="absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 transform">
-      <div className="flex justify-center">
+    <div className="flex w-full justify-center py-8">
+      <div className="flex w-full justify-center">
         <div className="border-grey grid w-1/3 grid-cols-1 items-center justify-center space-y-3 rounded-xl border px-12 py-8 text-center">
           <span className="text-2xl font-medium">Sign In</span>
           <input

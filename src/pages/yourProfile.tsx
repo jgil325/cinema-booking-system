@@ -47,11 +47,11 @@ const Page = () => {
     createNewCard({
       cardNumber: "4274904744200811",
       cardType: "VISA",
-      billingAddress: "1234 Street",
+      billingAddress: "Your Street (Please fill out form to save card)",
       expirationMonth: 1,
       expirationYear: 2025,
-      billingCity: "City",
-      billingState: "State",
+      billingCity: "Your City (Please fill out form to save card)",
+      billingState: "GA",
       billingZipCode: "00000",
       userId: user?.id || "",
     });

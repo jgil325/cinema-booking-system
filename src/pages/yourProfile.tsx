@@ -218,12 +218,20 @@ const MyProfile = ({ user }: { user: User }) => {
     [debouncedSavePhoneNumber]
   );
 
-  const { mutate: changePassword } =
+  const { mutateAsync: changePassword } =
     api.editProfile.changePassword.useMutation();
-  const handleChangePassword = () => {
+  const handleChangePassword = async() => {
     if (newPassword.localeCompare(newPassConfirm) !== 0)
       return window.alert("New Passwords Do Not Match");
-    changePassword({ newPassword, oldPassword });
+    try {
+      await changePassword({ newPassword, oldPassword });
+      setNewPassConfirm('')
+      setOldPassword('')
+      setNewPassword('')
+      alert('Successfully changed password!')
+    } catch {
+      alert('Issue updating your password.')
+    }
   };
 
   const { mutate: changePromoStatus } = 

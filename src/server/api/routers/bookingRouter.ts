@@ -400,6 +400,13 @@ export const bookingRouter = createTRPCRouter({
         return [];
       }
       // decrypt payment card info
+      for (var book of allBookings) {
+        //console.log(card.cardNumber)
+        var encryptedCardNumber = book.cardNumber;
+        var buf = Buffer.from(encryptedCardNumber, 'base64');
+        var de = buf.toString('utf8')
+        book.cardNumber = de
+      }
       return allBookings;
     }),
   getBookingByID: publicProcedure // used to find user's new booking on order confirmation page

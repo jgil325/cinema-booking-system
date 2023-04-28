@@ -124,7 +124,7 @@ const Page = () => {
                     key={card.id}
                     onClick={() => setSelectedCard(card)}
                   >
-                    Card {index}
+                    Card {`(${(card.cardNumber).substring(12)})`}
                   </button>
                 );
               })}

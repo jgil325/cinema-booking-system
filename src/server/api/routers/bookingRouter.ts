@@ -102,14 +102,14 @@ export const bookingRouter = createTRPCRouter({
         }
 
         // Check if a ticket already exists for this seatNumber
-        const checkTicket = await prisma.ticket.findFirst({
+        /*const checkTicket = await prisma.ticket.findFirst({
           where: {
             seatNumber: seatNumber,
           },
-        });
+        });*/
 
-        if (checkTicket) {
-          tickets.push(checkTicket);
+        if (false) {
+          //tickets.push(checkTicket);
         } else {
           // Create the ticket
           const ticket = await prisma.ticket.create({

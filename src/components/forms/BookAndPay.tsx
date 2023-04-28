@@ -1,16 +1,38 @@
-import {  type Ticket } from "@prisma/client";
+import { type Ticket } from "@prisma/client";
 import React, { useState } from "react";
 import { api } from "../../utils/api";
 
 const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
+  const getBookingFee = api.fees.getAllFees.useQuery();
+  var price = getBookingFee.data?.bookingFee;
+  const tax = 1.1;
+  var total = price * tax;
   const [paymentCardNumber, setPaymentCardNumber] = useState("");
+  const [paymentCardMonth, setPaymentCardMonth] = useState("");
+  const [paymentCardYear, setPaymentCardYear] = useState("");
   const [promoCode, setPromoCode] = useState("");
+  const [totalPrice, setTotalPrice] = useState(total);
+
   const { data: cards } = api.paymentCard.byId.useQuery();
+  const getPromo = api.promos.byCode.useMutation();
+
+  console.log(cards);
+
   const { mutate, data: booking } = api.booking.bookAndPay.useMutation();
   const handlePaymentCardNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setPaymentCardNumber(event.target.value);
+  };
+  const handlePaymentCardMonthChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPaymentCardMonth(event.target.value);
+  };
+  const handlePaymentCardYearChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPaymentCardYear(event.target.value);
   };
 
   const handlePromoCodeChange = (
@@ -19,9 +41,31 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
     setPromoCode(event.target.value);
   };
 
+  const handlePromoCode = async () => {
+    console.log(promoCode);
+    try {
+      const foundPromo = await getPromo.mutateAsync({ code: promoCode });
+      console.log(foundPromo);
+      var price = totalPrice;
+      setTotalPrice(price * foundPromo.discount);
+    } catch {
+      alert(`No promo was found by code: ${promoCode}`);
+    }
+  };
+
+  const setCardDetails = (card) => {
+    setPaymentCardNumber(card.cardNumber);
+    setPaymentCardMonth(card.expirationMonth);
+    setPaymentCardYear(card.expirationYear);
+  };
+
   const handlePayNowClick = () => {
-    // TODO: handle payment logic here
-    mutate({ tickets, paymentCardNumber, promoCode });
+    try {
+      mutate({
+        tickets: tickets,
+        paymentCardNumber: paymentCardNumber,
+      });
+    } catch {}
   };
 
   if (booking) {
@@ -56,16 +100,20 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
             ))}
           </tbody>
         </table>
-        <div>Total Price of Tickets: {booking?.booking?.ticketTotal}</div>
+        <div>Total Price of Tickets: ${booking?.booking?.ticketTotal.toFixed(2)}</div>
 
-        <div>Tax: {booking?.booking?.tax}</div>
+        <div>Tax: {booking?.booking?.tax.toFixed(2)}</div>
         {booking?.booking?.promoDiscount > 0 && (
-          <div>PromoDiscount: -{booking?.booking?.promoDiscount}</div>
+          <div>PromoDiscount: $-{booking?.booking?.promoDiscount.toFixed(2)}</div>
         )}
-        <div>TotalPrice: {booking?.booking?.totalPrice}</div>
+        <div>TotalPrice: ${booking?.booking?.totalPrice.toFixed(2)}</div>
       </div>
     );
   }
+    let calculatedTotal = 0;
+  tickets.forEach((ticket) => {
+    calculatedTotal += ticket.price;
+  });
   return (
     <div>
       <h1 className="text-center font-bold">Book And Pay</h1>
@@ -88,6 +136,10 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
           ))}
         </tbody>
       </table>
+      <div>Tickets: ${calculatedTotal.toFixed(2)}</div>
+      <div>Booking Free: $2.50</div>
+      <div>Tax: ${((calculatedTotal + 2.5) / 10).toFixed(2)}</div>
+      <div>Total Price: ${((calculatedTotal + 2.5) * 1.1).toFixed(2)}</div>
       {cards && cards.length > 0 && (
         <div className="mt-4">
           <span className="font-medium">
@@ -100,7 +152,9 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
                 <button
                   className="rounded border bg-gray-300 px-1"
                   key={card.id}
-                  onClick={() => setPaymentCardNumber(card.cardNumber)}
+                  onClick={() => {
+                    setCardDetails(card);
+                  }}
                 >
                   Card Ending In {card.cardNumber.slice(-4)}
                 </button>
@@ -122,6 +176,30 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
           className="w-full rounded-md border border-gray-400 p-2"
         />
       </div>
+      <div className="mt-4">
+        <label htmlFor="paymentCardNumber" className="block font-bold">
+          Payment Card Month
+        </label>
+        <input
+          type="text"
+          id="paymentCardNumber"
+          value={paymentCardMonth}
+          onChange={handlePaymentCardMonthChange}
+          className="w-full rounded-md border border-gray-400 p-2"
+        />
+      </div>
+      <div className="mt-4">
+        <label htmlFor="paymentCardNumber" className="block font-bold">
+          Payment Card Year
+        </label>
+        <input
+          type="text"
+          id="paymentCardNumber"
+          value={paymentCardYear}
+          onChange={handlePaymentCardYearChange}
+          className="w-full rounded-md border border-gray-400 p-2"
+        />
+      </div>
 
       <div className="mt-8">
         <label htmlFor="promoCode" className="block font-bold">
@@ -135,6 +213,12 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
           className="w-full rounded-md border border-gray-400 p-2"
         />
       </div>
+      <button
+        onClick={handlePromoCode}
+        className="mt-8 rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+      >
+        Enter Promo Code
+      </button>
 
       <button
         onClick={handlePayNowClick}

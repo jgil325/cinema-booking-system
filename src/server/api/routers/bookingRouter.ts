@@ -72,21 +72,30 @@ export const bookingRouter = createTRPCRouter({
         }
       }
 
-      const tickets = [];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const fees = await ctx.prisma.fees.findUnique({
+        where: {
+          id: "masterFees",
+        },
+      });
+      if (!fees) {
+        throw new Error('Fees not found');
+      }
 
+      const tickets = [];
       for (const seat of seats) {
         const { seatNumber, seatType } = seat;
 
-        let ticketPrice;
+        let ticketPrice = 0;
         switch (seatType) {
           case TicketType.CHILD:
-            ticketPrice = 5;
+            ticketPrice = fees.childFee;
             break;
           case TicketType.ADULT:
-            ticketPrice = 15;
+            ticketPrice = fees.adultFee;
             break;
           case TicketType.SENIOR:
-            ticketPrice = 10;
+            ticketPrice = fees.seniorFee;
             break;
           default:
             throw new Error(`Invalid ticket type: ${seatType}`);
@@ -143,8 +152,21 @@ export const bookingRouter = createTRPCRouter({
           message: "Must be logged in to book a ticket",
         });
       const { tickets, paymentCardNumber, promoCode } = input;
-      const bookingFee = 1;
+      let bookingFee = 0;
       const tax = 0.1;
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const fees = await ctx.prisma.fees.findUnique({
+        where: {
+          id: "masterFees",
+        },
+      });
+      if (!fees) {
+        throw new Error('Fees not found');
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      bookingFee = fees.bookingFee
 
       // Calculate the total price
       const ticketTotal = tickets.reduce(

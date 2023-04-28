@@ -19,11 +19,12 @@ const Navbar = () => {
       <div className="align-end mr-6 flex flex-row justify-between space-x-6">
         <div className="gap-30 flex flex-row space-x-8">
           <Link href={"/"}>
-            <FontAwesomeIcon
-              icon={faFilm}
-              size="3x"
-              className="ml-6 mt-3 text-white hover:cursor-pointer hover:text-sky-200"
-            />
+            <div className="ml-6 mt-3 text-white w-12 fa-xl">
+              <FontAwesomeIcon
+                icon={faFilm}
+                className="hover:cursor-pointer hover:text-sky-200"
+              />
+            </div>
           </Link>
           {/* <Link href={"/"}>
             <button className="my-4 rounded bg-sky-50 py-2 px-4 font-bold text-black hover:bg-sky-200">

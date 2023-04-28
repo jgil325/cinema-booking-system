@@ -95,28 +95,31 @@ const MovieCard = ({
           <p className="my-2">
             <strong>Synopsis:</strong> {movie.synopsis}
           </p>
-          <p className="my-2">
-            <strong>Showings:</strong>
-          </p>
-
-          <div className="grid grid-cols-2">
-            {shows?.map((show) => {
-              return (
-                <div
-                  className="font-sm my-1 mx-1 flex justify-between rounded bg-gray-300 px-1 text-sm"
-                  key={show.id}
-                >
-                  {show.showTime.toLocaleString("en-us", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                </div>
-              );
-            })}
-          </div>
+          {shows && shows.length > 0 && (
+            <div>
+              <p className="my-2">
+              <strong>Showings:</strong>
+              </p>
+              <div className="grid grid-cols-2">
+                {shows?.map((show) => {
+                  return (
+                    <div
+                      className="font-sm my-1 mx-1 flex justify-between rounded bg-gray-300 px-1 text-sm"
+                      key={show.id}
+                    >
+                      {show.showTime.toLocaleString("en-us", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </div>
+                  );
+              })}
+              </div>
+            </div>
+          )}
         </div>
       )}
       <Modal

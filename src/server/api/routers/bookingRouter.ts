@@ -177,28 +177,29 @@ export const bookingRouter = createTRPCRouter({
 
       const buf = Buffer.from(paymentCardNumber, 'utf8');
       const encodedCard = (buf.toString('base64')).toString()
+      const paymentCard = encodedCard
 
-      const paymentCard = await prisma.paymentCard.findFirst({
-        where: {
-          cardNumber: encodedCard,
-          userId: session.user.id,
-        },
-        include: {
-          User: true,
-        },
-      });
+      // const paymentCard = await prisma.paymentCard.findFirst({
+      //   where: {
+      //     cardNumber: encodedCard,
+      //     userId: session.user.id,
+      //   },
+      //   include: {
+      //     User: true,
+      //   },
+      // });
 
-      if (!paymentCard) {
-        throw new Error(`Payment card with id ${paymentCardNumber} not found`);
-      } else {
-        console.log(paymentCard.cardNumber)
-      }
+      // if (!paymentCard) {
+      //   throw new Error(`Payment card with id ${paymentCardNumber} not found`);
+      // } else {
+      //   console.log(paymentCard.cardNumber)
+      // }
 
-      if (paymentCard.userId !== session.user?.id) {
-        console.log(paymentCard.userId);
-        console.log(session.user?.id);
-        throw new Error(`You don't have permission to use this payment card`);
-      }
+      // if (paymentCard.userId !== session.user?.id) {
+      //   console.log(paymentCard.userId);
+      //   console.log(session.user?.id);
+      //   throw new Error(`You don't have permission to use this payment card`);
+      // }
 
       let promotionDiscount = 0;
       if (promoCode) {
@@ -260,7 +261,7 @@ export const bookingRouter = createTRPCRouter({
       //   const encodedCard = (buf.toString('base64')).toString()
       const booking = await prisma.booking.create({
         data: {
-          cardNumber: paymentCard.cardNumber,
+          cardNumber: paymentCard, // paymentCard.cardNumber
           showDate: show.showTime,
           showTitle: showTitle,
           tax: totalTax,
@@ -307,7 +308,7 @@ export const bookingRouter = createTRPCRouter({
             Booking ID: ${booking.id}\n
             Show Title: ${showTitle}\n
             Show Date: ${showDataString}\n
-            Ticket(s): ${seatListString}\n
+            Seats(s): ${seatListString}\n
             Total Cost: $${totalPrice.toFixed(2)}\n
 
             `, // TODO: Need to add this functionality

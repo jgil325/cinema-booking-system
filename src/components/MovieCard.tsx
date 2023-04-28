@@ -63,8 +63,8 @@ const MovieCard = ({
           width={384}
         />
       </div>
-      <div className="relative min-h-[40px] bg-zinc-100">
-        <h3 className="mx-3 text-3xl font-semibold tracking-tight text-black">
+      <div className="relative min-h-[40px] bg-zinc-100 pt-5">
+        <h3 className="mx-3 min-h-[70px] text-3xl font-semibold tracking-tight text-black">
           {movie.title}
         </h3>
         <h6 className="m-3 text-lg font-semibold tracking-tight text-slate-600">

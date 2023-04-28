@@ -3,6 +3,8 @@ import Modal from "react-modal";
 import BookTicketForm from "./forms/BookTicketForm";
 import type { Movie, Show } from "@prisma/client";
 import { Root, Trigger, Portal, Content } from "@radix-ui/react-popover";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 const MovieCard = ({
   movie,
@@ -14,7 +16,11 @@ const MovieCard = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const modalParentRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { data: session } = useSession();
+
   const openModal = () => {
+    if (!session?.user) void router.push("/signIn");
     setIsModalOpen(true);
   };
 
@@ -83,7 +89,7 @@ const MovieCard = ({
           </Trigger>
           <Portal>
             <Content>
-              <div className="bg-white px-4 pb-4 border border-black rounded mt-1 w-96">
+              <div className="mt-1 w-96 rounded border border-black bg-white px-4 pb-4">
                 <p className="my-2">
                   <strong>Category:</strong> {movie.category}
                 </p>

@@ -93,6 +93,9 @@ const Home: NextPage = () => {
           </>
         )}
       </main>
+      <div className="mt-10 w-full bg-gray-200 py-8 text-center">
+        © 2023 Cinema EBooking System. All rights reserved.
+      </div>
     </>
   );
 };

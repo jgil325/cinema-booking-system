@@ -47,11 +47,11 @@ const Page = () => {
     createNewCard({
       cardNumber: "4274904744200811",
       cardType: "VISA",
-      billingAddress: "1234 Street",
+      billingAddress: "Your Street (Please fill out form to save card)",
       expirationMonth: 1,
       expirationYear: 2025,
-      billingCity: "City",
-      billingState: "State",
+      billingCity: "Your City (Please fill out form to save card)",
+      billingState: "GA",
       billingZipCode: "00000",
       userId: user?.id || "",
     });
@@ -218,12 +218,20 @@ const MyProfile = ({ user }: { user: User }) => {
     [debouncedSavePhoneNumber]
   );
 
-  const { mutate: changePassword } =
+  const { mutateAsync: changePassword } =
     api.editProfile.changePassword.useMutation();
-  const handleChangePassword = () => {
+  const handleChangePassword = async() => {
     if (newPassword.localeCompare(newPassConfirm) !== 0)
       return window.alert("New Passwords Do Not Match");
-    changePassword({ newPassword, oldPassword });
+    try {
+      await changePassword({ newPassword, oldPassword });
+      setNewPassConfirm('')
+      setOldPassword('')
+      setNewPassword('')
+      alert('Successfully changed password!')
+    } catch (err) {
+      alert('Password must be 8 or more characters.')
+    }
   };
 
   const { mutate: changePromoStatus } = 

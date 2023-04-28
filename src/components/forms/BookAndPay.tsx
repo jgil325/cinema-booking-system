@@ -1,4 +1,4 @@
-import {  type Ticket } from "@prisma/client";
+import { type Ticket } from "@prisma/client";
 import React, { useState } from "react";
 import { api } from "../../utils/api";
 
@@ -66,10 +66,13 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
       </div>
     );
   }
+  let calculatedTotal = 0;
+  tickets.forEach((ticket) => {
+    calculatedTotal += ticket.price;
+  });
   return (
     <div>
       <h1 className="text-center font-bold">Book And Pay</h1>
-
       <table className="w-full table-fixed">
         <thead>
           <tr className="bg-gray-200 text-gray-700">
@@ -87,7 +90,11 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table>{" "}
+      <div>Tickets: {calculatedTotal}</div>
+      <div>Booking Free: 2.50</div>
+      <div>Tax: {(calculatedTotal + 2.5) / 10}</div>
+      <div>Total Price: {(calculatedTotal + 2.5) * 1.1}</div>
       {cards && cards.length > 0 && (
         <div className="mt-4">
           <span className="font-medium">
@@ -109,7 +116,6 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
           </div>
         </div>
       )}
-
       <div className="mt-8">
         <label htmlFor="paymentCardNumber" className="block font-bold">
           Payment Card Number
@@ -122,7 +128,6 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
           className="w-full rounded-md border border-gray-400 p-2"
         />
       </div>
-
       <div className="mt-8">
         <label htmlFor="promoCode" className="block font-bold">
           Promo Code (optional)
@@ -135,7 +140,6 @@ const BookAndPay = ({ tickets }: { tickets: Ticket[] }) => {
           className="w-full rounded-md border border-gray-400 p-2"
         />
       </div>
-
       <button
         onClick={handlePayNowClick}
         className="mt-8 rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"

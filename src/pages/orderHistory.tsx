@@ -36,6 +36,19 @@ const OrderHistory = () => {
     
     console.log(bookings)
 
+    const formatTickets = (booking) => {
+      const tickets = booking.tickets;
+      var formattedString = '';
+      if (tickets.length > 0) {
+        for (var ticket of tickets) {
+          formattedString += `Seat: ${ticket.seatNumber}   (${ticket.id})\n`
+        }
+      } else {
+        formattedString = 'N/A';
+      }
+      return formattedString.split('\n').map(str => <p>{str}</p>);
+    }
+
     return (
         <div>
             {bookingsExist ? (
@@ -55,8 +68,8 @@ const OrderHistory = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
                           Date/Time
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                          Ticket Number(s)
+                        <th className=" w-1/8 px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                          Seat Number(s)/Ticket Number(s)
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
                           Order Total
@@ -80,7 +93,7 @@ const OrderHistory = () => {
                               {(booking.showDate.toString()).split('G')[0]}
                             </td>
                             <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800">
-                              {"ticket id"}
+                              {formatTickets(booking)}
                             </td>
                             <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800">
                               {`$${booking.totalPrice}`}

@@ -229,8 +229,8 @@ const MyProfile = ({ user }: { user: User }) => {
       setOldPassword('')
       setNewPassword('')
       alert('Successfully changed password!')
-    } catch {
-      alert('Issue updating your password.')
+    } catch (err) {
+      alert('Password must be 8 or more characters.')
     }
   };
 

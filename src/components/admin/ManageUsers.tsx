@@ -17,7 +17,7 @@ const ManageUsers = () => {
         await suspend.mutateAsync({ email: email })
         alert(`${email} has been suspended!`)
       } catch {
-        alert(`Error suspending ${email}. Try again in a minute.`)
+        alert(`Error suspending ${email}. Could not find this user.`)
       }
     }
   }
@@ -31,7 +31,7 @@ const ManageUsers = () => {
         await unSuspend.mutateAsync({ email: email })
         alert(`${email} has been unsuspended!`)
       } catch {
-        alert(`Error unsuspending ${email}. Try again in a minute.`)
+        alert(`Error unsuspending ${email}. Could not find this user.`)
       }
     }
   }

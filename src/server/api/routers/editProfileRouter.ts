@@ -127,7 +127,7 @@ export const editProfileRouter = createTRPCRouter({
     changeFirstName: publicProcedure
         .input(
             z.object({
-                newFirstName: z.string()
+                newFirstName: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -158,7 +158,7 @@ export const editProfileRouter = createTRPCRouter({
     changeLastName: publicProcedure
         .input(
             z.object({
-                newLastName: z.string()
+                newLastName: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -220,8 +220,8 @@ export const editProfileRouter = createTRPCRouter({
     changePassword: publicProcedure
         .input(
             z.object({
-                newPassword: z.string(),
-                oldPassword: z.string()
+                newPassword: z.string().min(8),
+                oldPassword: z.string().min(8)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -270,7 +270,7 @@ export const editProfileRouter = createTRPCRouter({
         .input(
             z.object({
                 uid: z.string().min(1),
-                newPassword: z.string().min(1)
+                newPassword: z.string().min(8)
             }))
         .mutation(async ({ ctx, input }) => { 
             try {
@@ -302,7 +302,7 @@ export const editProfileRouter = createTRPCRouter({
     changeHomeStreet: publicProcedure
         .input(
             z.object({
-                newStreetName: z.string()
+                newStreetName: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -333,7 +333,7 @@ export const editProfileRouter = createTRPCRouter({
     changeHomeCity: publicProcedure
         .input(
             z.object({
-                newCityName: z.string()
+                newCityName: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -364,7 +364,7 @@ export const editProfileRouter = createTRPCRouter({
     changeHomeState: publicProcedure
         .input(
             z.object({
-                newStateName: z.string()
+                newStateName: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -426,8 +426,8 @@ export const editProfileRouter = createTRPCRouter({
     changeBillingAddress: publicProcedure
         .input(
             z.object({
-                newStreetName: z.string(),
-                cardId: z.string()
+                newStreetName: z.string().min(1),
+                cardId: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -467,8 +467,8 @@ export const editProfileRouter = createTRPCRouter({
     changeBillingCity: publicProcedure
         .input(
             z.object({
-                newCityName: z.string(),
-                cardId: z.string()
+                newCityName: z.string().min(1),
+                cardId: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -508,8 +508,8 @@ export const editProfileRouter = createTRPCRouter({
     changeBillingState: publicProcedure
         .input(
             z.object({
-                newStateName: z.string(),
-                cardId: z.string()
+                newStateName: z.string().min(1),
+                cardId: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -549,8 +549,8 @@ export const editProfileRouter = createTRPCRouter({
     changeBillingZipCode: publicProcedure
         .input(
             z.object({
-                newZipCode: z.string(),
-                cardId: z.string()
+                newZipCode: z.string().min(1),
+                cardId: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -591,7 +591,7 @@ export const editProfileRouter = createTRPCRouter({
         .input(
             z.object({
                 newCardType: z.nativeEnum(CardType),
-                cardId: z.string()
+                cardId: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -633,7 +633,7 @@ export const editProfileRouter = createTRPCRouter({
             z.object({
                 newCardExpirationMonth: z.number(),
                 newCardExpirationYear: z.number(),
-                cardId: z.string()
+                cardId: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {
@@ -691,7 +691,7 @@ export const editProfileRouter = createTRPCRouter({
         .input(
             z.object({
                 newCardNumber: z.string().length(16),
-                cardId: z.string()
+                cardId: z.string().min(1)
             }))
         .mutation(async ({ ctx, input }) => {
             try {

@@ -400,7 +400,31 @@ export const bookingRouter = createTRPCRouter({
         return [];
       }
       // decrypt payment card info
-      return allBookings;
+      for (var book of allBookings) {
+        //console.log(card.cardNumber)
+        var encryptedCardNumber = book.cardNumber;
+        var buf = Buffer.from(encryptedCardNumber, 'base64');
+        var de = buf.toString('utf8')
+        book.cardNumber = de
+      }
+      var fullBookings = []
+      for (var book of allBookings) {
+        var bookID = book.id
+        const tickets = await ctx.prisma.ticket.findMany({
+          where: {
+            bookingId: bookID
+          },
+          select: {
+            seatNumber: true,
+            id: true
+          }
+        });
+        const listTickets = {"tickets":tickets}
+        var combined = Object.assign({}, book, listTickets)
+        //console.log(combined)
+        fullBookings.push(combined)
+      }
+      return fullBookings;
     }),
   getBookingByID: publicProcedure // used to find user's new booking on order confirmation page
     .input(

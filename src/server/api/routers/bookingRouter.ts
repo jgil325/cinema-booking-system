@@ -407,6 +407,8 @@ export const bookingRouter = createTRPCRouter({
         var de = buf.toString('utf8')
         book.cardNumber = de
       }
+
+      
       return allBookings;
     }),
   getBookingByID: publicProcedure // used to find user's new booking on order confirmation page

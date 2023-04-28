@@ -159,8 +159,8 @@ const RegisterForm = () => {
         console.log(error.message)
         alert('Error: '+error.message)
       } else {
-        console.log('Unhandled Error, Please debug')
-        alert('Unhandled Error. Please debug')
+        console.log('Please enter all payment card details.')
+        alert('Please enter all payment card details.')
       }
     }
     return createAccountResult;

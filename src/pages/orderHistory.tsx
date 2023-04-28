@@ -96,7 +96,7 @@ const OrderHistory = () => {
                               {formatTickets(booking)}
                             </td>
                             <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800">
-                              {`$${booking.totalPrice}`}
+                              {`$${(booking.totalPrice).toFixed(2)}`}
                             </td>
                             <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800">
                               {'************'+(booking.cardNumber).substring(12)}
